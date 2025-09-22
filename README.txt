@@ -1,5 +1,5 @@
 Welcome to the Netflix and Coding README!!
-Coran McColm 24114365
+Coran McColm
 
 
 Here is some useful information for you.
