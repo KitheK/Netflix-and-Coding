@@ -2,4 +2,6 @@ Welcome to the Netflix and Coding README!!
 Coran McColm
 
 
-Here is some useful information for you.
+Kithe Kisia
+ this is the netflix and coding group project !!11!!
+just checking ts
