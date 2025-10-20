@@ -46,7 +46,6 @@ class Penalty:
         self.date_issued = datetime.now()
         self.status = "Active"
 
-
 class RefundRequest:
     def __init__(self, refund_id: int, order_id: int, reason: str):
         self.refund_id = refund_id

@@ -68,9 +68,3 @@ class CartItem:
     def __init__(self, product, quantity: int):
         self.product = product
         self.quantity = quantity
-    
-
-
-
-
-
