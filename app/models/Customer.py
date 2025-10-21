@@ -1,11 +1,11 @@
+from __future__ import annotations
 from datetime import datetime
 from typing import List, Optional, Dict, Any
-import hashlib
-import json
 from abc import ABC, abstractmethod
 from app.models.Users import User, UserRole, RefundStatus
-from app.models.Order import Order, OrderItem, RefundRequest, Review
-from __future__ import annotations
+from app.models.Order import Order, OrderItem, RefundRequest
+from app.models.Product import Review
+
 
 
 
@@ -39,22 +39,25 @@ class Customer(User):
    def request_refund(self, order_id, reason):
        refund_id = int(datetime.now().timestamp())  # generates unique refund ID
        return RefundRequest(refund_id, order_id, reason)
+   
 
-
+   #override dashboard for customer
+  # def view_dashboard(self):
+  #       return f"Viewing dashboard for {UserRole.CUSTOMER}"
 
 class Cart:
-   def __init__(self, customer_id:int):
+   def __init__(self, customer_id: int):
        self.customer_id = customer_id
-       self.items: List[CartItem] = []
+       self.items: List['CartItem'] = []
 
 
    def add_item(self, product, qty: int) -> None:
-       #Check if product already in cart
+       # Check if product already in cart
        for item in self.items:
            if item.product.product_id == product.product_id:
                item.quantity += qty
                return
-       #Add new item
+       # Add new item
        self.items.append(CartItem(product, qty))
 
 
@@ -62,11 +65,12 @@ class Cart:
        self.items = [item for item in self.items if item.product.product_id != product.product_id]
 
 
-   def calculate_total(self)-> float:
+   def calculate_total(self) -> float:
        return sum(item.product.price * item.quantity for item in self.items)
 
 
    def checkout(self):
+       # Convert CartItems to OrderItems
        order_items = [OrderItem(item.product, item.quantity, item.product.price) for item in self.items]
        order = Order(customer_id=self.customer_id, items=order_items)
        return order

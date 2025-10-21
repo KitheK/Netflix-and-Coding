@@ -1,6 +1,5 @@
 from app.models.Users import User, UserRole, RefundStatus
 from typing import List, Dict, Any
-from app.models.Customer import Cart
 from app.models.Order import Order, RefundRequest
 from datetime import datetime
 
@@ -24,10 +23,11 @@ class Admin(User):
        return msg
 
 
-   def apply_penalty(self, user_id, penalty) -> str:
-       msg = f"Penalty applied to user {user_id}: {penalty}"
-       print(msg)
-       return msg
+   def apply_penalty(self, penalty: 'Penalty') -> str:
+        msg = f"Penalty {penalty.penalty_id} applied to user {penalty.user_id}: {penalty.reason}"
+        print(msg)
+        return msg
+
 
 
    def resolve_dispute(self, dispute_id) -> str:
