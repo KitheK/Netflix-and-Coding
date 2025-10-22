@@ -1,4 +1,4 @@
-from app.models.Users import User, UserRole
+from app.models.User import User, UserRole
 from app.models.Product import Product
 from app.models.Admin import AnalyticsDashboard
 from typing import List

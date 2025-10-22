@@ -2,7 +2,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import List, Optional, Dict, Any
 from abc import ABC, abstractmethod
-from app.models.Users import User, UserRole, RefundStatus
+from app.models.User import User, UserRole, RefundStatus
 from app.models.Order import Order, OrderItem, RefundRequest
 from app.models.Product import Review
 

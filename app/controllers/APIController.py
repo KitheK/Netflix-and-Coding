@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from app.services.ProductService import ProductService
 
-router = APIRouter(prefix="/products", tags=["Products"])
+router = APIRouter(prefix="/api", tags=["API Controller"])
 product_service = ProductService()
 
 

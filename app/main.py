@@ -1,11 +1,11 @@
 from fastapi import FastAPI
-from app.routers import ProductRouter
+from app.controllers import APIController
 
 
 
 app = FastAPI(title = "Web Shopping Service")
 
-app.include_router(ProductRouter.router)
+app.include_router(APIController.router)
 
 
 app.get("/")

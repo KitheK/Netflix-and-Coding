@@ -1,8 +1,8 @@
-from app.repositories.ProductRepo import ProductRepository
+from app.repositories.FileProductRepository import FileProductRepository
 
 class ProductService:
     def __init__(self):
-        self.repo = ProductRepository("app/data/Products.json")
+        self.repo = FileProductRepository("app/data/Products.json")
 
     
     def get_all_products(self):

@@ -1,4 +1,4 @@
-from app.models.Users import User, UserRole, RefundStatus
+from app.models.User import User, UserRole, RefundStatus
 from typing import List, Dict, Any
 from app.models.Order import Order, RefundRequest
 from datetime import datetime
