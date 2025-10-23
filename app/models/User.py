@@ -1,8 +1,5 @@
-from enum import Enum
 from typing import List, Optional
-from datetime import datetime
 import hashlib
-import json
 from app.models.Enums import UserRole, OrderStatus, RefundStatus
 from abc import ABC, abstractmethod
 from typing import List
@@ -40,33 +37,9 @@ class User(ABC):
     def logout(self) -> None:
         print(f"{self.name} logged out.")
 
+
     @abstractmethod
 #not yet coded out the dashboard
 #The dashboard in this case refers to the custom landing page that the diffrent kinds of users will come to
     def view_dashboard(self):
-        pass
-
-"Abstract seller class"
-class Seller(User):
-    
-    def __init__(self, user_id: int, name: str, email: str, password_hash: str, analytics):
-        super().__init__(user_id, name, email, password_hash, UserRole.SELLER)
-        self.products = []
-        self.analytics = analytics
-
-    def add_product(self, product):
-        self.products.append(product)
-
-    def update_product(self, product_id, details):
-        for p in self.products:
-            if p.product_id == product_id:
-                p.__dict__.update(details)
-                print(f"Product {product_id} updated.")
-                return
-            print(f"Product {product_id} not found.")
-
-    def remove_product(self, product_id):
-        self.products = [p for p in self.products if p.product_id != product_id]
-        print(f"Product {product_id} removed.") 
-    def view_sales_report(self):
-        return self.analytics.generate_report(self.user_id)
+        return f"Viewing dashboard for {self.role.value}"

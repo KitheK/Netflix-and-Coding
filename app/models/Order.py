@@ -1,7 +1,5 @@
 from datetime import datetime
 from typing import List, Optional, Dict, Any
-import hashlib
-import json
 from abc import ABC, abstractmethod
 from app.models.Enums import OrderStatus, RefundStatus
 
@@ -9,7 +7,7 @@ from app.models.Enums import OrderStatus, RefundStatus
 
 
 class Order:
-   def __init__(self, customer_id: int, items: list):
+   def __init__(self, customer_id: int, items: List['OrderItem']):
        self.order_id = int(datetime.now().timestamp())
        self.customer_id = customer_id
        self.items = items
@@ -41,7 +39,7 @@ class OrderItem:
 
 
 class Receipt:
-   def __init__(self, order_id: int, items: list, total_amount: float):
+   def __init__(self, order_id: int, items: List['OrderItem'], total_amount: float):
        self.receipt_id = int(datetime.now().timestamp())
        self.order_id = order_id
        self.date_issued = datetime.now()
@@ -61,12 +59,15 @@ class Receipt:
 
 class RefundRequest:
    def __init__(self, refund_id: int, order_id: int, reason: str):
+       if not reason:
+           raise ValueError("Refund reason cannot be empty")
        self.refund_id = refund_id
        self.order_id = order_id
        self.reason = reason
        self.status = RefundStatus.REQUESTED
        self.date_requested = datetime.now()
   
+
    def approve(self) -> None:
        self.status = RefundStatus.APPROVED
        print(f"Refund {self.refund_id} approved")
