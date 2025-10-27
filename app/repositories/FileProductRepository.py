@@ -1,6 +1,7 @@
 from app.repositories.IProductRepository import IProductRepository
 from app.repositories.FileStorageManager import FileStorageManager
-from app.models.Product import Product, Review
+from app.models.Product import Product
+from app.models.Review import Review
 import json
 
 class FileProductRepository(IProductRepository):
