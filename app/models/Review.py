@@ -7,7 +7,6 @@ class Review:
         self.review_id = review_id
         self.user_id = user_id
         self.user_name = user_name
-        self.rating = rating
         self.title = title
         self.content = content
         self.date_posted = datetime.now().isoformat()
@@ -18,7 +17,6 @@ class Review:
             "review_id": self.review_id,
             "user_id": self.user_id,
             "user_name": self.user_name,
-            "rating": self.rating,
             "review_title": self.title,
             "review_content": self.content,
             "date_posted": self.date_posted
