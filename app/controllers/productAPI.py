@@ -39,7 +39,7 @@ def get_product(product_id: int):
 def create_product(product_data: ProductCreate):
     """Create a new product"""
     try:
-        product = product_service.create_product(product_data.dict())
+        product = product_service.create_product(product_data.model_dump())
         return product.to_dict()
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -49,7 +49,7 @@ def create_product(product_data: ProductCreate):
 def update_product(product_id: int, product_data: ProductUpdate):
     """Update an existing product"""
     try:
-        product = product_service.update_product(product_id, product_data.dict(exclude_unset=True))
+        product = product_service.update_product(product_id, product_data.model_dump(exclude_unset=True))
         return product.to_dict()
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))

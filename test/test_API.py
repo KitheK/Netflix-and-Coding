@@ -352,7 +352,7 @@ def test_product_id_string_handling(monkeypatch):
     
     # Test with non-numeric string ID
     resp = client.get("/api/products/abc")
-    assert resp.status_code == 404
+    assert resp.status_code == 422  # changed to type validation error
 
 def test_empty_database_scenario(monkeypatch):
     """Test behavior when no products exist"""
