@@ -1,1 +1,0 @@
-This is the README.md for Netflix-and-Coding's Web Shopping Service
