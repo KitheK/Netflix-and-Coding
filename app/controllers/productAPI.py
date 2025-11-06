@@ -69,6 +69,41 @@ def delete_product(product_id: int):
         raise HTTPException(status_code=400, detail=str(e))
 
 
+# Alphanumeric product IDs (e.g., Amazon ASINs) support endpoints
+@router.get("/by-id/{product_id}", response_model=ProductResponse)
+def get_product_by_string_id(product_id: str):
+    """Get a specific product by alphanumeric ID (e.g., ASIN)."""
+    try:
+        product = product_service.get_product_by_id(product_id)
+        return product.to_dict()
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+
+
+@router.put("/by-id/{product_id}", response_model=ProductResponse)
+def update_product_by_string_id(product_id: str, product_data: ProductUpdate):
+    """Update an existing product by alphanumeric ID."""
+    try:
+        product = product_service.update_product(product_id, product_data.model_dump(exclude_unset=True))
+        return product.to_dict()
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.delete("/by-id/{product_id}")
+def delete_product_by_string_id(product_id: str):
+    """Delete a product by alphanumeric ID."""
+    try:
+        product_service.delete_product(product_id)
+        return {"message": "Product deleted successfully"}
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
 @router.get("/search/{keyword}", response_model=List[ProductResponse])
 def search_products(keyword: str):
     """Search products by keyword"""

@@ -81,11 +81,13 @@ class ProductOperationResponse(BaseModel):
     product: Optional[ProductResponse] = None
 
 class SalesReportRequest(BaseModel):
-    """Model for sales report generation parameters"""
-    start_date: Optional[datetime] = None
-    end_date: Optional[datetime] = None
-    product_id: Optional[str] = None
-    report_type: str = Field(default="summary", regex="^(summary|detailed|financial)$")
+    seller_id: str
+    start_date: datetime
+    end_date: datetime
+    report_type: str = Field(default="summary", pattern="^(summary|detailed|financial)$")
+    
+    def __init__(self, seller_id: str, start_date: datetime, end_date: datetime, report_type: str = "summary"):
+        super().__init__(seller_id=seller_id, start_date=start_date, end_date=end_date, report_type=report_type)
 
 class SalesReportResponse(BaseModel):
     """Model for sales report response"""
