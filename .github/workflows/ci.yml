@@ -27,15 +27,15 @@ jobs:
     - name: Lint with flake8
       run: |
         pip install flake8
-        flake8 app --max-line-length=88
+        flake8 backend --max-line-length=88
 
     - name: Format with Black
       run: |
         pip install black
-        black --check app  #--check to only check formatting without making changes
+        black --check backend  #--check to only check formatting without making changes
 
 
     - name: Run tests with pytest
       run: |
         pip install pytest pytest-cov
-        pytest --cov=app tests/ --disable-warnings -q
+        pytest --cov=backend tests/ --disable-warnings -q
