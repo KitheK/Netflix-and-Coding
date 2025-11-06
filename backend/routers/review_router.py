@@ -42,6 +42,7 @@ async def update_review(review_id: str, review_data: ReviewUpdate):
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
 
+
 @router.delete("/{review_id}")
 async def delete_review(review_id: str):
     """Delete a review"""
