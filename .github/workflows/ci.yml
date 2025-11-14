@@ -39,4 +39,4 @@ jobs:
     - name: Run tests with pytest
       run: |
         pip install pytest pytest-cov
-        pytest --cov=backend backend/tests/ --disable-warnings -q
+        PYTHONPATH=$PYTHONPATH:$(pwd) pytest --cov=backend backend/tests/ --disable-warnings -q
