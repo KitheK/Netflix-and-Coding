@@ -1,5 +1,7 @@
 """Tests for cart endpoints"""
 
+import json
+from pathlib import Path
 from fastapi.testclient import TestClient
 from backend.main import app
 
@@ -8,6 +10,40 @@ client = TestClient(app)
 # Test user ID (just a fake ID for testing)
 TEST_USER_ID = "TESTUSER123456789ABCDEFGH"
 TEST_PRODUCT_ID = "B07JW9H4J1"  # A real product from products.json
+
+ # Clear only test user carts before each test, leaving real user data intact
+def setup_function():
+    """Remove only test users from cart.json to avoid deleting real data"""
+    cart_file = Path("backend/data/cart.json")
+    
+    # List of all test user IDs used in tests
+    test_users = [
+        "TESTUSER123456789ABCDEFGH",
+        "NONEXISTENT_USER_999",
+        "TEST_USER_QTY_28CHAR1234567",
+        "TEST_USER_REMOVE",
+        "TEST_USER_UPDATE",
+        "TEST_USER_ZERO",
+        "TEST_USER_TOTAL"
+    ]
+    
+    # Load existing carts
+    if cart_file.exists():
+        with open(cart_file, 'r') as f:
+            try:
+                carts = json.load(f)
+            except json.JSONDecodeError:
+                carts = {}
+    else:
+        carts = {}
+    
+    # Remove only test users
+    for test_user in test_users:
+        carts.pop(test_user, None)
+    
+    # Save back
+    with open(cart_file, 'w') as f:
+        json.dump(carts, f, indent=2)
 
 
 # Test 1: Add item to cart
