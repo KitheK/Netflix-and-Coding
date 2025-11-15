@@ -27,3 +27,15 @@ class JsonRepository:
         
         # return the data
         return data
+    
+    def load(self, filename: str):
+        """Compatibility wrapper so tests keep working."""
+        return self.get_all(filename)
+
+    def save(self, filename: str, data):
+        """Write JSON data to backend/data/ filename."""
+        file_path = self.data_dir / filename
+        file_path.parent.mkdir(parents=True, exist_ok=True)
+
+        with open(file_path, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=4)
