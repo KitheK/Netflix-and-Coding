@@ -5,6 +5,10 @@ from pathlib import Path
 from fastapi.testclient import TestClient
 from backend.main import app
 
+# TODO: still using backend/data/cart.json for tests
+# should move to backend/data/test/cart.json so we dont touch production data
+# see kithe's test isolation issue
+
 client = TestClient(app)
 
 # Test user ID (just a fake ID for testing)

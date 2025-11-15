@@ -15,22 +15,17 @@ class CartService:
     
     
     # Helper to load all carts from cart.json
-
     def _load_all_carts(self) -> Dict:
-   
-        carts = self.repository.get_all("cart.json")
+        carts = self.repository.load("cart.json")
 
         # If cart.json is empty list [], convert to empty dict {}
         if isinstance(carts, list):
             return {}
         return carts if carts else {}
     
-    
-        # Helper to save all carts back to cart.json
-    def _save_all_carts(self, carts: Dict) -> bool:
-        # Need to implement save_all in repository first
-        # For now, we'll add this method to JsonRepository
-        return self.repository.save_all("cart.json", carts)
+    # Helper to save all carts back to cart.json
+    def _save_all_carts(self, carts: Dict):
+        self.repository.save("cart.json", carts)
     
     
     def add_to_cart(self, user_id: str, product_id: str, quantity: int) -> dict:
