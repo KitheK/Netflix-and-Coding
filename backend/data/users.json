@@ -1,0 +1,18 @@
+[
+    {
+        "user_id": "b7feabcd-ce57-444c-ac8e-420d031c61af",
+        "name": "Other",
+        "email": "someoneelse@example.com",
+        "password_hash": "$2b$12$5BZbZ6bMzz59YS2IxUWAXerxNqPKOF7Hzyp9Sd5kX9TcrE8AaHQ96",
+        "role": "customer",
+        "user_token": "mIwNb0g5NkQLZg8KezL1H1uJ5Dza"
+    },
+    {
+        "user_id": "167c6e7c-f97d-40bd-8fe2-ebe45b7eac0c",
+        "name": "Charli",
+        "email": "newuser@example.com",
+        "password_hash": "$2b$12$DaX.1g/42Rj8JjpZ5MHf3.PwFsQScfmSk/9o4S7bnuWAnLy2nqHcK",
+        "role": "customer",
+        "user_token": "OGVNdsq10suHIux4hDF0bMs7rzXs"
+    }
+]

@@ -47,15 +47,25 @@ async def register_user(request: RegisterRequest):
 async def login_user(request: LoginRequest):
     """Login user with email and password"""
     try:
+        # First check if email exists
+        user_by_email = auth_service.get_user_by_email(request.email)
+        if user_by_email is None:
+            raise HTTPException(
+                status_code=401, 
+                detail={"X-Error-Details": "email not found"}
+            )      
         # Call auth_service's method to login user
         user = auth_service.login_user(
             email=request.email,
             password=request.password
         )
-        # If user not found or password invalid, return 401
-        if user is None:
-            raise HTTPException(status_code=401, detail="Invalid email or password")
         
+        # If user is None at this point, it means password was invalid
+        if user is None:
+            raise HTTPException(
+                status_code=401, 
+                detail={"X-Error-Details": "invalid password"}
+            )
         # Return success message with user details and token
         return {
             "message": "Login successful",
@@ -80,7 +90,7 @@ async def get_user_by_id(user_id: str):
     
     # If user not found, return 404 error
     if user is None:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(status_code=404, detail=f"User with ID '{user_id}' not found")
     
     # Return user details
     return {
@@ -101,7 +111,7 @@ async def get_user_by_email(email: str):
     
     # If user not found, return 404 error
     if user is None:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(status_code=404, detail=f"User with email '{email}' not found")
     
     # Return user details
     return {

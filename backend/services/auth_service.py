@@ -56,12 +56,20 @@ class AuthService:
         email_normalized = email.strip().lower()
 
         # Relaxed password validation to match existing tests:
-        # min 6 chars and at least one digit
-        if len(password) < 6:
-            raise ValueError("Password must be at least 6 characters long")
+        # min 8 chars and at least one digit
+        if len(password) < 8:
+            raise ValueError("Password must be at least 8 characters long")
         if not any(c.isdigit() for c in password):
             raise ValueError("Password must include at least one digit")
-
+        if not any(c.isupper() for c in password):
+            raise ValueError("Password must include at least one uppercase letter")
+        if not any(c.islower() for c in password):
+            raise ValueError("Password must include at least one lowercase letter")
+        if not any(c in "!@#$%^&*()-_=+[]{};:'\",.<>?/|`~" for c in password):
+            raise ValueError("Password must include at least one special character")
+        if password.lower() in ["password", "qwerty", "123456", "abc123", "letmein", "welcome", "admin"]:
+            raise ValueError("Password is too common or weak")
+        
         # Duplicate email check (case-insensitive)
         if any(u.email.lower() == email_normalized for u in users):
             raise ValueError("Email already exists")
