@@ -27,3 +27,18 @@ class JsonRepository:
         
         # return the data
         return data
+    
+
+
+    # saves data to a json file in the data directory
+    def save_all(self, filename: str, data: Dict[str, Any]) -> bool:
+        
+        # combines directory and filename to get full path. ex. backend/data/ + cart.json
+        file_path = self.data_dir / filename
+        
+        # write data to file with pretty formatting (indent=2 makes it readable, ensure_ascii=False supports special characters)
+        with open(file_path, 'w', encoding='utf-8') as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+        
+        # return True if successful
+        return True
