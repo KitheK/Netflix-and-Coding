@@ -25,19 +25,19 @@ class Cart(BaseModel):
 
     #this is what returns when you GET /cart (try to view your cart) it is seperate because it includes the total price of your cart
 class CartResponse(BaseModel): 
-    user_id: str
+    user_id: str  # UUID - permanent user identifier
     items: List[CartItem]
     total_price: float  # Sum of all (price × quantity)
 
 
     #this is what you send when you POST /cart (try to add something to your cart)
 class AddToCartRequest(BaseModel):
-    user_id: str  # 28-character user identifier
+    user_token: str  # 28-character authentication token
     product_id: str
     quantity: int = 1  # Default to 1 if not specified
 
 
     #this is what you send when you PUT /cart (try to update quantity of something in your cart)
 class UpdateCartRequest(BaseModel):
-    user_id: str
+    user_token: str  # 28-character authentication token
     quantity: int  # New quantity (0 = remove item)

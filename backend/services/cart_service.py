@@ -13,6 +13,16 @@ class CartService:
         self.repository = repository
         self.product_service = product_service
     
+    # Helper to get user_id from user_token by looking up in users.json
+    def _get_user_id_from_token(self, user_token: str) -> str:
+        """Look up the user_id (UUID) from a user_token"""
+        users = self.repository.load("users.json")
+        
+        for user in users:
+            if user.get("user_token") == user_token:
+                return user.get("user_id")
+        
+        raise ValueError(f"Invalid user token: {user_token}")
     
     # Helper to load all carts from cart.json
     def _load_all_carts(self) -> Dict:
