@@ -9,6 +9,7 @@ class JsonRepository:
     # default directory is backend/data
     def __init__(self, data_dir: str = "backend/data"):
         self.data_dir = Path(data_dir)
+        self.data_dir.mkdir(parents=True, exist_ok=True)
     
     # gets all data from a json file in the data directory (can return list, dict, or any JSON type)
     def get_all(self, filename: str) -> Any:
@@ -49,4 +50,4 @@ class JsonRepository:
     # Compatibility wrapper - same as save_all()
     def save(self, filename: str, data: Any):
         """Alias for save_all() - writes data to JSON file"""
-        self.save_all(filename, data)
+        return self.save_all(filename, data)

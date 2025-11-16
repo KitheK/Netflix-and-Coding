@@ -1,8 +1,11 @@
 # Product Router: API endpoints for product operations
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from backend.services.product_service import ProductService
 from backend.repositories.json_repository import JsonRepository
+from backend.models.product_model import CreateProductRequest, ProductResponse
+from backend.models.user_model import User
+from backend.services.auth_service import admin_required_dep
 from typing import Optional
 
 #create router with /products prefix and "products" tag
@@ -54,3 +57,13 @@ async def search_products(keyword: str, sort: Optional[str] = None):
     # return the list (empty if no matches - for frontend to handle "no results" case)
     return products
 
+@router.post("", response_model=ProductResponse, dependencies=[Depends(admin_required_dep)])
+async def create_product(request: CreateProductRequest):
+    """
+    Admin-only: Create a new product.
+    """
+    try:
+        product = product_service.create_product(**request.model_dump())
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    return product
