@@ -4,8 +4,14 @@ import bcrypt
 import secrets
 import string
 from typing import List, Optional, Any
+
+from fastapi import Depends, HTTPException, Security
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+
 from backend.repositories.json_repository import JsonRepository
 from backend.models.user_model import User
+
+# --- AuthService class (handles business logic) ---
 
 class AuthService:
     """Handles all authentication & user-related business logic."""
@@ -40,7 +46,6 @@ class AuthService:
                     return fn(data)
         raise AttributeError("Repository has no save/write method")
 
-    # Internal Helper: Load all users
     def _load_all_users(self) -> List[User]:
         raw_users = self._repo_load(self.user_file) or []
         users: List[User] = []
@@ -48,7 +53,6 @@ class AuthService:
             users.append(User(**user_dict))
         return users
 
-    # Register a new user
     def register_user(self, name: str, email: str, password: str) -> User:
         users = self._load_all_users()
 
@@ -110,9 +114,7 @@ class AuthService:
                 # Verify bcrypt password
                 if bcrypt.checkpw(password.encode(), user.password_hash.encode()):
                     return user
-                else:
-                    return None
-
+                return None
         return None
 
     # Get user by ID
@@ -122,7 +124,6 @@ class AuthService:
         for user in users:
             if user.user_id == user_id:
                 return user
-
         return None
 
     # Get user by email
@@ -135,3 +136,79 @@ class AuthService:
                 return user
 
         return None
+
+    def get_user_by_token(self, token: str) -> Optional[User]:
+        """Return a user by their user_token (or None if not found)."""
+        if not token:
+            return None
+        users = self._load_all_users()
+        for user in users:
+            if getattr(user, "user_token", None) == token:
+                return user
+        return None
+
+    def set_user_role(self, user_id: Optional[str] = None, email: Optional[str] = None, role: str = "admin") -> User:
+        """
+        Assign a role to a user by user_id or email.
+        Raises ValueError if user not found or role invalid.
+        """
+        role_norm = role.strip().lower()
+        if role_norm not in ("admin", "customer"):
+            raise ValueError("Invalid role, must be 'admin' or 'customer'")
+
+        users = self._load_all_users()
+        target = None
+        for u in users:
+            if user_id and u.user_id == user_id:
+                target = u
+                break
+            if email and u.email.lower() == email.strip().lower():
+                target = u
+                break
+
+        if target is None:
+            raise ValueError("User not found")
+
+        # assign role and persist
+        target.role = role_norm
+        updated = [u.model_dump() for u in users]
+        self._repo_save(self.user_file, updated)
+        return target
+
+# --- Dependency helpers (use these in routers, no separate file required) ---
+
+# HTTP bearer instance used by the dependency
+_security = HTTPBearer(auto_error=False)
+
+
+def _extract_token(credentials: Optional[HTTPAuthorizationCredentials]) -> str:
+    if not credentials:
+        return ""
+    return credentials.credentials or ""
+
+
+def get_current_user_dep(credentials: Optional[HTTPAuthorizationCredentials] = Security(_security)) -> User:
+    """
+    Dependency: return current user based on Bearer token.
+    Instantiate AuthService here so it picks up current env / repo state.
+    Raises 401 if missing/invalid.
+    """
+    token = _extract_token(credentials)
+    if not token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+
+    # instantiate fresh service (reads USERS_FILE at init) to avoid stale module-level capture
+    service = AuthService(JsonRepository())
+    user = service.get_user_by_token(token)
+    if user is None:
+        raise HTTPException(status_code=401, detail="Invalid or expired token")
+    return user
+
+
+def admin_required_dep(current_user: User = Depends(get_current_user_dep)) -> User:
+    """
+    Dependency: enforce admin role. Raises 403 if user is not admin.
+    """
+    if getattr(current_user, "role", "").lower() != "admin":
+        raise HTTPException(status_code=403, detail="Admin privileges required")
+    return current_user
