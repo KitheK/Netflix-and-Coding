@@ -1,10 +1,11 @@
 """Cart Router: API endpoints for shopping cart operations"""
 
-#this file has 4 API endpoints for cart operations: add to cart, get cart, remove from cart, update cart item quantity
+#this file has 5 API endpoints for cart operations: add to cart, get cart, remove from cart, update cart item quantity, checkout
 # Frontend sends user_token for authentication, backend translates it to user_id (UUID) for cart storage
 
 from fastapi import APIRouter, HTTPException, Query
 from backend.models.cart_model import AddToCartRequest, UpdateCartRequest, CartResponse
+from backend.models.transaction_model import CheckoutResponse
 from backend.services.cart_service import CartService
 from backend.services.product_service import ProductService
 from backend.repositories.json_repository import JsonRepository
@@ -70,3 +71,28 @@ def update_cart_item(product_id: str, request: UpdateCartRequest):
         quantity=request.quantity
     )
     return result
+
+
+# POST /cart/checkout - Process checkout and create transaction
+@router.post("/checkout", response_model=CheckoutResponse)
+def checkout(user_token: str = Query(..., description="User authentication token")):
+    
+    # TODO: Full receipt generation will be implemented in a separate issue.
+    # For now, this returns basic order confirmation string with transaction data.
+
+
+    try:
+        # Get user_id from token
+        user_id = cart_service._get_user_id_from_token(user_token)
+        
+        # Call checkout service method
+        checkout_response = cart_service.checkout(user_id)
+        
+        return checkout_response
+        
+    except ValueError as e:
+        # Handle specific errors (empty cart, invalid token, etc.)
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        # Handle unexpected errors
+        raise HTTPException(status_code=500, detail=f"Checkout failed: {str(e)}")

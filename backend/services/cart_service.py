@@ -1,7 +1,10 @@
 """Cart Service: Business logic for shopping cart operations"""
 
 from typing import Dict, List, Optional
+from datetime import datetime, timezone
+import uuid
 from backend.models.cart_model import CartItem, CartResponse
+from backend.models.transaction_model import Transaction, TransactionItem, CheckoutResponse
 from backend.repositories.json_repository import JsonRepository
 from backend.services.product_service import ProductService
 
@@ -175,5 +178,69 @@ class CartService:
         
         # Save back to cart.json
         self._save_all_carts(all_carts)
+        
+        return {"message": "Cart updated", "product_id": product_id, "quantity": quantity}
+    
+
+
+
+    #CHECKING OUT FUNCTIONALITY
+
+    def checkout(self, user_id: str) -> CheckoutResponse:
+        
+        #get the user's cart
+        cart = self.get_cart(user_id)
+        
+        # validate cart is not empty
+        if not cart.items or len(cart.items) == 0:
+            raise ValueError("Cannot checkout: cart is empty")
+        
+        # create transaction items from cart items.  cart item -> transaction item
+        # This creates a snapshot of what they're buying right now
+        transaction_items = []
+        for cart_item in cart.items:
+            transaction_item = TransactionItem(
+                product_id=cart_item.product_id,
+                product_name=cart_item.product_name,
+                img_link=cart_item.img_link,
+                product_link=cart_item.product_link,
+                discounted_price=cart_item.discounted_price,
+                quantity=cart_item.quantity
+            )
+            transaction_items.append(transaction_item)
+        
+        # create the transaction object
+        transaction = Transaction(
+            transaction_id=str(uuid.uuid4()),  # Generate unique UUID
+            user_id=user_id,
+            items=transaction_items,
+            total_price=cart.total_price,
+            timestamp=datetime.now(timezone.utc).isoformat(),  # ISO format with timezone
+            status="completed"
+        )
+        
+        # save transaction to transactions.json
+        # Load existing transactions (should be an array)
+        transactions = self.repository.load("transactions.json")
+        if not isinstance(transactions, list):
+            transactions = []
+        
+        # Add new transaction to the list
+        transactions.append(transaction.model_dump())  # Convert Pydantic model to dict
+        
+        # Save back to file
+        self.repository.save("transactions.json", transactions)
+        
+        # clear the user's cart because they've bought the items so when they go back to cart it doesnt show all the items they just bought
+        all_carts = self._load_all_carts()
+        all_carts[user_id]["items"] = []  # Empty the items list
+        self._save_all_carts(all_carts)
+        
+        # return checkout response
+        return CheckoutResponse(
+            message="Order confirmed",
+            transaction=transaction
+        )
+
         
         return {"message": "Cart updated", "product_id": product_id, "quantity": quantity}
