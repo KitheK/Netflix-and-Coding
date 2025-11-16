@@ -13,11 +13,11 @@ class ProductService:
         self.repository = repository
 
 
-        #helper method that basically loads and converts all products from the products.json to Product objects
-        #so you call this at the beginning of your functions to get the full list of products, then you can filter/search as needed
+    # helper method that basically loads and converts all products from the products.json to Product objects
+    # so you call this at the beginning of your functions to get the full list of products, then you can filter/search as needed
     def _load_all_products(self) -> List[Product]:
         # Get raw data from repository
-        raw_products = self.repository.get_all("products.json")
+        raw_products = self.repository.load("products.json")
         
         # Convert each dictionary to Product object
         products = []

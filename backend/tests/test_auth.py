@@ -8,6 +8,10 @@ import pytest
 from fastapi.testclient import TestClient
 from backend.main import app
 
+# TODO: this wipes users.json every test run - will delete real user data if it exists
+# need to move to backend/data/test/ folder so tests dont touch production files
+# see kithe's issue for test data isolation
+
 TEST_DB_PATH = "backend/data/users.json"
 
 @pytest.fixture(scope="function", autouse=True)
