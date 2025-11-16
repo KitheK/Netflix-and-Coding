@@ -29,7 +29,7 @@ def prepare_test_env():
     with open(TEST_DB_PATH, "w", encoding="utf-8") as f:
         json.dump([], f)
     
-    os.environ["USERS_FILE"] = TEST_DB_PATH
+    os.environ["USERS_FILE"] = "users.json"
     
     yield  # Run test here
     
