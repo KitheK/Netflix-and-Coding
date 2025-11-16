@@ -1,10 +1,13 @@
 # Auth Router: API endpoints for authentication operations
-
-from fastapi import APIRouter, HTTPException
-from backend.services.auth_service import AuthService
+from fastapi import APIRouter, HTTPException,Depends
+from backend.services.auth_service import AuthService,get_current_user_dep, admin_required_dep
 from backend.repositories.json_repository import JsonRepository
 from backend.models.auth_model import RegisterRequest, LoginRequest
 from typing import Optional
+from backend.models.auth_model import RegisterRequest, LoginRequest, UserResponse
+from backend.models.user_model import User
+from pydantic import BaseModel
+from fastapi import Body
 
 
 router = APIRouter(prefix="/auth", tags=["authentication"])
@@ -121,3 +124,42 @@ async def get_user_by_email(email: str):
         "user_token": user.user_token,
         "role": user.role
     }
+@router.get("/me")
+async def read_current_user(current_user: User = Depends(get_current_user_dep)):
+    """Return profile for authenticated user (requires Bearer token)."""
+    return {
+        "user_id": current_user.user_id,
+        "name": current_user.name,
+        "email": current_user.email,
+        "user_token": current_user.user_token,
+        "role": current_user.role
+    }
+
+
+@router.get("/admin-only")
+async def admin_only_route(current_user: User = Depends(admin_required_dep)):
+    """ Endpoint protected by admin_required dependency."""
+    return {"message": "admin access granted", "user_id": current_user.user_id}
+
+class RoleRequest(BaseModel):
+    role: str
+
+
+@router.post("/users/{user_id}/role")
+async def assign_role_to_user(user_id: str, body: RoleRequest, current_user: User = Depends(admin_required_dep)):
+    """
+    Admin-only: set role for a user by user_id.
+    Request body: "role": "admin" or "role": "customer"
+    """
+    try:
+        updated = auth_service.set_user_role(user_id=user_id, role=body.role)
+        return {
+            "message": "role updated",
+            "user": {
+                "user_id": updated.user_id,
+                "email": updated.email,
+                "role": updated.role
+            }
+        }
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
