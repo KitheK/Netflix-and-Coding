@@ -546,3 +546,147 @@ def test_create_product_persists_to_file():
     assert created_product is not None
     assert created_product["product_name"] == "Persistent Product"
     assert created_product["category"] == "Electronics"
+
+
+# ===== INTEGRATION TESTS: UPDATE PRODUCT (ADMIN-ONLY) =====
+
+def test_update_product_success():
+    """INTEGRATION TEST: Admin can update product name and price"""
+    token, _ = _create_admin_user()
+    headers = {"Authorization": f"Bearer {token}"}
+    
+    # Get existing product ID
+    product_id = TEST_PRODUCTS[0]["product_id"]
+    
+    # Update product
+    resp = client.put(f"/products/{product_id}", headers=headers, json={
+        "product_name": "Updated Product Name",
+        "discounted_price": 399.0
+    })
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["product_name"] == "Updated Product Name"
+    assert body["discounted_price"] == 399.0
+    assert body["product_id"] == product_id
+    # Other fields should remain unchanged
+    assert body["category"] == TEST_PRODUCTS[0]["category"]
+    assert body["actual_price"] == TEST_PRODUCTS[0]["actual_price"]
+
+
+def test_update_product_partial():
+    """INTEGRATION TEST: Can update only description field"""
+    token, _ = _create_admin_user()
+    headers = {"Authorization": f"Bearer {token}"}
+    
+    product_id = TEST_PRODUCTS[1]["product_id"]
+    
+    resp = client.put(f"/products/{product_id}", headers=headers, json={
+        "about_product": "Updated description only"
+    })
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["about_product"] == "Updated description only"
+    # All other fields unchanged
+    assert body["product_name"] == TEST_PRODUCTS[1]["product_name"]
+    assert body["discounted_price"] == TEST_PRODUCTS[1]["discounted_price"]
+
+
+def test_update_product_not_found():
+    """INTEGRATION TEST: Returns 404 for non-existent product"""
+    token, _ = _create_admin_user()
+    headers = {"Authorization": f"Bearer {token}"}
+    
+    resp = client.put("/products/NONEXISTENT", headers=headers, json={
+        "product_name": "Updated Name"
+    })
+    assert resp.status_code == 404
+    assert "not found" in resp.json()["detail"].lower()
+
+
+def test_update_product_invalid_price():
+    """INTEGRATION TEST: Validation rejects invalid discounted_price"""
+    token, _ = _create_admin_user()
+    headers = {"Authorization": f"Bearer {token}"}
+    
+    product_id = TEST_PRODUCTS[0]["product_id"]
+    
+    resp = client.put(f"/products/{product_id}", headers=headers, json={
+        "discounted_price": -100.0
+    })
+    assert resp.status_code == 400
+    assert "discounted_price" in resp.json()["detail"].lower()
+
+
+def test_update_product_empty_name():
+    """INTEGRATION TEST: Validation rejects empty product_name"""
+    token, _ = _create_admin_user()
+    headers = {"Authorization": f"Bearer {token}"}
+    
+    product_id = TEST_PRODUCTS[0]["product_id"]
+    
+    resp = client.put(f"/products/{product_id}", headers=headers, json={
+        "product_name": ""
+    })
+    assert resp.status_code == 400
+    assert "name cannot be empty" in resp.json()["detail"].lower()
+
+
+def test_update_product_invalid_rating():
+    """INTEGRATION TEST: Validation rejects rating > 5"""
+    token, _ = _create_admin_user()
+    headers = {"Authorization": f"Bearer {token}"}
+    
+    product_id = TEST_PRODUCTS[0]["product_id"]
+    
+    resp = client.put(f"/products/{product_id}", headers=headers, json={
+        "rating": 6.0
+    })
+    assert resp.status_code == 400
+    assert "rating" in resp.json()["detail"].lower()
+
+
+def test_update_product_forbidden_for_customer():
+    """INTEGRATION TEST: Non-admin cannot update products"""
+    token, _ = _create_customer_user()
+    headers = {"Authorization": f"Bearer {token}"}
+    
+    product_id = TEST_PRODUCTS[0]["product_id"]
+    
+    resp = client.put(f"/products/{product_id}", headers=headers, json={
+        "product_name": "Unauthorized Update"
+    })
+    assert resp.status_code == 403
+    assert "admin" in resp.json()["detail"].lower()
+
+
+def test_update_product_no_auth():
+    """INTEGRATION TEST: Authentication required to update products"""
+    product_id = TEST_PRODUCTS[0]["product_id"]
+    
+    resp = client.put(f"/products/{product_id}", json={
+        "product_name": "No Auth Update"
+    })
+    assert resp.status_code == 401
+
+
+def test_update_product_persists_to_file():
+    """INTEGRATION TEST: Updated product is persisted to products_test.json"""
+    token, _ = _create_admin_user()
+    headers = {"Authorization": f"Bearer {token}"}
+    
+    product_id = TEST_PRODUCTS[0]["product_id"]
+    
+    resp = client.put(f"/products/{product_id}", headers=headers, json={
+        "product_name": "Persisted Update",
+        "discounted_price": 499.0
+    })
+    assert resp.status_code == 200
+    
+    # Verify file was updated
+    with open(TEST_DB_PATH_PRODUCTS, "r", encoding="utf-8") as f:
+        products = json.load(f)
+    
+    updated_product = next((p for p in products if p["product_id"] == product_id), None)
+    assert updated_product is not None
+    assert updated_product["product_name"] == "Persisted Update"
+    assert updated_product["discounted_price"] == 499.0

@@ -3,7 +3,7 @@
 from fastapi import APIRouter, HTTPException, Depends
 from backend.services.product_service import ProductService
 from backend.repositories.json_repository import JsonRepository
-from backend.models.product_model import Product, CreateProductRequest
+from backend.models.product_model import Product, CreateProductRequest, UpdateProductRequest
 from backend.services.auth_service import admin_required_dep
 from typing import Optional
 
@@ -69,9 +69,7 @@ async def create_product(
     - Generates unique ASIN-like product ID (10 uppercase alphanumeric characters)
     - Saves to products.json
     """
-    # Check if user is admin
-    if current_user.role != "admin":
-        raise HTTPException(status_code=403, detail="Only admins can create products")
+    # admin_required_dep already validates role, no need to check again
     
     try:
         # Create product using service
@@ -94,3 +92,44 @@ async def create_product(
     except Exception as e:
         # Unexpected errors
         raise HTTPException(status_code=500, detail=f"Failed to create product: {str(e)}")
+
+
+# ADMIN ONLY: Update an existing product
+@router.put("/{product_id}", response_model=Product)
+async def update_product(
+    product_id: str,
+    request: UpdateProductRequest,
+    current_user: dict = Depends(admin_required_dep)
+):
+    """
+    ADMIN ONLY: Update an existing product
+    - Only updates fields that are provided in the request
+    - Validates all provided fields
+    - Returns 404 if product doesn't exist
+    - Persists changes to products.json
+    """
+    try:
+        # Update product using service
+        updated_product = product_service.update_product(
+            product_id=product_id,
+            product_name=request.product_name,
+            category=request.category,
+            discounted_price=request.discounted_price,
+            actual_price=request.actual_price,
+            discount_percentage=request.discount_percentage,
+            about_product=request.about_product,
+            img_link=request.img_link,
+            product_link=request.product_link,
+            rating=request.rating,
+            rating_count=request.rating_count
+        )
+        return updated_product
+    except ValueError as e:
+        # Product not found or validation error
+        if "not found" in str(e).lower():
+            raise HTTPException(status_code=404, detail=str(e))
+        else:
+            raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        # Unexpected errors
+        raise HTTPException(status_code=500, detail=f"Failed to update product: {str(e)}")
