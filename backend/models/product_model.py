@@ -32,3 +32,17 @@ class CreateProductRequest(BaseModel):
     rating: float = 0.0  # Default to 0.0 if not provided
     rating_count: Optional[int] = None
 
+
+class UpdateProductRequest(BaseModel):
+    """Request model for updating an existing product (all fields optional)"""
+    product_name: Optional[str] = None
+    category: Optional[str] = None
+    discounted_price: Optional[float] = None
+    actual_price: Optional[float] = None
+    discount_percentage: Optional[float] = None
+    about_product: Optional[str] = None
+    img_link: Optional[str] = None
+    product_link: Optional[str] = None
+    rating: Optional[float] = None
+    rating_count: Optional[int] = None
+
