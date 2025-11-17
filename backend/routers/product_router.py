@@ -1,8 +1,10 @@
 # Product Router: API endpoints for product operations
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from backend.services.product_service import ProductService
 from backend.repositories.json_repository import JsonRepository
+from backend.models.product_model import Product, CreateProductRequest
+from backend.services.auth_service import admin_required_dep
 from typing import Optional
 
 #create router with /products prefix and "products" tag
@@ -54,3 +56,41 @@ async def search_products(keyword: str, sort: Optional[str] = None):
     # return the list (empty if no matches - for frontend to handle "no results" case)
     return products
 
+
+# ADMIN ONLY: Create a new product
+@router.post("/", response_model=Product)
+async def create_product(
+    request: CreateProductRequest,
+    current_user: dict = Depends(admin_required_dep)
+):
+    """
+    ADMIN ONLY: Create a new product
+    - Validates all required fields
+    - Generates unique ASIN-like product ID (10 uppercase alphanumeric characters)
+    - Saves to products.json
+    """
+    # Check if user is admin
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Only admins can create products")
+    
+    try:
+        # Create product using service
+        new_product = product_service.create_product(
+            product_name=request.product_name,
+            category=request.category,
+            discounted_price=request.discounted_price,
+            actual_price=request.actual_price,
+            discount_percentage=request.discount_percentage,
+            about_product=request.about_product,
+            img_link=request.img_link,
+            product_link=request.product_link,
+            rating=request.rating,
+            rating_count=request.rating_count
+        )
+        return new_product
+    except ValueError as e:
+        # Validation errors
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        # Unexpected errors
+        raise HTTPException(status_code=500, detail=f"Failed to create product: {str(e)}")

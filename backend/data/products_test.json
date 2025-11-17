@@ -1,0 +1,80 @@
+[
+  {
+    "product_id": "B07JW9H4J1",
+    "product_name": "Wayona Nylon Braided USB to Lightning Cable",
+    "category": "Electronics|Cables",
+    "discounted_price": 299.0,
+    "actual_price": 599.0,
+    "discount_percentage": 50.0,
+    "rating": 4.5,
+    "rating_count": 24269,
+    "about_product": "Fast charging cable",
+    "img_link": "https://example.com/cable.jpg",
+    "product_link": "https://example.com/cable"
+  },
+  {
+    "product_id": "B08KT5LMRX",
+    "product_name": "Samsung 55-inch 4K Smart TV",
+    "category": "Electronics|TVs",
+    "discounted_price": 35999.0,
+    "actual_price": 54999.0,
+    "discount_percentage": 34.5,
+    "rating": 4.8,
+    "rating_count": 43994,
+    "about_product": "4K Smart TV with HDR support",
+    "img_link": "https://example.com/tv.jpg",
+    "product_link": "https://example.com/tv"
+  },
+  {
+    "product_id": "B09NX5K7QP",
+    "product_name": "Dell XPS 13 Laptop",
+    "category": "Electronics|Computers",
+    "discounted_price": 89999.0,
+    "actual_price": 119999.0,
+    "discount_percentage": 25.0,
+    "rating": 4.6,
+    "rating_count": 7928,
+    "about_product": "Ultra-portable laptop",
+    "img_link": "https://example.com/laptop.jpg",
+    "product_link": "https://example.com/laptop"
+  },
+  {
+    "product_id": "B07QR3N8VX",
+    "product_name": "iPhone 13 Pro",
+    "category": "Electronics|Phones",
+    "discounted_price": 99999.0,
+    "actual_price": 139999.0,
+    "discount_percentage": 28.6,
+    "rating": 4.7,
+    "rating_count": 94363,
+    "about_product": "Latest iPhone with Pro camera",
+    "img_link": "https://example.com/iphone.jpg",
+    "product_link": "https://example.com/iphone"
+  },
+  {
+    "product_id": "B08F5N7KJX",
+    "product_name": "Wireless Mouse",
+    "category": "Electronics|Accessories",
+    "discounted_price": 1499.0,
+    "actual_price": 2999.0,
+    "discount_percentage": 50.0,
+    "rating": 4.2,
+    "rating_count": 16905,
+    "about_product": "Ergonomic wireless mouse",
+    "img_link": "https://example.com/mouse.jpg",
+    "product_link": "https://example.com/mouse"
+  },
+  {
+    "product_id": "2S0KQUMVEX",
+    "product_name": "Persistent Product",
+    "category": "Electronics",
+    "discounted_price": 5999.0,
+    "actual_price": 9999.0,
+    "discount_percentage": 40.0,
+    "rating": 4.8,
+    "rating_count": null,
+    "about_product": "Should be saved",
+    "img_link": "https://example.com/img.jpg",
+    "product_link": "https://example.com/prod"
+  }
+]
