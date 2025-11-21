@@ -44,11 +44,23 @@ class ReviewService:
             review_title=review_req.review_title,
             review_content=review_req.review_content
         )
-        #
-        # TO DO handle writing to repository JSON later
-        #
+        # Writing to repository JSON
+        self.save_review_to_file(product_id, new_review)
+        
         return new_review
+    #saves the review to the file
+    def save_review_to_file(self, product_id: str, review: Review):
+        """Append the review to reviews.json safely"""
+        all_reviews = self.review_repository.get_all()  # get current data
+        if product_id not in all_reviews:
+            all_reviews[product_id] = []
     
+        all_reviews[product_id].append(review.dict())  # convert Pydantic model to dict
+
+        # Write back to file
+        self.review_repository.save_all(all_reviews)
+
+
     #loads the transactions from given file
     @classmethod
     def load_transactions(cls) -> dict:
