@@ -45,4 +45,3 @@ class UpdateProductRequest(BaseModel):
     product_link: Optional[str] = None
     rating: Optional[float] = None
     rating_count: Optional[int] = None
-

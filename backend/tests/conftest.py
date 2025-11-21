@@ -1,0 +1,58 @@
+"""Pytest configuration file - runs before any test modules are imported"""
+
+import os
+import json
+from pathlib import Path
+
+# Test products to populate products_test.json
+TEST_PRODUCTS = [
+    {
+        "product_id": "B07JW9H4J1",
+        "product_name": "Wayona Nylon Braided USB to Lightning Cable",
+        "category": "Electronics|Cables",
+        "discounted_price": 299.0,
+        "actual_price": 599.0,
+        "discount_percentage": 50.0,
+        "about_product": "Fast charging cable",
+        "img_link": "https://example.com/cable.jpg",
+        "product_link": "https://example.com/cable",
+        "rating": 4.5,
+        "rating_count": 24269
+    },
+    {
+        "product_id": "B08KT5LMRX",
+        "product_name": "Samsung 55-inch 4K Smart TV",
+        "category": "Electronics|TVs",
+        "discounted_price": 35999.0,
+        "actual_price": 54999.0,
+        "discount_percentage": 34.5,
+        "about_product": "4K Smart TV with HDR support",
+        "img_link": "https://example.com/tv.jpg",
+        "product_link": "https://example.com/tv",
+        "rating": 4.8,
+        "rating_count": 43994
+    },
+    {
+        "product_id": "B09NX5K7QP",
+        "product_name": "Dell XPS 13 Laptop",
+        "category": "Electronics|Computers",
+        "discounted_price": 89999.0,
+        "actual_price": 119999.0,
+        "discount_percentage": 25.0,
+        "about_product": "Ultra-portable laptop",
+        "img_link": "https://example.com/laptop.jpg",
+        "product_link": "https://example.com/laptop",
+        "rating": 4.6,
+        "rating_count": 7928
+    }
+]
+
+# Write test products file BEFORE any test modules import the app
+products_test_file = Path("backend/data/products_test.json")
+products_test_file.parent.mkdir(parents=True, exist_ok=True)
+with open(products_test_file, 'w') as f:
+    json.dump(TEST_PRODUCTS, f, indent=2)
+
+# Set environment variables BEFORE any test modules import the app
+os.environ["PRODUCTS_FILE"] = "products_test.json"
+os.environ["USERS_FILE"] = "users.json"
