@@ -1,44 +1,126 @@
-[
-  {
-    "transaction_id": "9d9c3ff3-e1fb-44f3-a6b9-903d355db844",
-    "user_id": "d43e42ec-52d6-44ca-b46d-9621ef50f961",
-    "items": [
-      {
-        "product_id": "B08QSC1XY8",
-        "product_name": "Zoul USB C 60W Fast Charging 3A 6ft/2M Long Type C Nylon Braided Data Cable Quick Charger Cable QC 3.0 for Samsung Galaxy M31S M30 S10 S9 S20 Plus, Note 10 9 8, A20e A40 A50 A70 (2M, Grey)",
-        "img_link": "https://m.media-amazon.com/images/I/419QKVTxaSL._SX300_SY300_QL70_FMwebp_.jpg",
-        "product_link": "https://www.amazon.in/Charging-Braided-Charger-Samsung-Galaxy/dp/B08QSC1XY8/ref=sr_1_36?qid=1672909125&s=electronics&sr=1-36",
-        "discounted_price": 389.0,
-        "quantity": 6
-      },
-      {
-        "product_id": "B07GVGTSLN",
-        "product_name": "Wayona Usb Type C Fast Charger Cable Fast Charging Usb C Cable/Cord Compatible For Samsung Galaxy S10E S10 S9 S8 Plus S10+,Note 10 Note 9 Note 8,S20,M31S,M40,Realme X3,Pixel 2 Xl (3 Ft Pack Of 1,Grey)",
-        "img_link": "https://m.media-amazon.com/images/W/WEBP_402378-T1/images/I/41J6oGU8w5L._SX300_SY300_QL70_FMwebp_.jpg",
-        "product_link": "https://www.amazon.in/Wayona-Cable-Braided-Charger-Smartphones/dp/B07GVGTSLN/ref=sr_1_93?qid=1672909128&s=electronics&sr=1-93",
-        "discounted_price": 325.0,
-        "quantity": 1
-      }
-    ],
-    "total_price": 2659.0,
-    "timestamp": "2025-11-16T07:42:37.255232Z",
-    "status": "completed"
-  },
-  {
-    "transaction_id": "3eaad09a-7f7f-4962-b78d-dc0a39ad9cb8",
-    "user_id": "00000000-0000-0000-0000-000000000103",
-    "items": [
-      {
-        "product_id": "B07JW9H4J1",
-        "product_name": "Wayona Nylon Braided USB to Lightning Fast Charging and Data Sync Cable Compatible for iPhone 13, 12,11, X, 8, 7, 6, 5, iPad Air, Pro, Mini (3 FT Pack of 1, Grey)",
-        "img_link": "https://m.media-amazon.com/images/W/WEBP_402378-T1/images/I/51UsScvHQNL._SX300_SY300_QL70_FMwebp_.jpg",
-        "product_link": "https://www.amazon.in/Wayona-Braided-WN3LG1-Syncing-Charging/dp/B07JW9H4J1/ref=sr_1_1?qid=1672909124&s=electronics&sr=1-1",
-        "discounted_price": 399.0,
-        "quantity": 2
-      }
-    ],
-    "total_price": 798.0,
-    "timestamp": "2025-11-21T07:32:14.092114+00:00",
-    "status": "completed"
-  }
-]
+{
+  "d43e42ec-52d6-44ca-b46d-9621ef50f961": [
+    {
+      "transaction_id": "9d9c3ff3-e1fb-44f3-a6b9-903d355db844",
+      "user_id": "d43e42ec-52d6-44ca-b46d-9621ef50f961",
+      "items": [
+        {
+          "product_id": "B08QSC1XY8",
+          "product_name": "Zoul USB C 60W Fast Charging Cable",
+          "img_link": "https://m.media-amazon.com/images/I/419QKVTxaSL._SX300_SY300_QL70_FMwebp_.jpg",
+          "product_link": "https://www.amazon.in/Charging-Braided-Charger-Samsung-Galaxy/dp/B08QSC1XY8",
+          "discounted_price": 389.0,
+          "quantity": 2
+        },
+        {
+          "product_id": "B07GVGTSLN",
+          "product_name": "Wayona USB Type C Fast Charger Cable",
+          "img_link": "https://m.media-amazon.com/images/W/WEBP_402378-T1/images/I/41J6oGU8w5L._SX300_SY300_QL70_FMwebp_.jpg",
+          "product_link": "https://www.amazon.in/Wayona-Cable-Braided-Charger-Smartphones/dp/B07GVGTSLN",
+          "discounted_price": 325.0,
+          "quantity": 1
+        }
+      ],
+      "total_price": 1103.0,
+      "timestamp": "2025-11-16T07:42:37.255232Z",
+      "status": "completed"
+    },
+    {
+      "transaction_id": "a1b2c3d4-e5f6-4789-0abc-def123456789",
+      "user_id": "d43e42ec-52d6-44ca-b46d-9621ef50f961",
+      "items": [
+        {
+          "product_id": "B07JW9H4J1",
+          "product_name": "Wayona Nylon Braided USB to Lightning Cable",
+          "img_link": "https://m.media-amazon.com/images/W/WEBP_402378-T1/images/I/51UsScvHQNL._SX300_SY300_QL70_FMwebp_.jpg",
+          "product_link": "https://www.amazon.in/Wayona-Braided-WN3LG1-Syncing-Charging/dp/B07JW9H4J1",
+          "discounted_price": 399.0,
+          "quantity": 3
+        }
+      ],
+      "total_price": 1197.0,
+      "timestamp": "2025-11-18T14:23:11.092114+00:00",
+      "status": "completed"
+    },
+    {
+      "transaction_id": "f8e7d6c5-b4a3-2109-8765-fedcba098765",
+      "user_id": "d43e42ec-52d6-44ca-b46d-9621ef50f961",
+      "items": [
+        {
+          "product_id": "B08KT5LMRX",
+          "product_name": "Samsung 55-inch 4K Smart TV",
+          "img_link": "https://example.com/tv.jpg",
+          "product_link": "https://example.com/tv",
+          "discounted_price": 35999.0,
+          "quantity": 1
+        }
+      ],
+      "total_price": 35999.0,
+      "timestamp": "2025-11-20T09:15:42.123456+00:00",
+      "status": "completed"
+    }
+  ],
+  "00000000-0000-0000-0000-000000000103": [
+    {
+      "transaction_id": "3eaad09a-7f7f-4962-b78d-dc0a39ad9cb8",
+      "user_id": "00000000-0000-0000-0000-000000000103",
+      "items": [
+        {
+          "product_id": "B07JW9H4J1",
+          "product_name": "Wayona Nylon Braided USB to Lightning Cable",
+          "img_link": "https://m.media-amazon.com/images/W/WEBP_402378-T1/images/I/51UsScvHQNL._SX300_SY300_QL70_FMwebp_.jpg",
+          "product_link": "https://www.amazon.in/Wayona-Braided-WN3LG1-Syncing-Charging/dp/B07JW9H4J1",
+          "discounted_price": 399.0,
+          "quantity": 2
+        }
+      ],
+      "total_price": 798.0,
+      "timestamp": "2025-11-21T07:32:14.092114+00:00",
+      "status": "completed"
+    },
+    {
+      "transaction_id": "b9c8d7e6-f5a4-3210-9876-abcdef123456",
+      "user_id": "00000000-0000-0000-0000-000000000103",
+      "items": [
+        {
+          "product_id": "B08QSC1XY8",
+          "product_name": "Zoul USB C 60W Fast Charging Cable",
+          "img_link": "https://m.media-amazon.com/images/I/419QKVTxaSL._SX300_SY300_QL70_FMwebp_.jpg",
+          "product_link": "https://www.amazon.in/Charging-Braided-Charger-Samsung-Galaxy/dp/B08QSC1XY8",
+          "discounted_price": 389.0,
+          "quantity": 1
+        },
+        {
+          "product_id": "B09NX5K7QP",
+          "product_name": "Dell XPS 13 Laptop",
+          "img_link": "https://example.com/laptop.jpg",
+          "product_link": "https://example.com/laptop",
+          "discounted_price": 89999.0,
+          "quantity": 1
+        }
+      ],
+      "total_price": 90388.0,
+      "timestamp": "2025-11-21T18:45:33.567890+00:00",
+      "status": "completed"
+    }
+  ],
+  "12345678-abcd-ef12-3456-7890abcdef12": [
+    {
+      "transaction_id": "aaaabbbb-cccc-dddd-eeee-ffffgggghhh1",
+      "user_id": "12345678-abcd-ef12-3456-7890abcdef12",
+      "items": [
+        {
+          "product_id": "B07GVGTSLN",
+          "product_name": "Wayona USB Type C Fast Charger Cable",
+          "img_link": "https://m.media-amazon.com/images/W/WEBP_402378-T1/images/I/41J6oGU8w5L._SX300_SY300_QL70_FMwebp_.jpg",
+          "product_link": "https://www.amazon.in/Wayona-Cable-Braided-Charger-Smartphones/dp/B07GVGTSLN",
+          "discounted_price": 325.0,
+          "quantity": 5
+        }
+      ],
+      "total_price": 1625.0,
+      "timestamp": "2025-11-19T11:22:33.444555+00:00",
+      "status": "completed"
+    }
+  ]
+}
