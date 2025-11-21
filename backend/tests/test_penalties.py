@@ -41,27 +41,21 @@ TEST_ADMIN_USER_ID = "00000000-0000-0000-0000-000000000203"
 class TestPenaltyServiceUnit:
     """UNIT TESTS: Test PenaltyService business logic without API layer"""
     
-    @pytest.fixture(scope="function", autouse=True)
-    def setup_test_repository(self, tmp_path):
-        """Create a temporary repository for isolated unit tests"""
-        # Create temporary data directory
-        test_data_dir = tmp_path / "test_data"
-        test_data_dir.mkdir()
-        
+    def setup_method(self):
+        """Set up test repository before each test method"""
+        import tempfile
+        import shutil
+        # Create temporary directory for this test
+        self.temp_dir = tempfile.mkdtemp()
         # Create JsonRepository with test directory
-        self.repository = JsonRepository(data_dir=str(test_data_dir))
+        self.repository = JsonRepository(data_dir=self.temp_dir)
         self.service = PenaltyService(self.repository)
-        
-        # Clean up penalties file
-        penalties_file = test_data_dir / "penalties.json"
-        if penalties_file.exists():
-            penalties_file.unlink()
-        
-        yield
-        
-        # Cleanup after test
-        if penalties_file.exists():
-            penalties_file.unlink()
+    
+    def teardown_method(self):
+        """Clean up after each test method"""
+        import shutil
+        if hasattr(self, 'temp_dir'):
+            shutil.rmtree(self.temp_dir, ignore_errors=True)
     
     def test_apply_penalty_success(self):
         """UNIT TEST: Apply penalty creates valid penalty record"""

@@ -79,7 +79,7 @@ async def apply_penalty(
         raise HTTPException(status_code=500, detail=f"Failed to apply penalty: {str(e)}")
 
 # POST /penalties/{penalty_id}/resolve - Mark a penalty as resolved (Admin-only)
-# NOTE: This route must come BEFORE /{user_id} to avoid routing conflicts
+# This must come before GET /{user_id} to avoid routing conflicts
 @router.post("/{penalty_id}/resolve", response_model=PenaltyResponse, dependencies=[Depends(admin_required_dep)])
 async def resolve_penalty(
     penalty_id: str,
@@ -107,7 +107,6 @@ async def resolve_penalty(
 
 
 # GET /penalties/{user_id} - List penalties for a specific user (Admin-only)
-# NOTE: This route must come AFTER /{penalty_id}/resolve to avoid routing conflicts
 @router.get("/{user_id}", response_model=List[Penalty])
 async def get_user_penalties_for_user(
     user_id: str,
