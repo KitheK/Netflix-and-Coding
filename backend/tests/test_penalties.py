@@ -18,7 +18,6 @@ from datetime import datetime, timezone
 from fastapi.testclient import TestClient
 from backend.main import app
 from backend.services.penalty_service import PenaltyService
-from backend.repositories.json_repository import JsonRepository
 from backend.models.penalty_model import Penalty
 
 # Test file paths
