@@ -208,6 +208,33 @@ class ProductService:
         
         return updated_product
 
+    def delete_product(self, product_id: str) -> Product:
+        """
+        Delete a product by ID (admin only).
+        Raises ValueError if product doesn't exist.
+        Returns the deleted product for confirmation.
+        """
+        products = self._load_all_products()
+        
+        # Find the product to delete
+        product_to_delete = None
+        remaining_products = []
+        
+        for product in products:
+            if product.product_id == product_id:
+                product_to_delete = product
+            else:
+                remaining_products.append(product)
+        
+        if product_to_delete is None:
+            raise ValueError(f"Product with ID {product_id} not found")
+        
+        # Save the updated list (without the deleted product)
+        updated_list = [p.model_dump() for p in remaining_products]
+        self._repo_save(updated_list)
+        
+        return product_to_delete
+
     def get_all_products(self) -> List[Product]:
         # Load and return all products (no filtering)
         return self._load_all_products()

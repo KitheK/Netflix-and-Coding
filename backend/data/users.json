@@ -1,10 +1,10 @@
 [
   {
-    "user_id": "742c5d0b-45c7-4b4f-804a-563e71ef2d6e",
+    "user_id": "191737e5-a9be-4800-8af4-148eacb6d200",
     "name": "Admin",
     "email": "admin@example.com",
-    "password_hash": "$2b$12$10WS.t33aQBVlD552lrBJebEA/5Ly/fNE6HvtzEhpXf5L2k/6OOq.",
-    "user_token": "0s973Az1bJVU5gDijgQVyPzHiLF6",
+    "password_hash": "$2b$12$spABImPwvCtGdiy/muhbKOGH/EYDafsfD7YpS1cYW4LpS7fHFcaZG",
+    "user_token": "k3NX816cEyyhC1wHCtaNimf4zypX",
     "role": "admin"
   }
 ]

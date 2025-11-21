@@ -1,18 +1,5 @@
 [
   {
-    "product_id": "B07JW9H4J1",
-    "product_name": "Persisted Update",
-    "category": "Electronics|Cables",
-    "discounted_price": 499.0,
-    "actual_price": 599.0,
-    "discount_percentage": 50.0,
-    "rating": 4.5,
-    "rating_count": 24269,
-    "about_product": "Fast charging cable",
-    "img_link": "https://example.com/cable.jpg",
-    "product_link": "https://example.com/cable"
-  },
-  {
     "product_id": "B08KT5LMRX",
     "product_name": "Samsung 55-inch 4K Smart TV",
     "category": "Electronics|TVs",

@@ -690,3 +690,154 @@ def test_update_product_persists_to_file():
     assert updated_product is not None
     assert updated_product["product_name"] == "Persisted Update"
     assert updated_product["discounted_price"] == 499.0
+
+
+# ===== INTEGRATION TESTS: DELETE PRODUCT (ADMIN-ONLY) =====
+
+def test_delete_product_success():
+    """INTEGRATION TEST: Admin can delete existing product"""
+    token, _ = _create_admin_user()
+    headers = {"Authorization": f"Bearer {token}"}
+    
+    # Get existing product ID
+    product_id = TEST_PRODUCTS[0]["product_id"]
+    
+    # Delete product
+    resp = client.delete(f"/products/{product_id}", headers=headers)
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["product_id"] == product_id
+    assert body["product_name"] == TEST_PRODUCTS[0]["product_name"]
+    
+    # Verify product is gone
+    get_resp = client.get(f"/products/{product_id}")
+    assert get_resp.status_code == 404
+
+
+def test_delete_product_not_found():
+    """INTEGRATION TEST: Returns 404 for non-existent product"""
+    token, _ = _create_admin_user()
+    headers = {"Authorization": f"Bearer {token}"}
+    
+    resp = client.delete("/products/NONEXISTENT123", headers=headers)
+    assert resp.status_code == 404
+    assert "not found" in resp.json()["detail"].lower()
+
+
+def test_delete_product_forbidden_for_customer():
+    """INTEGRATION TEST: Non-admin cannot delete products"""
+    token, _ = _create_customer_user()
+    headers = {"Authorization": f"Bearer {token}"}
+    
+    product_id = TEST_PRODUCTS[0]["product_id"]
+    
+    resp = client.delete(f"/products/{product_id}", headers=headers)
+    assert resp.status_code == 403
+    assert "admin" in resp.json()["detail"].lower()
+
+
+def test_delete_product_no_auth():
+    """INTEGRATION TEST: Authentication required to delete products"""
+    product_id = TEST_PRODUCTS[0]["product_id"]
+    
+    resp = client.delete(f"/products/{product_id}")
+    assert resp.status_code == 401
+
+
+def test_delete_product_persists_to_file():
+    """INTEGRATION TEST: Deleted product is removed from products_test.json"""
+    token, _ = _create_admin_user()
+    headers = {"Authorization": f"Bearer {token}"}
+    
+    # Count products before
+    with open(TEST_DB_PATH_PRODUCTS, "r", encoding="utf-8") as f:
+        products_before = json.load(f)
+    initial_count = len(products_before)
+    
+    product_id = TEST_PRODUCTS[0]["product_id"]
+    
+    # Delete product
+    resp = client.delete(f"/products/{product_id}", headers=headers)
+    assert resp.status_code == 200
+    
+    # Verify the deleted product is not in the list
+    with open(TEST_DB_PATH_PRODUCTS, "r", encoding="utf-8") as f:
+        products_after = json.load(f)
+    
+    deleted_product = next((p for p in products_after if p["product_id"] == product_id), None)
+    assert deleted_product is None
+
+
+def test_delete_product_returns_deleted_data():
+    """INTEGRATION TEST: Response includes deleted product data"""
+    token, _ = _create_admin_user()
+    headers = {"Authorization": f"Bearer {token}"}
+    
+    product_id = TEST_PRODUCTS[1]["product_id"]
+    expected_name = TEST_PRODUCTS[1]["product_name"]
+    expected_price = TEST_PRODUCTS[1]["discounted_price"]
+    
+    resp = client.delete(f"/products/{product_id}", headers=headers)
+    assert resp.status_code == 200
+    body = resp.json()
+    
+    # Should return the deleted product's data
+    assert body["product_id"] == product_id
+    assert body["product_name"] == expected_name
+    assert body["discounted_price"] == expected_price
+
+
+def test_delete_product_twice_fails():
+    """INTEGRATION TEST: Cannot delete same product twice"""
+    token, _ = _create_admin_user()
+    headers = {"Authorization": f"Bearer {token}"}
+    
+    product_id = TEST_PRODUCTS[2]["product_id"]
+    
+    # First deletion succeeds
+    resp1 = client.delete(f"/products/{product_id}", headers=headers)
+    assert resp1.status_code == 200
+    
+    # Second deletion fails (product already gone)
+    resp2 = client.delete(f"/products/{product_id}", headers=headers)
+    assert resp2.status_code == 404
+
+
+def test_delete_all_products():
+    """INTEGRATION TEST: Can delete all products sequentially"""
+    token, _ = _create_admin_user()
+    headers = {"Authorization": f"Bearer {token}"}
+    
+    # Delete all test products
+    for product in TEST_PRODUCTS:
+        resp = client.delete(f"/products/{product['product_id']}", headers=headers)
+        assert resp.status_code == 200
+    
+    # Verify all products are gone
+    with open(TEST_DB_PATH_PRODUCTS, "r", encoding="utf-8") as f:
+        products_after = json.load(f)
+    
+    assert len(products_after) == 0
+
+
+def test_delete_does_not_affect_other_products():
+    """INTEGRATION TEST: Deleting one product doesn't affect others"""
+    token, _ = _create_admin_user()
+    headers = {"Authorization": f"Bearer {token}"}
+    
+    # Get initial product IDs
+    with open(TEST_DB_PATH_PRODUCTS, "r", encoding="utf-8") as f:
+        products_before = json.load(f)
+    other_product_ids = [p["product_id"] for p in products_before if p["product_id"] != TEST_PRODUCTS[0]["product_id"]]
+    
+    # Delete first product
+    resp = client.delete(f"/products/{TEST_PRODUCTS[0]['product_id']}", headers=headers)
+    assert resp.status_code == 200
+    
+    # Verify other products still exist
+    with open(TEST_DB_PATH_PRODUCTS, "r", encoding="utf-8") as f:
+        products_after = json.load(f)
+    remaining_ids = [p["product_id"] for p in products_after]
+    
+    for other_id in other_product_ids:
+        assert other_id in remaining_ids, f"Product {other_id} should still exist"

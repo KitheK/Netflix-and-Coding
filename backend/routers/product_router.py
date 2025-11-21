@@ -133,3 +133,27 @@ async def update_product(
     except Exception as e:
         # Unexpected errors
         raise HTTPException(status_code=500, detail=f"Failed to update product: {str(e)}")
+
+
+# 6. DELETE /products/{product_id} - Delete product
+@router.delete("/{product_id}", response_model=Product)
+async def delete_product(
+    product_id: str,
+    current_user: dict = Depends(admin_required_dep)
+):
+    """
+    ADMIN ONLY: Delete a product by ID
+    - Confirms product exists before deletion
+    - Removes product from products.json
+    - Returns the deleted product for confirmation
+    """
+    try:
+        deleted_product = product_service.delete_product(product_id)
+        return deleted_product
+    except ValueError as e:
+        if "not found" in str(e).lower():
+            raise HTTPException(status_code=404, detail=str(e))
+        else:
+            raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to delete product: {str(e)}")
