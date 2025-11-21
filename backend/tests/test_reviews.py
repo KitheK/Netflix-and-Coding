@@ -3,6 +3,7 @@
 import pytest
 from fastapi.testclient import TestClient
 from backend.main import app
+from backend.models.review_model import AddReviewRequest
 
 client = TestClient(app)
 
@@ -131,3 +132,47 @@ def test_add_review_request_validation():
             review_title="Missing Required Fields",
             review_content="Invalid"
         )
+
+#INTEGRATION TEST FOR POST/{PRODUCT_ID}
+#Example users and products
+USER_WITH_PURCHASE = "00000000-0000-0000-0000-000000000103"
+USER_WITHOUT_PURCHASE = "nonexistent-user-0000-0000"
+PRODUCT_PURCHASED = "B07JW9H4J1"      # User has purchased this product
+PRODUCT_NOT_PURCHASED = "B08KT5LMRX"   # User has not purchased this product
+
+#Goes well
+def test_post_review_success():
+    """Test that a user who purchased the product can post a review"""
+    review_data = {
+        "user_id": USER_WITH_PURCHASE,
+        "user_name": "John Doe",
+        "review_title": "Great Product!",
+        "review_content": "Really satisfied with this purchase."
+    }
+
+    response = client.post(f"/reviews/{PRODUCT_PURCHASED}", json=review_data)
+    
+    assert response.status_code == 200
+    review = response.json()
+    
+    # Check response fields
+    assert review["user_id"] == USER_WITH_PURCHASE
+    assert review["review_title"] == "Great Product!"
+    assert review["review_content"] == "Really satisfied with this purchase."
+    assert "review_id" in review
+    assert len(review["review_id"]) == 14  # 14-character ID
+
+#Test if customer has not purchased the product yet.
+def test_post_review_failure_not_purchased():
+    """Test that a user who has not purchased the product gets a 400 error"""
+    review_data = {
+        "user_id": USER_WITHOUT_PURCHASE,
+        "user_name": "Jane Doe",
+        "review_title": "Cannot post",
+        "review_content": "Customer didn't buy this product."
+    }
+    
+    response = client.post(f"/reviews/{PRODUCT_NOT_PURCHASED}", json=review_data)
+    
+    assert response.status_code == 400
+    assert "User has not purchased this product" in response.json()["detail"]

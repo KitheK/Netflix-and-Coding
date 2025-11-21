@@ -2,7 +2,7 @@
 
 from fastapi import APIRouter, HTTPException
 from backend.services.review_service import ReviewService
-from backend.models.review_model import Review
+from backend.models.review_model import Review, AddReviewRequest
 from typing import List
 
 # Create router with /reviews prefix and "reviews" tag

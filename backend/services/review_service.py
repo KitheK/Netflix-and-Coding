@@ -2,14 +2,18 @@
 
 from backend.repositories.review_repository import ReviewRepository
 from typing import List
-from backend.models.review_model import Review
+from backend.models.review_model import Review, AddReviewRequest
 import json
 from pathlib import Path
+import uuid
 
 
 class ReviewService:
     """Service for handling review-related business logic"""
     
+    #will need to be changed if path changes!!
+    TRANSACTIONS_FILE = Path("backend/data/transactions.json")
+
     def __init__(self):
         # Create repository internally
         self.review_repository = ReviewRepository()
@@ -29,14 +33,10 @@ class ReviewService:
         """Add a review if the user has purchased the product"""
         
         # Check purchase
-
-
-        #TO DO check actual user for purchase
-        purchased = self.purchased_products.get(review_req.user_id, [])
-        if product_id not in purchased:
+        if not self.user_has_purchased(review_req.user_id, product_id):
             raise ValueError("User has not purchased this product")
-        
-        # Create Review object
+
+         # Create Review object
         new_review = Review(
             review_id=str(uuid.uuid4())[:14],  # 14-character generated ID
             user_id=review_req.user_id,
@@ -44,7 +44,29 @@ class ReviewService:
             review_title=review_req.review_title,
             review_content=review_req.review_content
         )
-        
-        #TO DO will handle writing to repository JSON later
-
+        #
+        # TO DO handle writing to repository JSON later
+        #
         return new_review
+    
+    #loads the transactions from given file
+    @classmethod
+    def load_transactions(cls) -> dict:
+        """Load transactions.json and return dict by user_id"""
+        path = Path(__file__).parent.parent / "data" / "transactions.json"
+        if not path.exists():
+            return {}
+        with open(path, "r", encoding="utf-8") as f:
+            return json.load(f)
+
+    @classmethod
+    def user_has_purchased(cls, user_id: str, product_id: str) -> bool:
+        """Return True if user has purchased the product in any completed transaction"""
+        transactions_by_user = cls.load_transactions().get(user_id, [])
+        for tx in transactions_by_user:
+            if tx.get("status") != "completed":
+                continue
+            for item in tx.get("items", []):
+                if item.get("product_id") == product_id:
+                    return True
+        return False

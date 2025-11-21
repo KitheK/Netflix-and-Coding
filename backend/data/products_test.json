@@ -24,5 +24,18 @@
     "product_link": "https://example.com/tv",
     "rating": 4.8,
     "rating_count": 43994
+  },
+  {
+    "product_id": "B09NX5K7QP",
+    "product_name": "Dell XPS 13 Laptop",
+    "category": "Electronics|Computers",
+    "discounted_price": 89999.0,
+    "actual_price": 119999.0,
+    "discount_percentage": 25.0,
+    "about_product": "Ultra-portable laptop",
+    "img_link": "https://example.com/laptop.jpg",
+    "product_link": "https://example.com/laptop",
+    "rating": 4.6,
+    "rating_count": 7928
   }
 ]
