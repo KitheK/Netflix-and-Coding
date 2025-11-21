@@ -126,21 +126,23 @@ def setup_function():
     with open(cart_file, 'w') as f:
         json.dump(carts, f, indent=2)
     
-    # Clear test user transactions
+    # Clear test user transactions (now a dict structure: {"user_id": [transactions]})
     if transactions_file.exists():
         with open(transactions_file, 'r') as f:
             try:
                 transactions = json.load(f)
             except json.JSONDecodeError:
-                transactions = []
+                transactions = {}
     else:
-        transactions = []
+        transactions = {}
     
-    if not isinstance(transactions, list):
-        transactions = []
+    # Ensure it's a dict, not a list (for migration from old structure)
+    if not isinstance(transactions, dict):
+        transactions = {}
     
-    # Remove test user transactions
-    transactions = [t for t in transactions if t.get("user_id") not in test_user_ids]
+    # Remove test user transaction lists
+    for test_user_id in test_user_ids:
+        transactions.pop(test_user_id, None)
     
     with open(transactions_file, 'w') as f:
         json.dump(transactions, f, indent=2)

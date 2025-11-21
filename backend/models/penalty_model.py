@@ -12,6 +12,7 @@ class Penalty(BaseModel):
     user_id: str             # UUID of the user who received the penalty
     reason: str              # Reason why the penalty was applied (e.g., "Late payment", "Terms violation")
     timestamp: str           # ISO format timestamp of when penalty was applied
+    status: str = "active"   # Penalty status: "active" or "resolved"
 
 
 # ApplyPenaltyRequest: Request body for applying a penalty

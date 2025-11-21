@@ -1,17 +1,19 @@
 """Penalty Router: API endpoints for penalty operations (Admin-only)"""
 
-from fastapi import APIRouter, HTTPException, Depends
-from backend.models.penalty_model import ApplyPenaltyRequest, PenaltyResponse
+from typing import List, Optional
+from fastapi import APIRouter, HTTPException, Depends, Query
+from backend.models.penalty_model import ApplyPenaltyRequest, PenaltyResponse, Penalty
 from backend.models.user_model import User
 from backend.services.penalty_service import PenaltyService
-from backend.services.auth_service import admin_required_dep
+from backend.services.auth_service import admin_required_dep, AuthService
 
 # Create router with prefix /penalties and tag "penalties"
 # All endpoints in this router will be accessible at /penalties/*
 router = APIRouter(prefix="/penalties", tags=["penalties"])
 
-# Initialize dependencies (service creates its own repository internally)
+# Initialize dependencies (services create their own repositories internally)
 penalty_service = PenaltyService()
+auth_service = AuthService()
 
 
 # POST /penalties/apply - Apply a penalty to a user (Admin-only)
@@ -74,3 +76,83 @@ async def apply_penalty(
         # Unexpected error - return 500 Internal Server Error
         raise HTTPException(status_code=500, detail=f"Failed to apply penalty: {str(e)}")
 
+# POST /penalties/{penalty_id}/resolve - Mark a penalty as resolved (Admin-only)
+# This must come before GET /{user_id} to avoid routing conflicts
+@router.post("/{penalty_id}/resolve", response_model=PenaltyResponse, dependencies=[Depends(admin_required_dep)])
+async def resolve_penalty(
+    penalty_id: str,
+    current_user: User = Depends(admin_required_dep),
+):
+    """
+    Admin-only: resolve a specific penalty.
+    Sets the penalty status to "resolved".
+    """
+    try:
+        penalty = penalty_service.resolve_penalty(penalty_id=penalty_id)
+        return PenaltyResponse(
+            message="Penalty resolved successfully",
+            penalty=penalty,
+        )
+    except ValueError as e:
+        message = str(e)
+        status_code = 404 if "not found" in message.lower() else 400
+        raise HTTPException(status_code=status_code, detail=message)
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to resolve penalty {penalty_id}: {str(e)}",
+        )
+
+
+# GET /penalties/{user_id} - List penalties for a specific user (Admin-only)
+@router.get("/{user_id}", response_model=List[Penalty])
+async def get_user_penalties_for_user(
+    user_id: str,
+    status: Optional[str] = Query(
+        None,
+        description="Optional status filter: 'active' or 'resolved'. If omitted, returns all.",
+    ),
+    current_user: User = Depends(admin_required_dep),
+):
+    """
+    Admin-only: list penalties for a specific user.
+
+    - IN: path param user_id (UUID string)
+    - IN (optional): query param status = 'active' | 'resolved'
+    - OUT: JSON array of Penalty objects for that user, sorted newest first
+    """
+    try:
+        # First check if user exists using AuthService
+        if auth_service.get_user_by_id(user_id) is None:
+            raise HTTPException(status_code=404, detail=f"User {user_id} not found")
+
+        # Validate status parameter if provided
+        if status is not None:
+            normalized_status = status.lower()
+            if normalized_status not in {"active", "resolved"}:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Invalid status value: '{status}'. Must be 'active' or 'resolved'.",
+                )
+
+        # Use the service to load and optionally filter penalties by status
+        penalties = penalty_service.get_user_penalties(user_id=user_id, status=status)
+        
+        # If status filter is provided and no penalties match, return specific error
+        if status is not None and len(penalties) == 0:
+            raise HTTPException(
+                status_code=404,
+                detail=f"No {status} penalties found for user {user_id}",
+            )
+        
+        # If no status filter and no penalties, return empty list (not an error)
+        return penalties
+    except HTTPException:
+        # Re-raise HTTPException (404, etc.) without wrapping
+        raise
+    except Exception as e:
+        # Generic error handler (e.g., file read issues)
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to retrieve penalties for user {user_id}: {str(e)}",
+        )
