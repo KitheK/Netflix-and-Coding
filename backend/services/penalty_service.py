@@ -10,9 +10,9 @@ from backend.repositories.penalty_repository import PenaltyRepository
 class PenaltyService:
     """Handles all business logic related to penalties"""
     
-    def __init__(self):
-        # Create our own repository internally
-        self.penalty_repository = PenaltyRepository()
+    def __init__(self, repository: Optional[PenaltyRepository] = None):
+        # Use provided repository (for testing) or create our own
+        self.penalty_repository = repository if repository is not None else PenaltyRepository()
     
     def apply_penalty(self, user_id: str, reason: str) -> Penalty:
         """
@@ -135,7 +135,7 @@ class PenaltyService:
         if not penalty_id or len(penalty_id.strip()) == 0:
             raise ValueError("penalty_id cannot be empty")
 
-        all_penalties = self.repository.load("penalties.json")
+        all_penalties = self.penalty_repository.get_all()
         if not isinstance(all_penalties, list):
             raise ValueError("penalties data is invalid")
 
@@ -153,6 +153,6 @@ class PenaltyService:
         if updated_penalty is None:
             raise ValueError("Penalty not found")
 
-        self.repository.save("penalties.json", all_penalties)
+        self.penalty_repository.save_all(all_penalties)
         return updated_penalty
 

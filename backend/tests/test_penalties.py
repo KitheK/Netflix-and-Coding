@@ -44,11 +44,14 @@ class TestPenaltyServiceUnit:
         """Set up test repository before each test method"""
         import tempfile
         import shutil
+        from pathlib import Path
+        from backend.repositories.penalty_repository import PenaltyRepository
         # Create temporary directory for this test
         self.temp_dir = tempfile.mkdtemp()
-        # Create JsonRepository with test directory
-        self.repository = JsonRepository(data_dir=self.temp_dir)
-        self.service = PenaltyService(self.repository)
+        # Create PenaltyRepository and override data_dir to use test directory
+        self.penalty_repository = PenaltyRepository()
+        self.penalty_repository.data_dir = Path(self.temp_dir)
+        self.service = PenaltyService(self.penalty_repository)
     
     def teardown_method(self):
         """Clean up after each test method"""
@@ -74,8 +77,8 @@ class TestPenaltyServiceUnit:
         # Verify timestamp is valid ISO format
         datetime.fromisoformat(penalty.timestamp.replace('Z', '+00:00'))
         
-        # Verify penalty was saved to file
-        penalties_file = Path("backend/data/penalties.json")
+        # Verify penalty was saved to file (in temp directory)
+        penalties_file = Path(self.temp_dir) / "penalties.json"
         assert penalties_file.exists()
         with open(penalties_file) as f:
             saved_penalties = json.load(f)
@@ -136,7 +139,7 @@ class TestPenaltyServiceUnit:
                 "status": "active",
             }
         )
-        self.repository.save("penalties.json", raw)
+        self.penalty_repository.save_all(raw)
 
         # Active only
         active = self.service.get_user_penalties(user_id=user_id, status="active")
