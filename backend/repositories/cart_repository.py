@@ -15,7 +15,10 @@ class CartRepository(BaseRepository):
     def get_filename(self) -> str:
         return "cart.json"
     
-    # Override get_all to return dict instead of list
+    # Override get_all abstract method from the base_repository to return dict instead of the default list (array)
+    #the cart repository uses a dict structure for O(1) user lookup for finding a users cart. this couldve been converted to an array (which would match all other load/save methods, so no need to override)
+    #but if we converted it to an array, then finding a users cart would be O(n) which is less efficient. the lookup speed is insignificant for small data, but if this was a real app with many users, it would be alot slower.
+
     def get_all(self) -> Dict[str, Any]:
         file_path = self.data_dir / self.get_filename()
         
