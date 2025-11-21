@@ -546,3 +546,298 @@ def test_create_product_persists_to_file():
     assert created_product is not None
     assert created_product["product_name"] == "Persistent Product"
     assert created_product["category"] == "Electronics"
+
+
+# ===== INTEGRATION TESTS: UPDATE PRODUCT (ADMIN-ONLY) =====
+
+def test_update_product_success():
+    """INTEGRATION TEST: Admin can update product name and price"""
+    token, _ = _create_admin_user()
+    headers = {"Authorization": f"Bearer {token}"}
+    
+    # Get existing product ID
+    product_id = TEST_PRODUCTS[0]["product_id"]
+    
+    # Update product
+    resp = client.put(f"/products/{product_id}", headers=headers, json={
+        "product_name": "Updated Product Name",
+        "discounted_price": 399.0
+    })
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["product_name"] == "Updated Product Name"
+    assert body["discounted_price"] == 399.0
+    assert body["product_id"] == product_id
+    # Other fields should remain unchanged
+    assert body["category"] == TEST_PRODUCTS[0]["category"]
+    assert body["actual_price"] == TEST_PRODUCTS[0]["actual_price"]
+
+
+def test_update_product_partial():
+    """INTEGRATION TEST: Can update only description field"""
+    token, _ = _create_admin_user()
+    headers = {"Authorization": f"Bearer {token}"}
+    
+    product_id = TEST_PRODUCTS[1]["product_id"]
+    
+    resp = client.put(f"/products/{product_id}", headers=headers, json={
+        "about_product": "Updated description only"
+    })
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["about_product"] == "Updated description only"
+    # All other fields unchanged
+    assert body["product_name"] == TEST_PRODUCTS[1]["product_name"]
+    assert body["discounted_price"] == TEST_PRODUCTS[1]["discounted_price"]
+
+
+def test_update_product_not_found():
+    """INTEGRATION TEST: Returns 404 for non-existent product"""
+    token, _ = _create_admin_user()
+    headers = {"Authorization": f"Bearer {token}"}
+    
+    resp = client.put("/products/NONEXISTENT", headers=headers, json={
+        "product_name": "Updated Name"
+    })
+    assert resp.status_code == 404
+    assert "not found" in resp.json()["detail"].lower()
+
+
+def test_update_product_invalid_price():
+    """INTEGRATION TEST: Validation rejects invalid discounted_price"""
+    token, _ = _create_admin_user()
+    headers = {"Authorization": f"Bearer {token}"}
+    
+    product_id = TEST_PRODUCTS[0]["product_id"]
+    
+    resp = client.put(f"/products/{product_id}", headers=headers, json={
+        "discounted_price": -100.0
+    })
+    assert resp.status_code == 400
+    assert "discounted_price" in resp.json()["detail"].lower()
+
+
+def test_update_product_empty_name():
+    """INTEGRATION TEST: Validation rejects empty product_name"""
+    token, _ = _create_admin_user()
+    headers = {"Authorization": f"Bearer {token}"}
+    
+    product_id = TEST_PRODUCTS[0]["product_id"]
+    
+    resp = client.put(f"/products/{product_id}", headers=headers, json={
+        "product_name": ""
+    })
+    assert resp.status_code == 400
+    assert "name cannot be empty" in resp.json()["detail"].lower()
+
+
+def test_update_product_invalid_rating():
+    """INTEGRATION TEST: Validation rejects rating > 5"""
+    token, _ = _create_admin_user()
+    headers = {"Authorization": f"Bearer {token}"}
+    
+    product_id = TEST_PRODUCTS[0]["product_id"]
+    
+    resp = client.put(f"/products/{product_id}", headers=headers, json={
+        "rating": 6.0
+    })
+    assert resp.status_code == 400
+    assert "rating" in resp.json()["detail"].lower()
+
+
+def test_update_product_forbidden_for_customer():
+    """INTEGRATION TEST: Non-admin cannot update products"""
+    token, _ = _create_customer_user()
+    headers = {"Authorization": f"Bearer {token}"}
+    
+    product_id = TEST_PRODUCTS[0]["product_id"]
+    
+    resp = client.put(f"/products/{product_id}", headers=headers, json={
+        "product_name": "Unauthorized Update"
+    })
+    assert resp.status_code == 403
+    assert "admin" in resp.json()["detail"].lower()
+
+
+def test_update_product_no_auth():
+    """INTEGRATION TEST: Authentication required to update products"""
+    product_id = TEST_PRODUCTS[0]["product_id"]
+    
+    resp = client.put(f"/products/{product_id}", json={
+        "product_name": "No Auth Update"
+    })
+    assert resp.status_code == 401
+
+
+def test_update_product_persists_to_file():
+    """INTEGRATION TEST: Updated product is persisted to products_test.json"""
+    token, _ = _create_admin_user()
+    headers = {"Authorization": f"Bearer {token}"}
+    
+    product_id = TEST_PRODUCTS[0]["product_id"]
+    
+    resp = client.put(f"/products/{product_id}", headers=headers, json={
+        "product_name": "Persisted Update",
+        "discounted_price": 499.0
+    })
+    assert resp.status_code == 200
+    
+    # Verify file was updated
+    with open(TEST_DB_PATH_PRODUCTS, "r", encoding="utf-8") as f:
+        products = json.load(f)
+    
+    updated_product = next((p for p in products if p["product_id"] == product_id), None)
+    assert updated_product is not None
+    assert updated_product["product_name"] == "Persisted Update"
+    assert updated_product["discounted_price"] == 499.0
+
+
+# ===== INTEGRATION TESTS: DELETE PRODUCT (ADMIN-ONLY) =====
+
+def test_delete_product_success():
+    """INTEGRATION TEST: Admin can delete existing product"""
+    token, _ = _create_admin_user()
+    headers = {"Authorization": f"Bearer {token}"}
+    
+    # Get existing product ID
+    product_id = TEST_PRODUCTS[0]["product_id"]
+    
+    # Delete product
+    resp = client.delete(f"/products/{product_id}", headers=headers)
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["product_id"] == product_id
+    assert body["product_name"] == TEST_PRODUCTS[0]["product_name"]
+    
+    # Verify product is gone
+    get_resp = client.get(f"/products/{product_id}")
+    assert get_resp.status_code == 404
+
+
+def test_delete_product_not_found():
+    """INTEGRATION TEST: Returns 404 for non-existent product"""
+    token, _ = _create_admin_user()
+    headers = {"Authorization": f"Bearer {token}"}
+    
+    resp = client.delete("/products/NONEXISTENT123", headers=headers)
+    assert resp.status_code == 404
+    assert "not found" in resp.json()["detail"].lower()
+
+
+def test_delete_product_forbidden_for_customer():
+    """INTEGRATION TEST: Non-admin cannot delete products"""
+    token, _ = _create_customer_user()
+    headers = {"Authorization": f"Bearer {token}"}
+    
+    product_id = TEST_PRODUCTS[0]["product_id"]
+    
+    resp = client.delete(f"/products/{product_id}", headers=headers)
+    assert resp.status_code == 403
+    assert "admin" in resp.json()["detail"].lower()
+
+
+def test_delete_product_no_auth():
+    """INTEGRATION TEST: Authentication required to delete products"""
+    product_id = TEST_PRODUCTS[0]["product_id"]
+    
+    resp = client.delete(f"/products/{product_id}")
+    assert resp.status_code == 401
+
+
+def test_delete_product_persists_to_file():
+    """INTEGRATION TEST: Deleted product is removed from products_test.json"""
+    token, _ = _create_admin_user()
+    headers = {"Authorization": f"Bearer {token}"}
+    
+    # Count products before
+    with open(TEST_DB_PATH_PRODUCTS, "r", encoding="utf-8") as f:
+        products_before = json.load(f)
+    initial_count = len(products_before)
+    
+    product_id = TEST_PRODUCTS[0]["product_id"]
+    
+    # Delete product
+    resp = client.delete(f"/products/{product_id}", headers=headers)
+    assert resp.status_code == 200
+    
+    # Verify the deleted product is not in the list
+    with open(TEST_DB_PATH_PRODUCTS, "r", encoding="utf-8") as f:
+        products_after = json.load(f)
+    
+    deleted_product = next((p for p in products_after if p["product_id"] == product_id), None)
+    assert deleted_product is None
+
+
+def test_delete_product_returns_deleted_data():
+    """INTEGRATION TEST: Response includes deleted product data"""
+    token, _ = _create_admin_user()
+    headers = {"Authorization": f"Bearer {token}"}
+    
+    product_id = TEST_PRODUCTS[1]["product_id"]
+    expected_name = TEST_PRODUCTS[1]["product_name"]
+    expected_price = TEST_PRODUCTS[1]["discounted_price"]
+    
+    resp = client.delete(f"/products/{product_id}", headers=headers)
+    assert resp.status_code == 200
+    body = resp.json()
+    
+    # Should return the deleted product's data
+    assert body["product_id"] == product_id
+    assert body["product_name"] == expected_name
+    assert body["discounted_price"] == expected_price
+
+
+def test_delete_product_twice_fails():
+    """INTEGRATION TEST: Cannot delete same product twice"""
+    token, _ = _create_admin_user()
+    headers = {"Authorization": f"Bearer {token}"}
+    
+    product_id = TEST_PRODUCTS[2]["product_id"]
+    
+    # First deletion succeeds
+    resp1 = client.delete(f"/products/{product_id}", headers=headers)
+    assert resp1.status_code == 200
+    
+    # Second deletion fails (product already gone)
+    resp2 = client.delete(f"/products/{product_id}", headers=headers)
+    assert resp2.status_code == 404
+
+
+def test_delete_all_products():
+    """INTEGRATION TEST: Can delete all products sequentially"""
+    token, _ = _create_admin_user()
+    headers = {"Authorization": f"Bearer {token}"}
+    
+    # Delete all test products
+    for product in TEST_PRODUCTS:
+        resp = client.delete(f"/products/{product['product_id']}", headers=headers)
+        assert resp.status_code == 200
+    
+    # Verify all products are gone
+    with open(TEST_DB_PATH_PRODUCTS, "r", encoding="utf-8") as f:
+        products_after = json.load(f)
+    
+    assert len(products_after) == 0
+
+
+def test_delete_does_not_affect_other_products():
+    """INTEGRATION TEST: Deleting one product doesn't affect others"""
+    token, _ = _create_admin_user()
+    headers = {"Authorization": f"Bearer {token}"}
+    
+    # Get initial product IDs
+    with open(TEST_DB_PATH_PRODUCTS, "r", encoding="utf-8") as f:
+        products_before = json.load(f)
+    other_product_ids = [p["product_id"] for p in products_before if p["product_id"] != TEST_PRODUCTS[0]["product_id"]]
+    
+    # Delete first product
+    resp = client.delete(f"/products/{TEST_PRODUCTS[0]['product_id']}", headers=headers)
+    assert resp.status_code == 200
+    
+    # Verify other products still exist
+    with open(TEST_DB_PATH_PRODUCTS, "r", encoding="utf-8") as f:
+        products_after = json.load(f)
+    remaining_ids = [p["product_id"] for p in products_after]
+    
+    for other_id in other_product_ids:
+        assert other_id in remaining_ids, f"Product {other_id} should still exist"
