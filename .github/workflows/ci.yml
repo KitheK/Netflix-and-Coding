@@ -37,15 +37,15 @@ jobs:
 
     - name: Run tests with pytest
       run: |
-        pip install pytest pytest-cov pytest-html
+        pip install pytest pytest-cov pytest-reporter-html1
         PYTHONPATH=$PYTHONPATH:$(pwd) pytest \
           --cov=backend \
           --cov-report=xml \
           --cov-report=html \
           --cov-report=term \
           --junitxml=pytest-report.xml \
-          --html=pytest-report.html \
-          --self-contained-html \
+          --template=html1/index.html \
+          --report=pytest-report.html \
           backend/tests/ \
           --disable-warnings \
           -v
