@@ -1,7 +1,14 @@
 """Tests for cart endpoints"""
 
 import json
+import os
 from pathlib import Path
+
+# Set environment variables BEFORE importing app
+os.environ["PRODUCTS_FILE"] = "products_test.json"
+os.environ["USERS_FILE"] = "users.json"
+os.environ["CARTS_FILE"] = "cart.json"
+
 from fastapi.testclient import TestClient
 from backend.main import app
 
@@ -32,10 +39,33 @@ TEST_USER_ZERO_TOKEN = "TESTTOKEN5555555555JJJKKKLLL"
 TEST_USER_TOTAL_ID = "00000000-0000-0000-0000-000000000006"
 TEST_USER_TOTAL_TOKEN = "TESTTOKEN6666666666MMMNNNOOO"
 
+# Test product data
+TEST_PRODUCTS = [
+    {
+        "product_id": "B07JW9H4J1",
+        "product_name": "Wayona Nylon Braided USB to Lightning Cable",
+        "category": "Electronics|Cables",
+        "discounted_price": 299.0,
+        "actual_price": 1899.0,
+        "discount_percentage": 84.0,
+        "rating": 4.3,
+        "rating_count": 8641,
+        "about_product": "Test cable for cart operations",
+        "img_link": "https://example.com/cable.jpg",
+        "product_link": "https://example.com/cable"
+    }
+]
+
+
 def setup_function():
     """Setup test users in users.json and clear their carts"""
     users_file = Path("backend/data/users.json")
     cart_file = Path("backend/data/cart.json")
+    products_file = Path("backend/data/products_test.json")
+    
+    # CREATE TEST PRODUCTS FILE FIRST
+    with open(products_file, 'w', encoding='utf-8') as f:
+        json.dump(TEST_PRODUCTS, f, indent=2)
     
     # Create test users in users.json
     test_users = [
@@ -91,7 +121,7 @@ def setup_function():
     
     # Load existing users
     if users_file.exists():
-        with open(users_file, 'r') as f:
+        with open(users_file, 'r', encoding='utf-8') as f:
             try:
                 users = json.load(f)
             except json.JSONDecodeError:
@@ -105,12 +135,12 @@ def setup_function():
     users.extend(test_users)
     
     # Save users
-    with open(users_file, 'w') as f:
+    with open(users_file, 'w', encoding='utf-8') as f:
         json.dump(users, f, indent=2)
     
     # Clear test user carts (using user_id as keys now, not tokens)
     if cart_file.exists():
-        with open(cart_file, 'r') as f:
+        with open(cart_file, 'r', encoding='utf-8') as f:
             try:
                 carts = json.load(f)
             except json.JSONDecodeError:
@@ -118,18 +148,29 @@ def setup_function():
     else:
         carts = {}
     
-    # Remove test user carts
-    for test_user_id in test_user_ids:
-        carts.pop(test_user_id, None)
+    # Handle both list and dictionary formats for carts
+    if isinstance(carts, list):
+        # If carts is a list, convert it to a dictionary format
+        carts_dict = {}
+        for cart_item in carts:
+            user_id = cart_item.get("user_id")
+            if user_id and user_id not in test_user_ids:
+                carts_dict[user_id] = cart_item
+        carts = carts_dict
+    else:
+        # If carts is already a dictionary, remove test user carts
+        for test_user_id in test_user_ids:
+            carts.pop(test_user_id, None)
     
-    # Save carts
-    with open(cart_file, 'w') as f:
+    # Save carts (ensure it's saved as a dictionary)
+    with open(cart_file, 'w', encoding='utf-8') as f:
         json.dump(carts, f, indent=2)
 
 
 def teardown_function():
     """Remove test users from users.json after tests"""
     users_file = Path("backend/data/users.json")
+    products_file = Path("backend/data/products_test.json")
     
     test_user_ids = {
         TEST_USER_ID, TEST_USER_QTY_ID, TEST_USER_REMOVE_ID,
@@ -137,7 +178,7 @@ def teardown_function():
     }
     
     if users_file.exists():
-        with open(users_file, 'r') as f:
+        with open(users_file, 'r', encoding='utf-8') as f:
             try:
                 users = json.load(f)
             except json.JSONDecodeError:
@@ -146,8 +187,12 @@ def teardown_function():
         # Remove test users
         users = [u for u in users if u["user_id"] not in test_user_ids]
         
-        with open(users_file, 'w') as f:
+        with open(users_file, 'w', encoding='utf-8') as f:
             json.dump(users, f, indent=2)
+    
+    # Clean up test products file
+    if products_file.exists():
+        products_file.unlink()
 
 
 # Test 1: Add item to cart

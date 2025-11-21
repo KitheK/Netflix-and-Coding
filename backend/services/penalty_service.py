@@ -4,15 +4,15 @@ from typing import List, Optional
 from datetime import datetime, timezone
 import uuid
 from backend.models.penalty_model import Penalty
-from backend.repositories.json_repository import JsonRepository
+from backend.repositories.penalty_repository import PenaltyRepository
 
 
 class PenaltyService:
     """Handles all business logic related to penalties"""
     
-    def __init__(self, repository: JsonRepository):
-        # Initialize the repository to read/write JSON files
-        self.repository = repository
+    def __init__(self):
+        # Create our own repository internally
+        self.penalty_repository = PenaltyRepository()
     
     def apply_penalty(self, user_id: str, reason: str) -> Penalty:
         """
@@ -63,7 +63,7 @@ class PenaltyService:
         
         # Load existing penalties from penalties.json file
         # If file doesn't exist or is corrupted, start with empty list
-        all_penalties = self.repository.load("penalties.json")
+        all_penalties = self.penalty_repository.get_all()
         if not isinstance(all_penalties, list):
             all_penalties = []
         
@@ -73,7 +73,7 @@ class PenaltyService:
         
         # Save the updated list back to penalties.json file
         # This persists the new penalty to disk
-        self.repository.save("penalties.json", all_penalties)
+        self.penalty_repository.save_all(all_penalties)
         
         # Return the created penalty object
         return penalty
@@ -90,7 +90,7 @@ class PenaltyService:
             List[Penalty]: List of penalties for the user, newest first
         """
         # Load all penalties from file
-        all_penalties = self.repository.load("penalties.json")
+        all_penalties = self.penalty_repository.get_all()
         
         # Handle empty or corrupted file
         if not isinstance(all_penalties, list):

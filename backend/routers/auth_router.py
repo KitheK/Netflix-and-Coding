@@ -1,7 +1,6 @@
 # Auth Router: API endpoints for authentication operations
 from fastapi import APIRouter, HTTPException,Depends
 from backend.services.auth_service import AuthService,get_current_user_dep, admin_required_dep
-from backend.repositories.json_repository import JsonRepository
 from backend.models.auth_model import RegisterRequest, LoginRequest
 from typing import Optional
 from backend.models.auth_model import RegisterRequest, LoginRequest, UserResponse
@@ -12,9 +11,8 @@ from fastapi import Body
 
 router = APIRouter(prefix="/auth", tags=["authentication"])
 
-# Create repository and service
-repository = JsonRepository()
-auth_service = AuthService(repository)
+# Create auth service (it creates its own repository internally)
+auth_service = AuthService()
 
 
 """Auth router endpoints"""

@@ -17,14 +17,49 @@ TEST_USER_EMPTY_TOKEN = "TESTTOKENEMPTY1234567890ABCD"
 TEST_USER_MULTI_ID = "00000000-0000-0000-0000-000000000103"
 TEST_USER_MULTI_TOKEN = "TESTTOKENMULTI1234567890ABCD"
 
-TEST_PRODUCT_ID = "B07JW9H4J1"  # A real product from products.json
+TEST_PRODUCT_ID = "B07JW9H4J1"  # A real product from products_test.json
+
+# Test products to populate products_test.json
+TEST_PRODUCTS = [
+    {
+        "product_id": "B07JW9H4J1",
+        "product_name": "Wayona Nylon Braided USB to Lightning Cable",
+        "category": "Electronics|Cables",
+        "discounted_price": 299.0,
+        "actual_price": 599.0,
+        "discount_percentage": 50.0,
+        "about_product": "Fast charging cable",
+        "img_link": "https://example.com/cable.jpg",
+        "product_link": "https://example.com/cable",
+        "rating": 4.5,
+        "rating_count": 24269
+    },
+    {
+        "product_id": "B08KT5LMRX",
+        "product_name": "Samsung 55-inch 4K Smart TV",
+        "category": "Electronics|TVs",
+        "discounted_price": 35999.0,
+        "actual_price": 54999.0,
+        "discount_percentage": 34.5,
+        "about_product": "4K Smart TV with HDR support",
+        "img_link": "https://example.com/tv.jpg",
+        "product_link": "https://example.com/tv",
+        "rating": 4.8,
+        "rating_count": 43994
+    }
+]
 
 
 def setup_function():
-    """Setup test users and clear their carts and transactions"""
+    """Setup test users, products, and clear their carts and transactions"""
     users_file = Path("backend/data/users.json")
     cart_file = Path("backend/data/cart.json")
     transactions_file = Path("backend/data/transactions.json")
+    products_test_file = Path("backend/data/products_test.json")
+    
+    # Write test products to products_test.json
+    with open(products_test_file, 'w') as f:
+        json.dump(TEST_PRODUCTS, f, indent=2)
     
     # Create test users
     test_users = [

@@ -1,25 +1,30 @@
-"""Cart Service: Business logic for shopping cart operations"""
+# Cart Service: Business logic for shopping cart operations
 
 from typing import Dict, List, Optional
 from datetime import datetime, timezone
 import uuid
 from backend.models.cart_model import CartItem, CartResponse
 from backend.models.transaction_model import Transaction, TransactionItem, CheckoutResponse
-from backend.repositories.json_repository import JsonRepository
+from backend.repositories.cart_repository import CartRepository
+from backend.repositories.user_repository import UserRepository
+from backend.repositories.transaction_repository import TransactionRepository
 from backend.services.product_service import ProductService
 
 
 class CartService:
-    """Handles all business logic for shopping cart"""
+    # Handles all business logic for shopping cart
     
-    def __init__(self, repository: JsonRepository, product_service: ProductService):
-        self.repository = repository
+    def __init__(self, product_service: ProductService):
+        # Create our own repositories internally
+        self.cart_repository = CartRepository()
+        self.user_repository = UserRepository()
+        self.transaction_repository = TransactionRepository()
         self.product_service = product_service
     
     # Helper to get user_id from user_token by looking up in users.json
     def _get_user_id_from_token(self, user_token: str) -> str:
-        """Look up the user_id (UUID) from a user_token"""
-        users = self.repository.load("users.json")
+        # Look up the user_id (UUID) from a user_token
+        users = self.user_repository.get_all()
         
         for user in users:
             if user.get("user_token") == user_token:
@@ -29,16 +34,12 @@ class CartService:
     
     # Helper to load all carts from cart.json
     def _load_all_carts(self) -> Dict:
-        carts = self.repository.load("cart.json")
-
-        # If cart.json is empty list [], convert to empty dict {}
-        if isinstance(carts, list):
-            return {}
+        carts = self.cart_repository.get_all()
         return carts if carts else {}
     
     # Helper to save all carts back to cart.json
     def _save_all_carts(self, carts: Dict):
-        self.repository.save("cart.json", carts)
+        self.cart_repository.save_all(carts)
     
     
     def add_to_cart(self, user_id: str, product_id: str, quantity: int) -> dict:
@@ -52,12 +53,9 @@ class CartService:
         # load all carts (using helper method from above)
         all_carts = self._load_all_carts()
         
-
         # get or create user's cart
-        #if no cart for a user, then create a new cart
         if user_id not in all_carts:
             all_carts[user_id] = {"items": []}
-        
         
         user_cart = all_carts[user_id]["items"]
         
@@ -221,7 +219,7 @@ class CartService:
         
         # save transaction to transactions.json
         # Load existing transactions (should be an array)
-        transactions = self.repository.load("transactions.json")
+        transactions = self.transaction_repository.get_all()
         if not isinstance(transactions, list):
             transactions = []
         
@@ -229,12 +227,13 @@ class CartService:
         transactions.append(transaction.model_dump())  # Convert Pydantic model to dict
         
         # Save back to file
-        self.repository.save("transactions.json", transactions)
+        self.transaction_repository.save_all(transactions)
         
         # clear the user's cart because they've bought the items so when they go back to cart it doesnt show all the items they just bought
         all_carts = self._load_all_carts()
-        all_carts[user_id]["items"] = []  # Empty the items list
-        self._save_all_carts(all_carts)
+        if user_id in all_carts:
+            all_carts[user_id]["items"] = []  # Empty the items list
+            self._save_all_carts(all_carts)
         
         # return checkout response
         return CheckoutResponse(
