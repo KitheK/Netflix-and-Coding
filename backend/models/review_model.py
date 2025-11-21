@@ -28,7 +28,3 @@ class AddReviewRequest(BaseModel):
     review_title: str
     review_content: str 
     # rating: float  # Optional rating
-
-    #forbid extra fields, helps with testing
-    class Config:
-        extra = "forbid"

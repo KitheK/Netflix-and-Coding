@@ -131,13 +131,3 @@ def test_add_review_request_validation():
             review_title="Missing Required Fields",
             review_content="Invalid"
         )
-
-    # Extra unexpected field should raise ValidationError
-    with pytest.raises(ValidationError):
-        AddReviewRequest(
-            user_id="USER123",
-            user_name="John Doe",
-            review_title="Title",
-            review_content="Content",
-            extra_field="not allowed"
-        )
