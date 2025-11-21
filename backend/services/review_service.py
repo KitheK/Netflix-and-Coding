@@ -3,6 +3,8 @@
 from backend.repositories.review_repository import ReviewRepository
 from typing import List
 from backend.models.review_model import Review
+import json
+from pathlib import Path
 
 
 class ReviewService:
@@ -22,3 +24,27 @@ class ReviewService:
         
         # Convert dict data to Review objects
         return [Review(**review) for review in product_reviews]
+    
+    def add_review(self, product_id: str, review_req: AddReviewRequest) -> Review:
+        """Add a review if the user has purchased the product"""
+        
+        # Check purchase
+
+
+        #TO DO check actual user for purchase
+        purchased = self.purchased_products.get(review_req.user_id, [])
+        if product_id not in purchased:
+            raise ValueError("User has not purchased this product")
+        
+        # Create Review object
+        new_review = Review(
+            review_id=str(uuid.uuid4())[:14],  # 14-character generated ID
+            user_id=review_req.user_id,
+            user_name=review_req.user_name,
+            review_title=review_req.review_title,
+            review_content=review_req.review_content
+        )
+        
+        #TO DO will handle writing to repository JSON later
+
+        return new_review
