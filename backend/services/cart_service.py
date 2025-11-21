@@ -1,7 +1,7 @@
 # Cart Service: Business logic for shopping cart operations
 
 from typing import Dict, List, Optional
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 import uuid
 from backend.models.cart_model import CartItem, CartResponse
 from backend.models.transaction_model import Transaction, TransactionItem, CheckoutResponse
@@ -193,6 +193,17 @@ class CartService:
         if not cart.items or len(cart.items) == 0:
             raise ValueError("Cannot checkout: cart is empty")
         
+        # Get user info for receipt
+        users = self.user_repository.get_all()
+        user_info = None
+        for user in users:
+            if user.get("user_id") == user_id:
+                user_info = user
+                break
+        
+        if not user_info:
+            raise ValueError(f"User {user_id} not found")
+        
         # create transaction items from cart items.  cart item -> transaction item
         # This creates a snapshot of what they're buying right now
         transaction_items = []
@@ -207,13 +218,20 @@ class CartService:
             )
             transaction_items.append(transaction_item)
         
+        # Calculate dates
+        purchase_time = datetime.now(timezone.utc)
+        delivery_date = purchase_time + timedelta(days=5)  # 5 days from now
+        
         # create the transaction object
         transaction = Transaction(
             transaction_id=str(uuid.uuid4()),  # Generate unique UUID
             user_id=user_id,
+            customer_name=user_info.get("name", "Unknown"), # get customer name and email vv from user_repository for reciept generation
+            customer_email=user_info.get("email", "unknown@example.com"),
             items=transaction_items,
-            total_price=cart.total_price,
-            timestamp=datetime.now(timezone.utc).isoformat(),  # ISO format with timezone
+            total_price=cart.total_price,  # Already calculated from cart
+            timestamp=purchase_time.isoformat(),  # ISO format with timezone
+            estimated_delivery=delivery_date.strftime("%Y-%m-%d"),  # Format as YYYY-MM-DD
             status="completed"
         )
         
