@@ -17,7 +17,7 @@ transaction_service = TransactionService(repository)
 # We need CartService just to access the _get_user_id_from_token helper
 # In a real app, this helper would be in a shared auth service
 from backend.services.product_service import ProductService
-product_service = ProductService(repository)
+product_service = ProductService()
 cart_service = CartService(repository, product_service)
 
 

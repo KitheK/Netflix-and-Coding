@@ -13,9 +13,9 @@ from backend.repositories.json_repository import JsonRepository
 # Create router with prefix /cart.  so they will be like /cart/add, /cart/, etc.
 router = APIRouter(prefix="/cart", tags=["cart"])
 
-# initialize dependencies (repository -> services)
+# Initialize dependencies (repository -> cart service, product service creates its own repo)
 repository = JsonRepository()
-product_service = ProductService(repository)
+product_service = ProductService()
 cart_service = CartService(repository, product_service)
 
 

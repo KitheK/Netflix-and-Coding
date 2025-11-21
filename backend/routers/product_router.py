@@ -2,18 +2,15 @@
 
 from fastapi import APIRouter, HTTPException, Depends
 from backend.services.product_service import ProductService
-from backend.repositories.json_repository import JsonRepository
 from backend.models.product_model import Product, CreateProductRequest, UpdateProductRequest
 from backend.services.auth_service import admin_required_dep
 from typing import Optional
 
-#create router with /products prefix and "products" tag
+# Create router with /products prefix and "products" tag
 router = APIRouter(prefix="/products", tags=["products"])
 
-#create repository and service
-repository = JsonRepository()
-product_service = ProductService(repository)
-
+# Create product service (it creates its own repository internally)
+product_service = ProductService()
 
 
 """Product router endpoints"""
