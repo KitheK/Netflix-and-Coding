@@ -156,17 +156,3 @@ class PenaltyService:
         self.repository.save("penalties.json", all_penalties)
         return updated_penalty
 
-    def user_exists(self, user_id: str) -> bool:
-        """
-        Check if a user exists in users.json.
-        Returns False if file doesn't exist, is invalid, or user not found.
-        """
-        try:
-            users_data = self.repository.load("users.json")
-            if isinstance(users_data, list):
-                return any(user.get("user_id") == user_id for user in users_data)
-            return False
-        except Exception:
-            # If file doesn't exist or any error occurs, return False
-            return False
-

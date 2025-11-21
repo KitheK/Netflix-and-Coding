@@ -455,42 +455,33 @@ class TestPenaltyAPIIntegration:
         assert len(body) >= 2
         assert all(p["status"] == "resolved" for p in body)
 
-    def test_get_penalties_invalid_status_returns_all(self):
-        """INTEGRATION TEST: Unknown status value returns all penalties (no filter applied)"""
+    def test_get_penalties_invalid_status_returns_400(self):
+        """INTEGRATION TEST: Unknown status value returns 400 Bad Request"""
         headers = {"Authorization": f"Bearer {self.admin_token}"}
 
-        # Create penalties for TEST_USER_ID_1
-        reasons = ["Violation A", "Violation B"]
-        for reason in reasons:
-            resp = client.post(
-                "/penalties/apply",
-                json={
-                    "user_id": TEST_USER_ID_1,
-                    "reason": reason,
-                },
-                headers=headers,
-            )
-            assert resp.status_code == 200
-
-        # Mark one as resolved so we have mixed statuses
-        with open(TEST_DB_PATH_PENALTIES, "r", encoding="utf-8") as f:
-            penalties = json.load(f)
-        for p in penalties:
-            if p.get("user_id") == TEST_USER_ID_1:
-                p["status"] = "resolved"
-                break
-        with open(TEST_DB_PATH_PENALTIES, "w", encoding="utf-8") as f:
-            json.dump(penalties, f, indent=2)
-
-        # Use an invalid status filter; service should ignore it and return all for the user
+        # Use an invalid status filter; should return 400
         resp_invalid = client.get(
             f"/penalties/{TEST_USER_ID_1}?status=unknown", headers=headers
         )
-        assert resp_invalid.status_code == 200
-        body = resp_invalid.json()
-        assert isinstance(body, list)
-        # Should still return both penalties for this user
-        assert len(body) == 2
+        assert resp_invalid.status_code == 400
+        assert "invalid status value" in resp_invalid.json()["detail"].lower()
+        assert "active" in resp_invalid.json()["detail"].lower()
+        assert "resolved" in resp_invalid.json()["detail"].lower()
+
+    def test_get_penalties_invalid_status_no_penalties_returns_400(self):
+        """INTEGRATION TEST: Invalid status with user having no penalties returns 400, not misleading 404"""
+        headers = {"Authorization": f"Bearer {self.admin_token}"}
+
+        # Ensure user has no penalties (or use a fresh user)
+        # Use an invalid status filter for a user with no penalties
+        # Should return 400 (invalid status), not 404 with misleading message
+        resp_invalid = client.get(
+            f"/penalties/{TEST_USER_ID_2}?status=invalid_status", headers=headers
+        )
+        assert resp_invalid.status_code == 400
+        assert "invalid status value" in resp_invalid.json()["detail"].lower()
+        # Should NOT contain misleading message like "No invalid_status penalties found"
+        assert "no invalid_status penalties" not in resp_invalid.json()["detail"].lower()
 
     def test_get_penalties_invalid_user(self):
         """INTEGRATION TEST: Invalid user ID returns 404 with message"""

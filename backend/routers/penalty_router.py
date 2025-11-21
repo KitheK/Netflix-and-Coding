@@ -5,7 +5,7 @@ from fastapi import APIRouter, HTTPException, Depends, Query
 from backend.models.penalty_model import ApplyPenaltyRequest, PenaltyResponse, Penalty
 from backend.models.user_model import User
 from backend.services.penalty_service import PenaltyService
-from backend.services.auth_service import admin_required_dep
+from backend.services.auth_service import admin_required_dep, AuthService
 from backend.repositories.json_repository import JsonRepository
 
 # Create router with prefix /penalties and tag "penalties"
@@ -16,6 +16,7 @@ router = APIRouter(prefix="/penalties", tags=["penalties"])
 # JsonRepository handles reading/writing JSON files from backend/data directory
 repository = JsonRepository()
 penalty_service = PenaltyService(repository)
+auth_service = AuthService(repository)
 
 
 # POST /penalties/apply - Apply a penalty to a user (Admin-only)
@@ -124,9 +125,18 @@ async def get_user_penalties_for_user(
     - OUT: JSON array of Penalty objects for that user, sorted newest first
     """
     try:
-        # First check if user exists
-        if not penalty_service.user_exists(user_id):
+        # First check if user exists using AuthService
+        if auth_service.get_user_by_id(user_id) is None:
             raise HTTPException(status_code=404, detail=f"User {user_id} not found")
+
+        # Validate status parameter if provided
+        if status is not None:
+            normalized_status = status.lower()
+            if normalized_status not in {"active", "resolved"}:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Invalid status value: '{status}'. Must be 'active' or 'resolved'.",
+                )
 
         # Use the service to load and optionally filter penalties by status
         penalties = penalty_service.get_user_penalties(user_id=user_id, status=status)
