@@ -2,19 +2,20 @@
 
 from typing import List, Optional
 from backend.models.transaction_model import Transaction
-from backend.repositories.json_repository import JsonRepository
+from backend.repositories.transaction_repository import TransactionRepository
 
 
 class TransactionService:
     
-    def __init__(self, repository: JsonRepository):
-        self.repository = repository
+    def __init__(self):
+        # Create our own repository internally
+        self.transaction_repository = TransactionRepository()
     
     #get all transactions for a specific user, sorted by newest first
     def get_user_transactions(self, user_id: str) -> List[Transaction]:
 
         # Load all transactions from file
-        all_transactions = self.repository.load("transactions.json")
+        all_transactions = self.transaction_repository.get_all()
         
         # Handle empty or corrupted file
         if not isinstance(all_transactions, list):
@@ -38,7 +39,7 @@ class TransactionService:
     def get_transaction_by_id(self, transaction_id: str, user_id: str) -> Optional[Transaction]:
        
         # Load all transactions
-        all_transactions = self.repository.load("transactions.json")
+        all_transactions = self.transaction_repository.get_all()
         
         # Handle empty or corrupted file
         if not isinstance(all_transactions, list):

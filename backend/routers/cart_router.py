@@ -8,15 +8,13 @@ from backend.models.cart_model import AddToCartRequest, UpdateCartRequest, CartR
 from backend.models.transaction_model import CheckoutResponse
 from backend.services.cart_service import CartService
 from backend.services.product_service import ProductService
-from backend.repositories.json_repository import JsonRepository
 
 # Create router with prefix /cart.  so they will be like /cart/add, /cart/, etc.
 router = APIRouter(prefix="/cart", tags=["cart"])
 
-# Initialize dependencies (repository -> cart service, product service creates its own repo)
-repository = JsonRepository()
+# Initialize dependencies (services create their own repositories internally)
 product_service = ProductService()
-cart_service = CartService(repository, product_service)
+cart_service = CartService(product_service)
 
 
 # POST /cart/add - Add a product to users cart
