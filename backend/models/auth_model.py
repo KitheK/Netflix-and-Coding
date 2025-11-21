@@ -13,3 +13,12 @@ class LoginRequest(BaseModel):
     """Request model for user login."""
     email: EmailStr
     password: str
+
+
+class UserResponse(BaseModel):
+    """Safe user representation returned by auth endpoints."""
+    user_id: str
+    name: str
+    email: EmailStr
+    user_token: str
+    role: str
