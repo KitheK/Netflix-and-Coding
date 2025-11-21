@@ -110,11 +110,7 @@ class TestPenaltyServiceUnit:
         """UNIT TEST: Service can filter penalties by status (active vs resolved)"""
         user_id = str(uuid.uuid4())
 
-        # Manually create penalties with different statuses
-        base_penalty = self.service.apply_penalty(user_id=user_id, reason="Base reason")
-
-        # Load raw data and tweak statuses for testing
-        raw = self.repository.load("penalties.json")
+        # Create test penalties with different statuses directly
         # Ensure at least 3 entries for this user with mixed statuses
         raw = []
         raw.append(
