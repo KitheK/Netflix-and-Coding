@@ -105,3 +105,39 @@ def test_review_endpoint_with_empty_product_id():
     
     # Should return 404 or 405 (method not allowed) since the route requires a product_id
     assert response.status_code in [404, 405]
+
+def test_add_review_request_validation():
+    """Test that AddReviewRequest validates input correctly"""
+    from backend.models.review_model import AddReviewRequest
+    from pydantic import ValidationError
+
+    # Valid request should work
+    req = AddReviewRequest(
+        user_id="USER123",
+        user_name="John Doe",
+        review_title="Great product!",
+        review_content="Works perfectly."
+    )
+
+    assert req.user_id == "USER123"
+    assert req.user_name == "John Doe"
+    assert req.review_title == "Great product!"
+    assert req.review_content == "Works perfectly."
+
+    # Missing required field should raise ValidationError
+    with pytest.raises(ValidationError):
+        AddReviewRequest(
+            user_name="Missing Information",
+            review_title="Missing Required Fields",
+            review_content="Invalid"
+        )
+
+    # Extra unexpected field should raise ValidationError
+    with pytest.raises(ValidationError):
+        AddReviewRequest(
+            user_id="USER123",
+            user_name="John Doe",
+            review_title="Title",
+            review_content="Content",
+            extra_field="not allowed"
+        )
