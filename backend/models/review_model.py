@@ -18,3 +18,13 @@ class Review(BaseModel):
 # need to update the product's overall number of ratings, as well as do some math to update
 #the overall rating of the product based on the users rating, while considering the number of
 #ratings for the product to figure out the level of impact a single review has on the products rating. 
+
+
+class AddReviewRequest(BaseModel):
+    """Request model for adding a new review"""
+    
+    user_id: str
+    user_name: str
+    review_title: str
+    review_content: str 
+    # rating: float  # Optional rating
