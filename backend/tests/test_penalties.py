@@ -280,3 +280,60 @@ class TestPenaltyAPIIntegration:
         
         assert response.status_code == 400
         assert "user_id cannot be empty" in response.json()["detail"]
+
+    def test_get_penalties_for_user_success(self):
+        """INTEGRATION TEST: Admin can list all penalties for a specific user"""
+        headers = {"Authorization": f"Bearer {self.admin_token}"}
+
+        # Create two penalties for TEST_USER_ID_1
+        for reason in ["First violation", "Second violation"]:
+            resp = client.post(
+                "/penalties/apply",
+                json={
+                    "user_id": TEST_USER_ID_1,
+                    "reason": reason,
+                },
+                headers=headers,
+            )
+            assert resp.status_code == 200
+
+        # Create one penalty for TEST_USER_ID_2 (should not appear in results)
+        other_resp = client.post(
+            "/penalties/apply",
+            json={
+                "user_id": TEST_USER_ID_2,
+                "reason": "Other user violation",
+            },
+            headers=headers,
+        )
+        assert other_resp.status_code == 200
+
+        # Now fetch penalties for TEST_USER_ID_1
+        list_resp = client.get(f"/penalties/{TEST_USER_ID_1}", headers=headers)
+        assert list_resp.status_code == 200
+        penalties = list_resp.json()
+
+        # Should only return penalties for this user
+        assert isinstance(penalties, list)
+        assert len(penalties) == 2
+        assert all(p["user_id"] == TEST_USER_ID_1 for p in penalties)
+
+    def test_get_penalties_for_user_no_penalties(self):
+        """INTEGRATION TEST: Getting penalties for a user with no penalties returns empty list"""
+        headers = {"Authorization": f"Bearer {self.admin_token}"}
+
+        # Ensure there are no penalties yet for TEST_USER_ID_1
+        list_resp = client.get(f"/penalties/{TEST_USER_ID_1}", headers=headers)
+        assert list_resp.status_code == 200
+        penalties = list_resp.json()
+        assert isinstance(penalties, list)
+        assert len(penalties) == 0
+
+    def test_get_penalties_for_user_forbidden_for_customer(self):
+        """INTEGRATION TEST: Non-admin user cannot view another user's penalties"""
+        headers_customer = {"Authorization": f"Bearer {self.user1_token}"}
+
+        # Customer tries to read penalties for another user
+        resp = client.get(f"/penalties/{TEST_USER_ID_2}", headers=headers_customer)
+        assert resp.status_code == 403
+        assert "admin" in resp.json()["detail"].lower()

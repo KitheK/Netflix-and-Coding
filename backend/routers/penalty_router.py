@@ -1,7 +1,8 @@
 """Penalty Router: API endpoints for penalty operations (Admin-only)"""
 
+from typing import List
 from fastapi import APIRouter, HTTPException, Depends
-from backend.models.penalty_model import ApplyPenaltyRequest, PenaltyResponse
+from backend.models.penalty_model import ApplyPenaltyRequest, PenaltyResponse, Penalty
 from backend.models.user_model import User
 from backend.services.penalty_service import PenaltyService
 from backend.services.auth_service import admin_required_dep
@@ -77,3 +78,25 @@ async def apply_penalty(
         # Unexpected error - return 500 Internal Server Error
         raise HTTPException(status_code=500, detail=f"Failed to apply penalty: {str(e)}")
 
+# GET /penalties/{user_id} - List all penalties for a specific user (Admin-only)
+@router.get("/{user_id}", response_model=List[Penalty])
+async def get_user_penalties_for_user(
+    user_id: str,
+    current_user: User = Depends(admin_required_dep),
+):
+    """
+    Admin-only: list all penalties for a specific user.
+
+    - IN: path param user_id (UUID string)
+    - OUT: JSON array of Penalty objects for that user, sorted newest first
+    """
+    try:
+        # Use the service to load and filter penalties by user_id
+        penalties = penalty_service.get_user_penalties(user_id=user_id)
+        return penalties
+    except Exception as e:
+        # Generic error handler (e.g., file read issues)
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to retrieve penalties for user {user_id}: {str(e)}",
+        )
