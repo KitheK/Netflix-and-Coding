@@ -106,6 +106,60 @@ class TestPenaltyServiceUnit:
         with pytest.raises(ValueError, match="reason cannot be empty"):
             self.service.apply_penalty(user_id=user_id, reason="   ")
 
+    def test_get_user_penalties_filters_by_status(self):
+        """UNIT TEST: Service can filter penalties by status (active vs resolved)"""
+        user_id = str(uuid.uuid4())
+
+        # Manually create penalties with different statuses
+        base_penalty = self.service.apply_penalty(user_id=user_id, reason="Base reason")
+
+        # Load raw data and tweak statuses for testing
+        raw = self.repository.load("penalties.json")
+        # Ensure at least 3 entries for this user with mixed statuses
+        raw = []
+        raw.append(
+            {
+                "penalty_id": "p1",
+                "user_id": user_id,
+                "reason": "Active 1",
+                "timestamp": "2025-01-01T10:00:00+00:00",
+                "status": "active",
+            }
+        )
+        raw.append(
+            {
+                "penalty_id": "p2",
+                "user_id": user_id,
+                "reason": "Resolved 1",
+                "timestamp": "2025-01-02T10:00:00+00:00",
+                "status": "resolved",
+            }
+        )
+        raw.append(
+            {
+                "penalty_id": "p3",
+                "user_id": user_id,
+                "reason": "Active 2",
+                "timestamp": "2025-01-03T10:00:00+00:00",
+                "status": "active",
+            }
+        )
+        self.repository.save("penalties.json", raw)
+
+        # Active only
+        active = self.service.get_user_penalties(user_id=user_id, status="active")
+        assert [p.penalty_id for p in active] == ["p3", "p1"]  # newest first
+        assert all(p.status == "active" for p in active)
+
+        # Resolved only
+        resolved = self.service.get_user_penalties(user_id=user_id, status="resolved")
+        assert [p.penalty_id for p in resolved] == ["p2"]
+        assert all(p.status == "resolved" for p in resolved)
+
+        # No status filter returns all
+        all_penalties = self.service.get_user_penalties(user_id=user_id)
+        assert [p.penalty_id for p in all_penalties] == ["p3", "p2", "p1"]
+
 
 # ============================================================================
 # INTEGRATION TESTS - Testing full API endpoints with database
@@ -337,3 +391,207 @@ class TestPenaltyAPIIntegration:
         resp = client.get(f"/penalties/{TEST_USER_ID_2}", headers=headers_customer)
         assert resp.status_code == 403
         assert "admin" in resp.json()["detail"].lower()
+
+    def test_get_penalties_filtered_active(self):
+        """INTEGRATION TEST: GET /penalties/{user_id}?status=active filters to active penalties only"""
+        headers = {"Authorization": f"Bearer {self.admin_token}"}
+
+        # Create three penalties, then manually mark some resolved in the file
+        for reason in ["Active 1", "Resolved 1", "Active 2"]:
+            resp = client.post(
+                "/penalties/apply",
+                json={
+                    "user_id": TEST_USER_ID_1,
+                    "reason": reason,
+                },
+                headers=headers,
+            )
+            assert resp.status_code == 200
+
+        # Load file and mark middle penalty as resolved
+        with open(TEST_DB_PATH_PENALTIES, "r", encoding="utf-8") as f:
+            penalties = json.load(f)
+
+        # Assume all 3 belong to TEST_USER_ID_1 in order
+        penalties[1]["status"] = "resolved"
+        with open(TEST_DB_PATH_PENALTIES, "w", encoding="utf-8") as f:
+            json.dump(penalties, f, indent=2)
+
+        # Request only active penalties
+        resp_active = client.get(
+            f"/penalties/{TEST_USER_ID_1}?status=active", headers=headers
+        )
+        assert resp_active.status_code == 200
+        body = resp_active.json()
+        assert isinstance(body, list)
+        # Should contain only the two active penalties
+        assert len(body) == 2
+        assert all(p["status"] == "active" for p in body)
+
+    def test_get_penalties_filtered_resolved(self):
+        """INTEGRATION TEST: GET /penalties/{user_id}?status=resolved filters to resolved penalties only"""
+        headers = {"Authorization": f"Bearer {self.admin_token}"}
+
+        # Create two penalties for TEST_USER_ID_2
+        for reason in ["Resolved X", "Resolved Y"]:
+            resp = client.post(
+                "/penalties/apply",
+                json={
+                    "user_id": TEST_USER_ID_2,
+                    "reason": reason,
+                },
+                headers=headers,
+            )
+            assert resp.status_code == 200
+
+        # Mark all TEST_USER_ID_2 penalties as resolved in the file
+        with open(TEST_DB_PATH_PENALTIES, "r", encoding="utf-8") as f:
+            penalties = json.load(f)
+
+        for p in penalties:
+            if p.get("user_id") == TEST_USER_ID_2:
+                p["status"] = "resolved"
+
+        with open(TEST_DB_PATH_PENALTIES, "w", encoding="utf-8") as f:
+            json.dump(penalties, f, indent=2)
+
+        # Request only resolved penalties
+        resp_resolved = client.get(
+            f"/penalties/{TEST_USER_ID_2}?status=resolved", headers=headers
+        )
+        assert resp_resolved.status_code == 200
+        body = resp_resolved.json()
+        assert isinstance(body, list)
+        assert len(body) >= 2
+        assert all(p["status"] == "resolved" for p in body)
+
+    def test_get_penalties_invalid_status_returns_all(self):
+        """INTEGRATION TEST: Unknown status value returns all penalties (no filter applied)"""
+        headers = {"Authorization": f"Bearer {self.admin_token}"}
+
+        # Create penalties for TEST_USER_ID_1
+        reasons = ["Violation A", "Violation B"]
+        for reason in reasons:
+            resp = client.post(
+                "/penalties/apply",
+                json={
+                    "user_id": TEST_USER_ID_1,
+                    "reason": reason,
+                },
+                headers=headers,
+            )
+            assert resp.status_code == 200
+
+        # Mark one as resolved so we have mixed statuses
+        with open(TEST_DB_PATH_PENALTIES, "r", encoding="utf-8") as f:
+            penalties = json.load(f)
+        for p in penalties:
+            if p.get("user_id") == TEST_USER_ID_1:
+                p["status"] = "resolved"
+                break
+        with open(TEST_DB_PATH_PENALTIES, "w", encoding="utf-8") as f:
+            json.dump(penalties, f, indent=2)
+
+        # Use an invalid status filter; service should ignore it and return all for the user
+        resp_invalid = client.get(
+            f"/penalties/{TEST_USER_ID_1}?status=unknown", headers=headers
+        )
+        assert resp_invalid.status_code == 200
+        body = resp_invalid.json()
+        assert isinstance(body, list)
+        # Should still return both penalties for this user
+        assert len(body) == 2
+
+    def test_get_penalties_invalid_user(self):
+        """INTEGRATION TEST: Invalid user ID returns 404 with message"""
+        headers = {"Authorization": f"Bearer {self.admin_token}"}
+        fake_user_id = "00000000-0000-0000-0000-ABCDEFABCDEF"
+
+        resp = client.get(f"/penalties/{fake_user_id}", headers=headers)
+        assert resp.status_code == 404
+        assert "not found" in resp.json()["detail"].lower()
+
+    def test_get_penalties_filter_no_results(self):
+        """INTEGRATION TEST: Status filter with no matching penalties returns 404"""
+        headers = {"Authorization": f"Bearer {self.admin_token}"}
+
+        # Create one active penalty only
+        resp = client.post(
+            "/penalties/apply",
+            json={
+                "user_id": TEST_USER_ID_1,
+                "reason": "Only active penalty",
+            },
+            headers=headers,
+        )
+        assert resp.status_code == 200
+
+        # Request resolved penalties (none exist)
+        resp_filtered = client.get(
+            f"/penalties/{TEST_USER_ID_1}?status=resolved",
+            headers=headers,
+        )
+        assert resp_filtered.status_code == 404
+        assert "no resolved penalties" in resp_filtered.json()["detail"].lower()
+
+    def test_resolve_penalty_success(self):
+        """INTEGRATION TEST: Admin can resolve a penalty"""
+        headers = {"Authorization": f"Bearer {self.admin_token}"}
+
+        # Create penalty
+        resp = client.post(
+            "/penalties/apply",
+            json={
+                "user_id": TEST_USER_ID_1,
+                "reason": "Resolve me",
+            },
+            headers=headers,
+        )
+        assert resp.status_code == 200
+        penalty_id = resp.json()["penalty"]["penalty_id"]
+
+        # Resolve penalty
+        resolve_resp = client.post(f"/penalties/{penalty_id}/resolve", headers=headers)
+        assert resolve_resp.status_code == 200
+        data = resolve_resp.json()
+        assert data["message"] == "Penalty resolved successfully"
+        assert data["penalty"]["status"] == "resolved"
+
+        # Ensure GET with status filter shows no active penalties (should return 404)
+        active_resp = client.get(
+            f"/penalties/{TEST_USER_ID_1}?status=active", headers=headers
+        )
+        assert active_resp.status_code == 404
+        assert "no active penalties found" in active_resp.json()["detail"].lower()
+
+    def test_resolve_penalty_not_found(self):
+        """INTEGRATION TEST: Resolving non-existent penalty returns 404"""
+        headers = {"Authorization": f"Bearer {self.admin_token}"}
+        fake_id = "00000000-0000-0000-0000-999999999999"
+
+        resp = client.post(f"/penalties/{fake_id}/resolve", headers=headers)
+        assert resp.status_code == 404
+        assert "not found" in resp.json()["detail"].lower()
+
+    def test_resolve_penalty_already_resolved(self):
+        """INTEGRATION TEST: Resolving an already resolved penalty returns 400"""
+        headers = {"Authorization": f"Bearer {self.admin_token}"}
+
+        resp = client.post(
+            "/penalties/apply",
+            json={
+                "user_id": TEST_USER_ID_2,
+                "reason": "Already resolved test",
+            },
+            headers=headers,
+        )
+        penalty_id = resp.json()["penalty"]["penalty_id"]
+
+        # First resolve succeeds
+        first = client.post(f"/penalties/{penalty_id}/resolve", headers=headers)
+        assert first.status_code == 200
+
+        # Second resolve should fail with 400
+        second = client.post(f"/penalties/{penalty_id}/resolve", headers=headers)
+        assert second.status_code == 400
+        assert "already resolved" in second.json()["detail"].lower()

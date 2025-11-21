@@ -78,12 +78,13 @@ class PenaltyService:
         # Return the created penalty object
         return penalty
     
-    def get_user_penalties(self, user_id: str) -> List[Penalty]:
+    def get_user_penalties(self, user_id: str, status: Optional[str] = None) -> List[Penalty]:
         """
-        Get all penalties for a specific user, sorted by newest first.
+        Get penalties for a specific user, optionally filtered by status, sorted by newest first.
         
         Args:
             user_id: UUID of the user to get penalties for
+            status: Optional status filter ("active" or "resolved"). If None, return all.
             
         Returns:
             List[Penalty]: List of penalties for the user, newest first
@@ -102,10 +103,65 @@ class PenaltyService:
             for penalty_dict in all_penalties
             if penalty_dict.get("user_id") == user_id
         ]
-        
+
+        # Optional status filter: only "active" or "resolved"
+        if status is not None:
+            normalized = status.lower()
+            if normalized in {"active", "resolved"}:
+                user_penalties = [
+                    p for p in user_penalties
+                    if (p.status or "").lower() == normalized
+                ]
+
         # Sort by timestamp, newest first
         # ISO format timestamps sort correctly alphabetically
         user_penalties.sort(key=lambda p: p.timestamp, reverse=True)
         
         return user_penalties
+
+    def resolve_penalty(self, penalty_id: str) -> Penalty:
+        """
+        Mark a penalty as resolved.
+
+        Args:
+            penalty_id: The ID of the penalty to resolve.
+
+        Returns:
+            Penalty: The updated penalty with status "resolved".
+
+        Raises:
+            ValueError: If penalty is not found or already resolved.
+        """
+        if not penalty_id or len(penalty_id.strip()) == 0:
+            raise ValueError("penalty_id cannot be empty")
+
+        all_penalties = self.repository.load("penalties.json")
+        if not isinstance(all_penalties, list):
+            raise ValueError("penalties data is invalid")
+
+        updated_penalty: Optional[Penalty] = None
+        for penalty_dict in all_penalties:
+            if penalty_dict.get("penalty_id") == penalty_id:
+                current_status = (penalty_dict.get("status") or "active").lower()
+                if current_status == "resolved":
+                    raise ValueError("Penalty is already resolved")
+
+                penalty_dict["status"] = "resolved"
+                updated_penalty = Penalty(**penalty_dict)
+                break
+
+        if updated_penalty is None:
+            raise ValueError("Penalty not found")
+
+        self.repository.save("penalties.json", all_penalties)
+        return updated_penalty
+
+    def user_exists(self, user_id: str) -> bool:
+        """
+        Check if a user exists in users.json
+        """
+        users_data = self.repository.load("users.json")
+        if isinstance(users_data, list):
+            return any(user.get("user_id") == user_id for user in users_data)
+        return False
 
