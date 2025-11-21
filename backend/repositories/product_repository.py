@@ -4,6 +4,8 @@ import os
 from backend.repositories.base_repository import BaseRepository
 
 
+# Repository for product data
+#inherits from BaseRepository to get common load/save logic
 class ProductRepository(BaseRepository):
     # Repository for product data
     # Handles all data access to products.json (or products_test.json in tests)
@@ -17,3 +19,6 @@ class ProductRepository(BaseRepository):
         
         # Default to products.json
         return "products.json"
+
+#this repository is LOCKED to products.json (or products_test.json)
+#it cannot access any other files like cart.json or users.json
