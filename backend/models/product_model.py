@@ -1,27 +1,26 @@
+"""Product models for request/response"""
+
 from pydantic import BaseModel
 from typing import Optional
 
 
 class Product(BaseModel):
-    """Product model : uses cleaned numeric data from products.json"""
-
+    """Product model matching products.json structure"""
     product_id: str
     product_name: str
     category: str
-    discounted_price: float     # in indian rupees (convert from rupees to something else when we add external api)
-    actual_price: float         # in indian rupees (convert from rupees to something else when we add external api)
-    discount_percentage: float  # is a float like 64.0 for 64%
+    discounted_price: float
+    actual_price: float
+    discount_percentage: float
+    rating: float
+    rating_count: Optional[int] = None
     about_product: str
     img_link: str
     product_link: str
-    
-    # overall product ratings
-    rating: float  
-    rating_count: Optional[int] = None  
 
 
 class CreateProductRequest(BaseModel):
-    """Request model for creating a product (admin only)."""
+    """Request model for creating a new product"""
     product_name: str
     category: str
     discounted_price: float
@@ -30,21 +29,19 @@ class CreateProductRequest(BaseModel):
     about_product: str
     img_link: str
     product_link: str
-    rating: float = 0.0
+    rating: float = 0.0  # Default to 0.0 if not provided
     rating_count: Optional[int] = None
 
 
-class ProductResponse(BaseModel):
-    """Response model for product endpoints."""
-    product_id: str
-    product_name: str
-    category: str
-    discounted_price: float
-    actual_price: float
-    discount_percentage: float
-    about_product: str
-    img_link: str
-    product_link: str
-    rating: float
-    rating_count: Optional[int]
-
+class UpdateProductRequest(BaseModel):
+    """Request model for updating an existing product (all fields optional)"""
+    product_name: Optional[str] = None
+    category: Optional[str] = None
+    discounted_price: Optional[float] = None
+    actual_price: Optional[float] = None
+    discount_percentage: Optional[float] = None
+    about_product: Optional[str] = None
+    img_link: Optional[str] = None
+    product_link: Optional[str] = None
+    rating: Optional[float] = None
+    rating_count: Optional[int] = None

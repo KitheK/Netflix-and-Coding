@@ -1,55 +1,28 @@
-"""Product Service: Business logic for product operations"""
+# Product Service: Business logic for product operations
 
-import os
 import uuid
 import string
 import random
-from typing import Optional, List
+from typing import List, Optional
 from backend.models.product_model import Product
-from backend.repositories.json_repository import JsonRepository
+from backend.repositories.product_repository import ProductRepository
 
 
 class ProductService:
-    """Handles all business logic related to products"""
+    # Handles all business logic related to products
     
-    def __init__(self, repository: JsonRepository):
-        # JsonRepository is the data access class that gets data from json files
-        self.repository = repository
-        # choose product file:
-        # 1) explicit env var PRODUCTS_FILE (expected to be a filename under data dir)
-        # 2) products_test.json if present (tests create this file)
-        # 3) fallback to products.json
-        self.product_file = os.environ.get("PRODUCTS_FILE")
-        if not self.product_file:
-            test_path = os.path.join("backend", "data", "products_test.json")
-            if os.path.exists(test_path):
-                self.product_file = "products_test.json"
-            else:
-                self.product_file = "products.json"
+    def __init__(self):
+        # Create our own ProductRepository internally
+        # ProductRepository is locked to products.json (or products_test.json in tests)
+        self.repository = ProductRepository()
 
-    def _repo_load(self, filename: Optional[str] = None) -> List[dict]:
-        """Load data from repository. Use configured product_file by default."""
-        filename = filename or self.product_file
-        for name in ("load", "get_all", "read", "read_all"):
-            fn = getattr(self.repository, name, None)
-            if callable(fn):
-                try:
-                    return fn(filename) or []  # Ensure we always return a list
-                except TypeError:
-                    return fn() or []  # Ensure we always return a list
-        raise AttributeError("Repository has no load/get_all/read method")
+    # Load all products from repository
+    def _repo_load(self) -> List[dict]:
+        return self.repository.get_all()
 
-    def _repo_save(self, data: List[dict], filename: Optional[str] = None) -> None:
-        """Save data to repository. Use configured product_file by default."""
-        filename = filename or self.product_file
-        for name in ("save", "write", "write_all", "save_all"):
-            fn = getattr(self.repository, name, None)
-            if callable(fn):
-                try:
-                    return fn(filename, data)
-                except TypeError:
-                    return fn(data)
-        raise AttributeError("Repository has no save/write method")
+    # Save all products to repository
+    def _repo_save(self, data: List[dict]) -> None:
+        self.repository.save_all(data)
     
 
     # helper method that basically loads and converts all products from the products.json to Product objects
@@ -139,6 +112,102 @@ class ProductService:
 
         return new_product
 
+    def update_product(self, product_id: str, product_name: Optional[str] = None,
+                      category: Optional[str] = None, discounted_price: Optional[float] = None,
+                      actual_price: Optional[float] = None, discount_percentage: Optional[float] = None,
+                      about_product: Optional[str] = None, img_link: Optional[str] = None,
+                      product_link: Optional[str] = None, rating: Optional[float] = None,
+                      rating_count: Optional[int] = None) -> Product:
+        """
+        Update an existing product (admin only).
+        Only updates fields that are provided (not None).
+        Raises ValueError if product doesn't exist or validation fails.
+        """
+        products = self._load_all_products()
+        
+        # Find the product to update
+        product_index = None
+        existing_product = None
+        for idx, product in enumerate(products):
+            if product.product_id == product_id:
+                product_index = idx
+                existing_product = product
+                break
+        
+        if existing_product is None:
+            raise ValueError(f"Product with ID {product_id} not found")
+        
+        # Validate fields if provided
+        if product_name is not None and len(product_name.strip()) == 0:
+            raise ValueError("Product name cannot be empty")
+        if category is not None and len(category.strip()) == 0:
+            raise ValueError("category cannot be empty")
+        if discounted_price is not None and discounted_price <= 0:
+            raise ValueError("discounted_price must be greater than 0")
+        if actual_price is not None and actual_price <= 0:
+            raise ValueError("actual_price must be greater than 0")
+        if discount_percentage is not None and (discount_percentage < 0 or discount_percentage > 100):
+            raise ValueError("discount percentage must be between 0 and 100")
+        if about_product is not None and len(about_product.strip()) == 0:
+            raise ValueError("description cannot be empty")
+        if img_link is not None and len(img_link.strip()) == 0:
+            raise ValueError("image link cannot be empty")
+        if product_link is not None and len(product_link.strip()) == 0:
+            raise ValueError("product link cannot be empty")
+        if rating is not None and (rating < 0 or rating > 5):
+            raise ValueError("rating must be between 0 and 5")
+        
+        # Update only provided fields
+        updated_product = Product(
+            product_id=existing_product.product_id,
+            product_name=product_name.strip() if product_name is not None else existing_product.product_name,
+            category=category.strip() if category is not None else existing_product.category,
+            discounted_price=discounted_price if discounted_price is not None else existing_product.discounted_price,
+            actual_price=actual_price if actual_price is not None else existing_product.actual_price,
+            discount_percentage=discount_percentage if discount_percentage is not None else existing_product.discount_percentage,
+            about_product=about_product.strip() if about_product is not None else existing_product.about_product,
+            img_link=img_link.strip() if img_link is not None else existing_product.img_link,
+            product_link=product_link.strip() if product_link is not None else existing_product.product_link,
+            rating=rating if rating is not None else existing_product.rating,
+            rating_count=rating_count if rating_count is not None else existing_product.rating_count
+        )
+        
+        # Replace the product in the list
+        products[product_index] = updated_product
+        
+        # Persist changes
+        updated_list = [p.model_dump() for p in products]
+        self._repo_save(updated_list)
+        
+        return updated_product
+
+    def delete_product(self, product_id: str) -> Product:
+        """
+        Delete a product by ID (admin only).
+        Raises ValueError if product doesn't exist.
+        Returns the deleted product for confirmation.
+        """
+        products = self._load_all_products()
+        
+        # Find the product to delete
+        product_to_delete = None
+        remaining_products = []
+        
+        for product in products:
+            if product.product_id == product_id:
+                product_to_delete = product
+            else:
+                remaining_products.append(product)
+        
+        if product_to_delete is None:
+            raise ValueError(f"Product with ID {product_id} not found")
+        
+        # Save the updated list (without the deleted product)
+        updated_list = [p.model_dump() for p in remaining_products]
+        self._repo_save(updated_list)
+        
+        return product_to_delete
+
     def get_all_products(self) -> List[Product]:
         # Load and return all products (no filtering)
         return self._load_all_products()
@@ -195,7 +264,3 @@ class ProductService:
             return sorted(products, key=lambda p: p.discount_percentage, reverse=True)
         else:
             return products  # no sorting if invalid option
-
-
-
-

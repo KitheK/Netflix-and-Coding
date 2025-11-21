@@ -18,7 +18,6 @@ from datetime import datetime, timezone
 from fastapi.testclient import TestClient
 from backend.main import app
 from backend.services.penalty_service import PenaltyService
-from backend.repositories.json_repository import JsonRepository
 from backend.models.penalty_model import Penalty
 
 # Test file paths
@@ -76,7 +75,10 @@ class TestPenaltyServiceUnit:
         datetime.fromisoformat(penalty.timestamp.replace('Z', '+00:00'))
         
         # Verify penalty was saved to file
-        saved_penalties = self.repository.load("penalties.json")
+        penalties_file = Path("backend/data/penalties.json")
+        assert penalties_file.exists()
+        with open(penalties_file) as f:
+            saved_penalties = json.load(f)
         assert len(saved_penalties) == 1
         assert saved_penalties[0]["penalty_id"] == penalty.penalty_id
         assert saved_penalties[0]["user_id"] == user_id
