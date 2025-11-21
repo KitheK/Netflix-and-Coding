@@ -6,17 +6,14 @@ from backend.models.penalty_model import ApplyPenaltyRequest, PenaltyResponse, P
 from backend.models.user_model import User
 from backend.services.penalty_service import PenaltyService
 from backend.services.auth_service import admin_required_dep, AuthService
-from backend.repositories.json_repository import JsonRepository
 
 # Create router with prefix /penalties and tag "penalties"
 # All endpoints in this router will be accessible at /penalties/*
 router = APIRouter(prefix="/penalties", tags=["penalties"])
 
-# Initialize dependencies (repository -> service)
-# JsonRepository handles reading/writing JSON files from backend/data directory
-repository = JsonRepository()
-penalty_service = PenaltyService(repository)
-auth_service = AuthService(repository)
+# Initialize dependencies (services create their own repositories internally)
+penalty_service = PenaltyService()
+auth_service = AuthService()
 
 
 # POST /penalties/apply - Apply a penalty to a user (Admin-only)
