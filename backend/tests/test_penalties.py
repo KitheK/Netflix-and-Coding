@@ -18,7 +18,6 @@ from datetime import datetime, timezone
 from fastapi.testclient import TestClient
 from backend.main import app
 from backend.services.penalty_service import PenaltyService
-from backend.repositories.json_repository import JsonRepository
 from backend.models.penalty_model import Penalty
 
 # Test file paths
@@ -43,17 +42,12 @@ class TestPenaltyServiceUnit:
     
     @pytest.fixture(scope="function", autouse=True)
     def setup_test_repository(self, tmp_path):
-        """Create a temporary repository for isolated unit tests"""
-        # Create temporary data directory
-        test_data_dir = tmp_path / "test_data"
-        test_data_dir.mkdir()
-        
-        # Create JsonRepository with test directory
-        self.repository = JsonRepository(data_dir=str(test_data_dir))
-        self.service = PenaltyService(self.repository)
+        """Create test service (repository created internally)"""
+        # Service creates its own PenaltyRepository internally
+        self.service = PenaltyService()
         
         # Clean up penalties file
-        penalties_file = test_data_dir / "penalties.json"
+        penalties_file = Path("backend/data/penalties.json")
         if penalties_file.exists():
             penalties_file.unlink()
         
@@ -82,7 +76,10 @@ class TestPenaltyServiceUnit:
         datetime.fromisoformat(penalty.timestamp.replace('Z', '+00:00'))
         
         # Verify penalty was saved to file
-        saved_penalties = self.repository.load("penalties.json")
+        penalties_file = Path("backend/data/penalties.json")
+        assert penalties_file.exists()
+        with open(penalties_file) as f:
+            saved_penalties = json.load(f)
         assert len(saved_penalties) == 1
         assert saved_penalties[0]["penalty_id"] == penalty.penalty_id
         assert saved_penalties[0]["user_id"] == user_id

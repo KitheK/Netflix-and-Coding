@@ -1,55 +1,28 @@
-"""Product Service: Business logic for product operations"""
+# Product Service: Business logic for product operations
 
-import os
 import uuid
 import string
 import random
-from typing import Optional, List
+from typing import List, Optional
 from backend.models.product_model import Product
-from backend.repositories.json_repository import JsonRepository
+from backend.repositories.product_repository import ProductRepository
 
 
 class ProductService:
-    """Handles all business logic related to products"""
+    # Handles all business logic related to products
     
-    def __init__(self, repository: JsonRepository):
-        # JsonRepository is the data access class that gets data from json files
-        self.repository = repository
-        # choose product file:
-        # 1) explicit env var PRODUCTS_FILE (expected to be a filename under data dir)
-        # 2) products_test.json if present (tests create this file)
-        # 3) fallback to products.json
-        self.product_file = os.environ.get("PRODUCTS_FILE")
-        if not self.product_file:
-            test_path = os.path.join("backend", "data", "products_test.json")
-            if os.path.exists(test_path):
-                self.product_file = "products_test.json"
-            else:
-                self.product_file = "products.json"
+    def __init__(self):
+        # Create our own ProductRepository internally
+        # ProductRepository is locked to products.json (or products_test.json in tests)
+        self.repository = ProductRepository()
 
-    def _repo_load(self, filename: Optional[str] = None) -> List[dict]:
-        """Load data from repository. Use configured product_file by default."""
-        filename = filename or self.product_file
-        for name in ("load", "get_all", "read", "read_all"):
-            fn = getattr(self.repository, name, None)
-            if callable(fn):
-                try:
-                    return fn(filename)
-                except TypeError:
-                    return fn()
-        raise AttributeError("Repository has no load/get_all/read method")
+    # Load all products from repository
+    def _repo_load(self) -> List[dict]:
+        return self.repository.get_all()
 
-    def _repo_save(self, data: List[dict], filename: Optional[str] = None) -> None:
-        """Save data to repository. Use configured product_file by default."""
-        filename = filename or self.product_file
-        for name in ("save", "write", "write_all", "save_all"):
-            fn = getattr(self.repository, name, None)
-            if callable(fn):
-                try:
-                    return fn(filename, data)
-                except TypeError:
-                    return fn(data)
-        raise AttributeError("Repository has no save/write method")
+    # Save all products to repository
+    def _repo_save(self, data: List[dict]) -> None:
+        self.repository.save_all(data)
     
 
     # helper method that basically loads and converts all products from the products.json to Product objects

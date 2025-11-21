@@ -5,20 +5,18 @@ from typing import List
 from backend.models.transaction_model import Transaction
 from backend.services.transaction_service import TransactionService
 from backend.services.cart_service import CartService
-from backend.repositories.json_repository import JsonRepository
 
 # Create router with prefix /transactions
 router = APIRouter(prefix="/transactions", tags=["transactions"])
 
-# Initialize dependencies
-repository = JsonRepository()
-transaction_service = TransactionService(repository)
+# Initialize dependencies (services create their own repositories internally)
+transaction_service = TransactionService()
 
 # We need CartService just to access the _get_user_id_from_token helper
 # In a real app, this helper would be in a shared auth service
 from backend.services.product_service import ProductService
-product_service = ProductService(repository)
-cart_service = CartService(repository, product_service)
+product_service = ProductService()
+cart_service = CartService(product_service)
 
 
 # GET /transactions/ - Get all transactions for current user

@@ -1,4 +1,3 @@
-import os
 import uuid
 import bcrypt
 import secrets
@@ -8,44 +7,34 @@ from typing import List, Optional, Any
 from fastapi import Depends, HTTPException, Security
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
-from backend.repositories.json_repository import JsonRepository
+from backend.repositories.user_repository import UserRepository
 from backend.models.user_model import User
 
 class AuthService:
-    """Handles all authentication & user-related business logic."""
+    # Handles all authentication & user-related business logic
 
-    def __init__(self, repository: JsonRepository):
-        self.repository = repository
-        # allow override via env var for tests: set USERS_FILE=test_users.json
-        self.user_file = os.environ.get("USERS_FILE", "users.json")
+    def __init__(self):
+        # Create our own UserRepository internally
+        # UserRepository is locked to users.json
+        self.repository = UserRepository()
 
+    # Generate a cryptographically secure 28-character token
     def _generate_user_token(self) -> str:
-        """Generate a cryptographically secure 28-character token."""
         characters = string.ascii_letters + string.digits
         return ''.join(secrets.choice(characters) for _ in range(28))
 
-    def _repo_load(self, filename: str) -> List[dict]:
-        for name in ("load", "get_all", "read", "read_all"):
-            fn = getattr(self.repository, name, None)
-            if callable(fn):
-                try:
-                    return fn(filename)
-                except TypeError:
-                    return fn()
-        raise AttributeError("Repository has no load/get_all/read method")
+    # Load all users from repository
+    # Load all users from repository
+    def _repo_load(self) -> List[dict]:
+        return self.repository.get_all()
 
-    def _repo_save(self, filename: str, data: List[dict]) -> None:
-        for name in ("save", "write", "write_all", "save_all"):
-            fn = getattr(self.repository, name, None)
-            if callable(fn):
-                try:
-                    return fn(filename, data)
-                except TypeError:
-                    return fn(data)
-        raise AttributeError("Repository has no save/write method")
+    # Save all users to repository
+    def _repo_save(self, data: List[dict]) -> None:
+        self.repository.save_all(data)
 
+    # Load all users and convert to User objects
     def _load_all_users(self) -> List[User]:
-        raw_users = self._repo_load(self.user_file) or []
+        raw_users = self._repo_load() or []
         users: List[User] = []
         for user_dict in raw_users:
             users.append(User(**user_dict))
@@ -81,7 +70,7 @@ class AuthService:
 
         updated_list = [u.model_dump() for u in users]
         updated_list.append(new_user.model_dump())
-        self._repo_save(self.user_file, updated_list)
+        self._repo_save(updated_list)
 
         return new_user
 
@@ -125,9 +114,9 @@ class AuthService:
 # HTTP bearer instance used by the dependency
 _security = HTTPBearer(auto_error=False)
 
-# module-level default repository + service used by the dependency helpers
-_default_repository = JsonRepository()
-default_auth_service = AuthService(_default_repository)
+# Module-level default service used by the dependency helpers
+# AuthService creates its own UserRepository internally
+default_auth_service = AuthService()
 
 
 def _extract_token(credentials: Optional[HTTPAuthorizationCredentials]) -> str:
