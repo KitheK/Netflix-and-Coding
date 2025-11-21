@@ -218,16 +218,20 @@ class CartService:
         )
         
         # save transaction to transactions.json
-        # Load existing transactions (should be an array)
-        transactions = self.transaction_repository.get_all()
-        if not isinstance(transactions, list):
-            transactions = []
+        # Load existing transactions (now a dict: {"user_id": [transactions]})
+        all_transactions = self.transaction_repository.get_all()
+        if not isinstance(all_transactions, dict):
+            all_transactions = {}
         
-        # Add new transaction to the list
-        transactions.append(transaction.model_dump())  # Convert Pydantic model to dict
+        # Get or create the user's transaction list
+        if user_id not in all_transactions:
+            all_transactions[user_id] = []
+        
+        # Append new transaction to the user's list
+        all_transactions[user_id].append(transaction.model_dump())  # Convert Pydantic model to dict
         
         # Save back to file
-        self.transaction_repository.save_all(transactions)
+        self.transaction_repository.save_all(all_transactions)
         
         # clear the user's cart because they've bought the items so when they go back to cart it doesnt show all the items they just bought
         all_carts = self._load_all_carts()
