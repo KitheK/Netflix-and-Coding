@@ -68,6 +68,7 @@ class TestExternalServiceUnit:
         """Clean up after each test method"""
         os.environ.pop("PRODUCTS_FILE", None)
     
+    @pytest.mark.unit
     @pytest.mark.asyncio
     async def test_get_exchange_rate_success(self):
         """UNIT TEST: Successfully fetch exchange rate from API"""
@@ -107,6 +108,7 @@ class TestExternalServiceUnit:
             rate = await self.external_service.get_exchange_rate("CAD")
             assert rate == 0.016
     
+    @pytest.mark.unit
     @pytest.mark.asyncio
     async def test_get_exchange_rate_invalid_currency(self):
         """UNIT TEST: Invalid currency code raises ValueError"""
@@ -126,6 +128,7 @@ class TestExternalServiceUnit:
         with pytest.raises(ValueError, match="Invalid currency code"):
             await self.external_service.get_exchange_rate("US1")
     
+    @pytest.mark.unit
     @pytest.mark.asyncio
     async def test_convert_product_prices_success(self):
         """UNIT TEST: Convert product prices to target currency"""
@@ -234,6 +237,7 @@ class TestExternalAPIIntegration:
         
         os.environ.pop("PRODUCTS_FILE", None)
     
+    @pytest.mark.integration
     def test_get_currency_conversion_success(self):
         """INTEGRATION TEST: GET /external/currency?to=USD returns converted products"""
         response = client.get("/external/currency?to=USD")
@@ -258,6 +262,7 @@ class TestExternalAPIIntegration:
         assert "discounted_price" in first_product
         assert "actual_price" in first_product
     
+    @pytest.mark.integration
     def test_get_currency_conversion_invalid_currency(self):
         """INTEGRATION TEST: Invalid currency code returns 400 Bad Request"""
         # Test invalid currency code
@@ -270,6 +275,7 @@ class TestExternalAPIIntegration:
         response = client.get("/external/currency")
         assert response.status_code == 422  # FastAPI validation error
     
+    @pytest.mark.integration
     def test_get_currency_conversion_same_currency(self):
         """INTEGRATION TEST: Requesting INR (base currency) returns products with rate 1.0"""
         response = client.get("/external/currency?to=INR")
