@@ -45,8 +45,6 @@ jobs:
           --cov-report=term \
           --junitxml=pytest-report.xml \
           --html-output=./pytest-report \
-          --generate-xml \
-          --xml-report=pytest-report-combined.xml \
           backend/tests/ \
           --disable-warnings \
           -v
@@ -65,14 +63,6 @@ jobs:
       with:
         name: pytest-junit-xml
         path: pytest-report.xml
-        retention-days: 30
-
-    - name: Upload pytest report (Combined XML)
-      uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: pytest-combined-xml
-        path: pytest-report-combined.xml
         retention-days: 30
 
     - name: Upload coverage report (HTML)
