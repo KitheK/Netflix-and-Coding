@@ -37,7 +37,7 @@ jobs:
 
     - name: Run tests with pytest
       run: |
-        pip install pytest pytest-cov pytest-reporter-plus
+        pip install pytest pytest-cov pytest-reporter-plus allure-pytest
         PYTHONPATH=$PYTHONPATH:$(pwd) pytest \
           --cov=backend \
           --cov-report=xml \
@@ -45,9 +45,30 @@ jobs:
           --cov-report=term \
           --junitxml=pytest-report.xml \
           --html-output=./pytest-report \
+          --alluredir=allure-results \
           backend/tests/ \
           --disable-warnings \
           -v
+
+    - name: Install Allure CLI
+      run: |
+        wget https://github.com/allure-framework/allure2/releases/download/2.24.1/allure-2.24.1.tgz
+        tar -zxf allure-2.24.1.tgz
+        sudo mv allure-2.24.1 /opt/allure
+        sudo ln -s /opt/allure/bin/allure /usr/local/bin/allure
+
+    - name: Generate Allure Report
+      if: always()
+      run: |
+        allure generate allure-results --clean -o allure-report
+
+    - name: Upload Allure Report
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: allure-report
+        path: allure-report/
+        retention-days: 30
 
     - name: Upload pytest report (HTML)
       uses: actions/upload-artifact@v4
