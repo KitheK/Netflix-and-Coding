@@ -8,8 +8,11 @@ import secrets
 import string
 import bcrypt
 import pytest
+from unittest.mock import Mock, patch, MagicMock
 from fastapi.testclient import TestClient
 from backend.main import app
+from backend.services.product_service import ProductService
+from backend.models.product_model import Product
 
 TEST_DB_PATH_USERS = "backend/data/users.json"
 TEST_DB_PATH_PRODUCTS = "backend/data/products_test.json"
@@ -163,8 +166,85 @@ def _create_customer_user():
 
 
 
+# ============================================================================
+# UNIT TESTS - Testing ProductService with mocked dependencies
+# ============================================================================
+
+class TestProductServiceUnit:
+    """UNIT TESTS: Test ProductService business logic with mocked repository"""
+    
+    def setup_method(self):
+        """Set up test service with mocked repository"""
+        self.mock_repository = Mock()
+        self.service = ProductService()
+        self.service.repository = self.mock_repository
+    
+    @pytest.mark.unit
+    def test_search_products_success(self):
+        """UNIT TEST: Search products filters correctly"""
+        # Mock repository data
+        mock_products = [
+            {"product_id": "1", "product_name": "Laptop Computer", "category": "Electronics",
+             "discounted_price": 999.0, "actual_price": 1299.0, "discount_percentage": 23.0,
+             "about_product": "Laptop", "img_link": "https://example.com/img.jpg",
+             "product_link": "https://example.com/product", "rating": 4.5, "rating_count": 100},
+            {"product_id": "2", "product_name": "Mouse Pad", "category": "Accessories",
+             "discounted_price": 10.0, "actual_price": 15.0, "discount_percentage": 33.0,
+             "about_product": "Mouse pad", "img_link": "https://example.com/img.jpg",
+             "product_link": "https://example.com/product", "rating": 4.0, "rating_count": 50},
+            {"product_id": "3", "product_name": "Gaming Laptop", "category": "Electronics",
+             "discounted_price": 1499.0, "actual_price": 1999.0, "discount_percentage": 25.0,
+             "about_product": "Gaming laptop", "img_link": "https://example.com/img.jpg",
+             "product_link": "https://example.com/product", "rating": 4.8, "rating_count": 200},
+        ]
+        self.mock_repository.get_all.return_value = mock_products
+        
+        # Search for "laptop" using get_product_by_keyword
+        results = self.service.get_product_by_keyword("laptop")
+        
+        # Should find 2 products
+        assert len(results) == 2
+        assert all("laptop" in p.product_name.lower() for p in results)
+    
+    @pytest.mark.unit
+    def test_sort_products_by_price(self):
+        """UNIT TEST: Sort products by price works correctly"""
+        from backend.models.product_model import Product
+        
+        # Create Product objects
+        products = [
+            Product(product_id="1", product_name="Product 1", category="Test",
+                   discounted_price=100.0, actual_price=150.0, discount_percentage=33.0,
+                   about_product="Test", img_link="https://example.com/img.jpg",
+                   product_link="https://example.com/product", rating=4.0, rating_count=10),
+            Product(product_id="2", product_name="Product 2", category="Test",
+                   discounted_price=50.0, actual_price=75.0, discount_percentage=33.0,
+                   about_product="Test", img_link="https://example.com/img.jpg",
+                   product_link="https://example.com/product", rating=4.0, rating_count=10),
+            Product(product_id="3", product_name="Product 3", category="Test",
+                   discounted_price=200.0, actual_price=250.0, discount_percentage=20.0,
+                   about_product="Test", img_link="https://example.com/img.jpg",
+                   product_link="https://example.com/product", rating=4.0, rating_count=10),
+        ]
+        
+        # Sort ascending using sort_products method
+        sorted_products = self.service.sort_products(products, "price_asc")
+        prices = [p.discounted_price for p in sorted_products]
+        assert prices == sorted(prices)
+        
+        # Sort descending
+        sorted_products_desc = self.service.sort_products(products, "price_desc")
+        prices_desc = [p.discounted_price for p in sorted_products_desc]
+        assert prices_desc == sorted(prices, reverse=True)
+
+
+# ============================================================================
+# INTEGRATION TESTS - Testing full API endpoints with TestClient
+# ============================================================================
+
+@pytest.mark.integration
 def test_get_all_products():
-    """ GET /products/ returns all products from database"""
+    """INTEGRATION TEST: GET /products/ returns all products from database"""
     response = client.get("/products/")
     assert response.status_code == 200
     products = response.json()
@@ -172,8 +252,9 @@ def test_get_all_products():
     assert len(products) > 0  # should have products in the list
 
 
+@pytest.mark.integration
 def test_get_product_by_id_success():
-    """GET /products/{id} retrieves specific product"""
+    """INTEGRATION TEST: GET /products/{id} retrieves specific product"""
     response = client.get("/products/")
     products = response.json()
     valid_id = products[0]["product_id"]
@@ -186,13 +267,15 @@ def test_get_product_by_id_success():
     assert "discounted_price" in product
 
 
+@pytest.mark.integration
 def test_get_product_by_id_not_found():
-    """ GET /products/{id} returns 404 for invalid ID"""
+    """INTEGRATION TEST: GET /products/{id} returns 404 for invalid ID"""
     response = client.get("/products/INVALID_ID_12345")
     assert response.status_code == 404
     assert "not found" in response.json()["detail"].lower()
 
 
+@pytest.mark.integration
 def test_search_products_with_results():
     """ GET /products/search/{keyword} filters by keyword"""
     response = client.get("/products/search/laptop")
@@ -204,6 +287,7 @@ def test_search_products_with_results():
         assert "laptop" in product["product_name"].lower() or "laptop" in product["category"].lower()
 
 
+@pytest.mark.integration
 def test_search_products_no_results():
     """: Search with no matches returns empty list"""
     response = client.get("/products/search/xyznonexistentkeyword123")
@@ -213,6 +297,7 @@ def test_search_products_no_results():
     assert len(products) == 0
 
 
+@pytest.mark.integration
 def test_sort_products_by_price_asc():
     """ GET /products/?sort=price_asc sorts ascending"""
     response = client.get("/products/?sort=price_asc")
@@ -222,6 +307,7 @@ def test_sort_products_by_price_asc():
     assert prices == sorted(prices)
 
 
+@pytest.mark.integration
 def test_sort_products_by_price_desc():
     """ GET /products/?sort=price_desc sorts descending"""
     response = client.get("/products/?sort=price_desc")
@@ -230,6 +316,7 @@ def test_sort_products_by_price_desc():
     prices = [p["discounted_price"] for p in products]
     assert prices == sorted(prices, reverse=True)
 
+@pytest.mark.integration
 def test_sort_products_by_rating_desc():
     """GET /products/?sort=rating_desc sorts by rating"""
     response = client.get("/products/?sort=rating_desc")
@@ -239,6 +326,7 @@ def test_sort_products_by_rating_desc():
     assert ratings == sorted(ratings, reverse=True)
 
 
+@pytest.mark.integration
 def test_sort_search_results():
     """Combined search and sort works correctly"""
     response = client.get("/products/search/phone?sort=price_asc")
@@ -249,6 +337,7 @@ def test_sort_search_results():
         assert prices == sorted(prices)
 
 
+@pytest.mark.integration
 def test_product_has_required_fields():
     """Product response includes all required fields"""
     response = client.get("/products/")
@@ -265,6 +354,7 @@ def test_product_has_required_fields():
         assert field in product, f"Missing required field: {field}"
 
 
+@pytest.mark.integration
 def test_numeric_types():
     """ Numeric fields are numbers not strings"""
     response = client.get("/products/")
@@ -276,8 +366,9 @@ def test_numeric_types():
     assert isinstance(product["discount_percentage"], (int, float))
     assert isinstance(product["rating"], (int, float))
 
+@pytest.mark.integration
 def test_create_product_success():
-    """Admin can create valid product (full request cycle)"""
+    """INTEGRATION TEST: Admin can create valid product (full request cycle)"""
     token, _ = _create_admin_user()
     headers = {"Authorization": f"Bearer {token}"}
     resp = client.post("/products", headers=headers, json={
@@ -301,6 +392,7 @@ def test_create_product_success():
     assert len(body["product_id"]) == 10  # ASIN format
 
 
+@pytest.mark.integration
 def test_create_product_default_rating():
     """ Product created without rating defaults to 0.0"""
     token, _ = _create_admin_user()
@@ -320,6 +412,7 @@ def test_create_product_default_rating():
     assert body["rating"] == 0.0
 
 
+@pytest.mark.integration
 def test_create_product_invalid_discounted_price():
     """Validation rejects discounted_price <= 0"""
     token, _ = _create_admin_user()
@@ -338,6 +431,7 @@ def test_create_product_invalid_discounted_price():
     assert "discounted_price" in resp.json()["detail"].lower()
 
 
+@pytest.mark.integration
 def test_create_product_invalid_actual_price():
     """Validation rejects actual_price <= 0"""
     token, _ = _create_admin_user()
@@ -356,6 +450,7 @@ def test_create_product_invalid_actual_price():
     assert "actual_price" in resp.json()["detail"].lower()
 
 
+@pytest.mark.integration
 def test_create_product_invalid_discount_percentage():
     """Validation rejects discount_percentage > 100"""
     token, _ = _create_admin_user()
@@ -374,6 +469,7 @@ def test_create_product_invalid_discount_percentage():
     assert "discount percentage" in resp.json()["detail"].lower()
 
 
+@pytest.mark.integration
 def test_create_product_empty_product_name():
     """Validation rejects empty product_name"""
     token, _ = _create_admin_user()
@@ -392,6 +488,7 @@ def test_create_product_empty_product_name():
     assert "name cannot be empty" in resp.json()["detail"].lower()
 
 
+@pytest.mark.integration
 def test_create_product_empty_category():
     """Validation rejects empty category"""
     token, _ = _create_admin_user()
@@ -410,6 +507,7 @@ def test_create_product_empty_category():
     assert "category cannot be empty" in resp.json()["detail"].lower()
 
 
+@pytest.mark.integration
 def test_create_product_empty_description():
     """Validation rejects empty about_product"""
     token, _ = _create_admin_user()
@@ -428,6 +526,7 @@ def test_create_product_empty_description():
     assert "description cannot be empty" in resp.json()["detail"].lower()
 
 
+@pytest.mark.integration
 def test_create_product_empty_img_link():
     """Validation rejects empty img_link"""
     token, _ = _create_admin_user()
@@ -446,6 +545,7 @@ def test_create_product_empty_img_link():
     assert "image link cannot be empty" in resp.json()["detail"].lower()
 
 
+@pytest.mark.integration
 def test_create_product_empty_product_link():
     """ Validation rejects empty product_link"""
     token, _ = _create_admin_user()
@@ -464,6 +564,7 @@ def test_create_product_empty_product_link():
     assert "product link cannot be empty" in resp.json()["detail"].lower()
 
 
+@pytest.mark.integration
 def test_create_product_invalid_rating():
     """ Validation rejects rating > 5"""
     token, _ = _create_admin_user()
@@ -483,6 +584,7 @@ def test_create_product_invalid_rating():
     assert "rating must be between 0 and 5" in resp.json()["detail"].lower()
 
 
+@pytest.mark.integration
 def test_create_product_forbidden_for_customer():
     """ Authorization prevents non-admin from creating products"""
     token, _ = _create_customer_user()
@@ -501,6 +603,7 @@ def test_create_product_forbidden_for_customer():
     assert "admin" in resp.json()["detail"].lower()
 
 
+@pytest.mark.integration
 def test_create_product_no_auth():
     """ Authentication required to create products"""
     resp = client.post("/products", json={
@@ -516,6 +619,7 @@ def test_create_product_no_auth():
     assert resp.status_code == 401
 
 
+@pytest.mark.integration
 def test_create_product_persists_to_file():
     """ Created product is persisted to products_test.json"""
     token, _ = _create_admin_user()
@@ -550,6 +654,7 @@ def test_create_product_persists_to_file():
 
 # ===== INTEGRATION TESTS: UPDATE PRODUCT (ADMIN-ONLY) =====
 
+@pytest.mark.integration
 def test_update_product_success():
     """INTEGRATION TEST: Admin can update product name and price"""
     token, _ = _create_admin_user()
@@ -573,6 +678,7 @@ def test_update_product_success():
     assert body["actual_price"] == TEST_PRODUCTS[0]["actual_price"]
 
 
+@pytest.mark.integration
 def test_update_product_partial():
     """INTEGRATION TEST: Can update only description field"""
     token, _ = _create_admin_user()
@@ -591,6 +697,7 @@ def test_update_product_partial():
     assert body["discounted_price"] == TEST_PRODUCTS[1]["discounted_price"]
 
 
+@pytest.mark.integration
 def test_update_product_not_found():
     """INTEGRATION TEST: Returns 404 for non-existent product"""
     token, _ = _create_admin_user()
@@ -603,6 +710,7 @@ def test_update_product_not_found():
     assert "not found" in resp.json()["detail"].lower()
 
 
+@pytest.mark.integration
 def test_update_product_invalid_price():
     """INTEGRATION TEST: Validation rejects invalid discounted_price"""
     token, _ = _create_admin_user()
@@ -617,6 +725,7 @@ def test_update_product_invalid_price():
     assert "discounted_price" in resp.json()["detail"].lower()
 
 
+@pytest.mark.integration
 def test_update_product_empty_name():
     """INTEGRATION TEST: Validation rejects empty product_name"""
     token, _ = _create_admin_user()
@@ -631,6 +740,7 @@ def test_update_product_empty_name():
     assert "name cannot be empty" in resp.json()["detail"].lower()
 
 
+@pytest.mark.integration
 def test_update_product_invalid_rating():
     """INTEGRATION TEST: Validation rejects rating > 5"""
     token, _ = _create_admin_user()
@@ -645,6 +755,7 @@ def test_update_product_invalid_rating():
     assert "rating" in resp.json()["detail"].lower()
 
 
+@pytest.mark.integration
 def test_update_product_forbidden_for_customer():
     """INTEGRATION TEST: Non-admin cannot update products"""
     token, _ = _create_customer_user()
@@ -659,6 +770,7 @@ def test_update_product_forbidden_for_customer():
     assert "admin" in resp.json()["detail"].lower()
 
 
+@pytest.mark.integration
 def test_update_product_no_auth():
     """INTEGRATION TEST: Authentication required to update products"""
     product_id = TEST_PRODUCTS[0]["product_id"]
@@ -669,6 +781,7 @@ def test_update_product_no_auth():
     assert resp.status_code == 401
 
 
+@pytest.mark.integration
 def test_update_product_persists_to_file():
     """INTEGRATION TEST: Updated product is persisted to products_test.json"""
     token, _ = _create_admin_user()
@@ -694,6 +807,7 @@ def test_update_product_persists_to_file():
 
 # ===== INTEGRATION TESTS: DELETE PRODUCT (ADMIN-ONLY) =====
 
+@pytest.mark.integration
 def test_delete_product_success():
     """INTEGRATION TEST: Admin can delete existing product"""
     token, _ = _create_admin_user()
@@ -714,6 +828,7 @@ def test_delete_product_success():
     assert get_resp.status_code == 404
 
 
+@pytest.mark.integration
 def test_delete_product_not_found():
     """INTEGRATION TEST: Returns 404 for non-existent product"""
     token, _ = _create_admin_user()
@@ -724,6 +839,7 @@ def test_delete_product_not_found():
     assert "not found" in resp.json()["detail"].lower()
 
 
+@pytest.mark.integration
 def test_delete_product_forbidden_for_customer():
     """INTEGRATION TEST: Non-admin cannot delete products"""
     token, _ = _create_customer_user()
@@ -736,6 +852,7 @@ def test_delete_product_forbidden_for_customer():
     assert "admin" in resp.json()["detail"].lower()
 
 
+@pytest.mark.integration
 def test_delete_product_no_auth():
     """INTEGRATION TEST: Authentication required to delete products"""
     product_id = TEST_PRODUCTS[0]["product_id"]
@@ -744,6 +861,7 @@ def test_delete_product_no_auth():
     assert resp.status_code == 401
 
 
+@pytest.mark.integration
 def test_delete_product_persists_to_file():
     """INTEGRATION TEST: Deleted product is removed from products_test.json"""
     token, _ = _create_admin_user()
@@ -768,6 +886,7 @@ def test_delete_product_persists_to_file():
     assert deleted_product is None
 
 
+@pytest.mark.integration
 def test_delete_product_returns_deleted_data():
     """INTEGRATION TEST: Response includes deleted product data"""
     token, _ = _create_admin_user()
@@ -787,6 +906,7 @@ def test_delete_product_returns_deleted_data():
     assert body["discounted_price"] == expected_price
 
 
+@pytest.mark.integration
 def test_delete_product_twice_fails():
     """INTEGRATION TEST: Cannot delete same product twice"""
     token, _ = _create_admin_user()
@@ -803,6 +923,7 @@ def test_delete_product_twice_fails():
     assert resp2.status_code == 404
 
 
+@pytest.mark.integration
 def test_delete_all_products():
     """INTEGRATION TEST: Can delete all products sequentially"""
     token, _ = _create_admin_user()
@@ -820,6 +941,7 @@ def test_delete_all_products():
     assert len(products_after) == 0
 
 
+@pytest.mark.integration
 def test_delete_does_not_affect_other_products():
     """INTEGRATION TEST: Deleting one product doesn't affect others"""
     token, _ = _create_admin_user()
