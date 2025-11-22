@@ -37,15 +37,15 @@ jobs:
 
     - name: Run tests with pytest
       run: |
-        pip install pytest pytest-cov pytest-reporter-html1
+        pip install pytest pytest-cov pytest-html-reporter
         PYTHONPATH=$PYTHONPATH:$(pwd) pytest \
           --cov=backend \
           --cov-report=xml \
           --cov-report=html \
           --cov-report=term \
           --junitxml=pytest-report.xml \
-          --template=html1/index.html \
-          --report=pytest-report.html \
+          --html-report=./pytest-report \
+          --title="Pytest Test Report" \
           backend/tests/ \
           --disable-warnings \
           -v
@@ -55,7 +55,7 @@ jobs:
       if: always()
       with:
         name: pytest-report
-        path: pytest-report.html
+        path: pytest-report/
         retention-days: 30
 
     - name: Upload pytest report (JUnit XML)
