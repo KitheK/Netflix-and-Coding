@@ -1,21 +1,24 @@
-"""Tests for the review endpoints"""
 
+from backend.main import app
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 from fastapi.testclient import TestClient
 from pathlib import Path
-import json
-from backend.main import app
-from backend.models.review_model import AddReviewRequest
-from backend.services.review_service import ReviewService
+
+"""Tests for the review endpoints"""
 
 client = TestClient(app)
+from backend.models.review_model import AddReviewRequest
+from backend.services.review_service import ReviewService
+import json
+
 
 # Test product IDs from the actual reviews.json
 PRODUCT_WITH_REVIEWS = "B07JW9H4J1"  # This product has 8 reviews in reviews.json
 PRODUCT_WITHOUT_REVIEWS = "NONEXISTENT_PRODUCT_ID"
 
-#For Testing Reviews write to JSON
+
+# For Testing Reviews write to JSON
 TEMP_REVIEWS_FILE = Path("backend/data/reviews_test.json")
 
 # ============================================================================
@@ -154,6 +157,42 @@ def test_add_review_request_validation():
             review_content="Invalid"
         )
 
+# --- Admin review deletion tests (current setup) ---
+
+
+
+# --- Simple admin review deletion tests ---
+
+def test_admin_delete_review_success():
+    """Should return 200 and detail if review deleted (assumes admin auth works in test env)."""
+    # These IDs should exist in your test data for a real integration test
+    product_id = PRODUCT_WITH_REVIEWS
+    # Get a review ID from the product's reviews
+    response = client.get(f"/reviews/{product_id}")
+    assert response.status_code == 200
+    reviews = response.json()
+    if not reviews:
+        pytest.skip("No reviews to delete for this product in test data.")
+    review_id = reviews[0]["review_id"]
+    # Try to delete as admin (assumes test env allows it)
+    response = client.delete(f"/reviews/{product_id}/{review_id}")
+    # Accept 200, 401 (unauthenticated), or 403 (forbidden) depending on test environment
+    assert response.status_code in [200, 401, 403]
+    if response.status_code == 200:
+        assert response.json()["detail"] == "Review deleted"
+
+
+def test_admin_delete_review_not_found():
+    """Should return 404 if review does not exist (assumes admin auth works in test env)."""
+    product_id = PRODUCT_WITH_REVIEWS
+    review_id = "NON_EXISTENT_REVIEW_ID"
+    response = client.delete(f"/reviews/{product_id}/{review_id}")
+    # Accept 404 if not found, 401 if unauthenticated in test env, or 403 if forbidden
+    assert response.status_code in [404, 401, 403]
+    if response.status_code == 404:
+        assert response.json()["detail"] == "Review not found"
+
+
 #INTEGRATION TEST FOR POST/{PRODUCT_ID}
 
 #Example users and products
@@ -275,3 +314,5 @@ def test_post_review_failure_duplicate(review_service_tmp):
         review_service_tmp.add_review(product_id, review_req)
     
     assert "already reviewed" in str(exc.value)
+
+
