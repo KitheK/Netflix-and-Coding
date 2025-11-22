@@ -147,27 +147,41 @@ PRODUCT_PURCHASED = "B07JW9H4J1"      # User has purchased this product
 PRODUCT_NOT_PURCHASED = "B08KT5LMRX"   # User has not purchased this product
 
 #Goes well
-def test_post_review_success():
-    """Test that a user who purchased the product can post a review"""
-    review_data = {
-        "user_id": USER_WITH_PURCHASE,
+def test_post_review_success(monkeypatch):
+    """Test that a user who purchased the product can post a review (PR#5: only one review per user)"""
+    product_id = "TEST_PRODUCT_UNIQUE"
+    review_req_data = {
+        "user_id": "USER_TEST_001",
         "user_name": "John Doe",
         "review_title": "Great Product!",
         "review_content": "Really satisfied with this purchase."
     }
 
-    response = client.post(f"/reviews/{PRODUCT_PURCHASED}", json=review_data)
-    
-    assert response.status_code == 200
-    review = response.json()
-    
-    # Check response fields
-    assert review["user_id"] == USER_WITH_PURCHASE
-    assert review["review_title"] == "Great Product!"
-    assert review["review_content"] == "Really satisfied with this purchase."
-    assert "review_id" in review
-    assert len(review["review_id"]) == 14  # 14-character ID
+    # Create a fake ReviewService instance
+    service = ReviewService()
 
+    # Monkeypatch get_all to return empty reviews for the product
+    monkeypatch.setattr(service.review_repository, "get_all", lambda: {product_id: []})
+
+    # Monkeypatch save_all to do nothing (we're not testing file writing here)
+    monkeypatch.setattr(service.review_repository, "save_all", lambda data: None)
+
+    # Monkeypatch user_has_purchased to always True
+    monkeypatch.setattr(service, "user_has_purchased", lambda u, p: True)
+
+    # Create AddReviewRequest object
+    from backend.models.review_model import AddReviewRequest
+    review_req = AddReviewRequest(**review_req_data)
+
+    # Call add_review
+    new_review = service.add_review(product_id, review_req)
+
+    # Check returned review
+    assert new_review.user_id == review_req_data["user_id"]
+    assert new_review.review_title == review_req_data["review_title"]
+    assert new_review.review_content == review_req_data["review_content"]
+    assert len(new_review.review_id) == 14
+    
 #Test if customer has not purchased the product yet.
 def test_post_review_failure_not_purchased():
     """Test that a user who has not purchased the product gets a 400 error"""
@@ -240,3 +254,27 @@ def test_add_review_writes_to_json(review_service_tmp):
 
     # Restore original method
     service.user_has_purchased = original_check
+
+def test_post_review_failure_duplicate(review_service_tmp):
+    """User cannot post more than one review per product"""
+    product_id = "TEST_DUPLICATE_PRODUCT"
+    user_id = "user_duplicate"
+
+    review_req = AddReviewRequest(
+        user_id=user_id,
+        user_name="Jane Tester",
+        review_title="First Review",
+        review_content="Good product."
+    )
+
+    # Monkeypatch purchase check to True
+    review_service_tmp.user_has_purchased = lambda u, p: True
+
+    # First review succeeds
+    review_service_tmp.add_review(product_id, review_req)
+
+    # Second review should fail
+    with pytest.raises(ValueError) as exc:
+        review_service_tmp.add_review(product_id, review_req)
+    
+    assert "already reviewed" in str(exc.value)
