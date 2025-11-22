@@ -358,14 +358,14 @@ If you need to highlight the best examples, these 5 PRs showcase both testing va
 ## Statistics Summary
 
 | Category | Count |
-|----------|-------|
+| -------- | ----- |
 | Total PRs | 11 |
 | Merged PRs | 11 |
-| Total Files Changed | 157+ |
+| Total Files Changed | 157+ (across analyzed PRs) |
 | Total Additions | 8,117+ lines |
 | Total Deletions | 13,075+ lines |
-| Testing Methods Used | 7+ |
-| Refactoring Patterns | 6+ |
+| Testing Methods Used | 7 |
+| Refactoring Patterns | 6 |
 
 ---
 
