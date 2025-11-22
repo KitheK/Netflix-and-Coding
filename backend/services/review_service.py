@@ -8,8 +8,32 @@ from pathlib import Path
 import uuid
 
 
+
 class ReviewService:
-    """Service for handling review-related business logic"""
+    """
+    Service layer for review-related business logic.
+    Handles validation, business rules, and delegates persistence to ReviewRepository.
+    All review endpoints should use this service instead of accessing the repository directly.
+    """
+
+    def delete_review_by_id(self, product_id: str, review_id: str) -> bool:
+        """
+        Delete a review by product_id and review_id.
+        Returns True if deleted, False if not found.
+        This is intended for admin use only (enforced at the router layer).
+        """
+        all_reviews = self.review_repository.get_all()
+        if product_id not in all_reviews:
+            return False
+        reviews = all_reviews[product_id]
+        initial_count = len(reviews)
+        # Remove review with matching review_id
+        reviews = [r for r in reviews if r.get("review_id") != review_id]
+        if len(reviews) == initial_count:
+            return False  # No review deleted
+        all_reviews[product_id] = reviews
+        self.review_repository.save_all(all_reviews)
+        return True
     
     #will need to be changed if path changes!!
     TRANSACTIONS_FILE = Path("backend/data/transactions.json")
