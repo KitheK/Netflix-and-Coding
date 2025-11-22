@@ -35,8 +35,48 @@ jobs:
 #        pip install flake8
 #        flake8 backend \--max-line-length=88\--extend-ignore=E203,W503
 
-
     - name: Run tests with pytest
       run: |
-        pip install pytest pytest-cov
-        PYTHONPATH=$PYTHONPATH:$(pwd) pytest --cov=backend backend/tests/ --disable-warnings -q
+        pip install pytest pytest-cov pytest-reporter-plus
+        PYTHONPATH=$PYTHONPATH:$(pwd) pytest \
+          --cov=backend \
+          --cov-report=xml \
+          --cov-report=html \
+          --cov-report=term \
+          --junitxml=pytest-report.xml \
+          --html-output=./pytest-report \
+          backend/tests/ \
+          --disable-warnings \
+          -v
+
+    - name: Upload pytest report (HTML)
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: pytest-report
+        path: pytest-report/
+        retention-days: 30
+
+    - name: Upload pytest report (JUnit XML)
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: pytest-junit-xml
+        path: pytest-report.xml
+        retention-days: 30
+
+    - name: Upload coverage report (HTML)
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: coverage-report
+        path: htmlcov/
+        retention-days: 30
+
+    - name: Upload coverage report (XML)
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: coverage-xml
+        path: coverage.xml
+        retention-days: 30
