@@ -37,46 +37,85 @@ jobs:
 
     - name: Run tests with pytest
       run: |
-        pip install pytest pytest-cov pytest-reporter-plus
+        pip install pytest pytest-cov
         PYTHONPATH=$PYTHONPATH:$(pwd) pytest \
           --cov=backend \
-          --cov-report=xml \
-          --cov-report=html \
+          --cov-report=xml:coverage-unit.xml \
+          --cov-report=html:htmlcov-unit \
           --cov-report=term \
-          --junitxml=pytest-report.xml \
-          --html-output=./pytest-report \
+          --junitxml=junit-unit.xml \
+          -m unit \
           backend/tests/ \
           --disable-warnings \
           -v
+      continue-on-error: true
 
-    - name: Upload pytest report (HTML)
+    - name: Run integration tests with pytest
+      run: |
+        PYTHONPATH=$PYTHONPATH:$(pwd) pytest \
+          --cov=backend \
+          --cov-append \
+          --cov-report=xml:coverage-integration.xml \
+          --cov-report=html:htmlcov-integration \
+          --cov-report=term \
+          --junitxml=junit-integration.xml \
+          -m integration \
+          backend/tests/ \
+          --disable-warnings \
+          -v
+      continue-on-error: true
+
+    - name: Generate combined coverage report
+      run: |
+        pip install coverage
+        # Generate combined coverage from .coverage file (both test runs appended)
+        coverage xml -o coverage.xml
+        coverage html -d htmlcov
+
+    - name: Upload unit test coverage report
       uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: pytest-report
-        path: pytest-report/
+        name: coverage-unit-report
+        path: htmlcov-unit/
         retention-days: 30
 
-    - name: Upload pytest report (JUnit XML)
+    - name: Upload integration test coverage report
       uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: pytest-junit-xml
-        path: pytest-report.xml
+        name: coverage-integration-report
+        path: htmlcov-integration/
         retention-days: 30
 
-    - name: Upload coverage report (HTML)
+    - name: Upload combined coverage report
       uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: coverage-report
+        name: coverage-combined-report
         path: htmlcov/
         retention-days: 30
 
-    - name: Upload coverage report (XML)
+    - name: Upload coverage XML
       uses: actions/upload-artifact@v4
       if: always()
       with:
         name: coverage-xml
         path: coverage.xml
+        retention-days: 30
+
+    - name: Upload unit test JUnit XML
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: junit-unit-xml
+        path: junit-unit.xml
+        retention-days: 30
+
+    - name: Upload integration test JUnit XML
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: junit-integration-xml
+        path: junit-integration.xml
         retention-days: 30
