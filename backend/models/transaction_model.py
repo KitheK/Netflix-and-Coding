@@ -19,9 +19,12 @@ class TransactionItem(BaseModel):
 class Transaction(BaseModel):
     transaction_id: str          # Unique UUID for this transaction
     user_id: str                 # UUID of the user who made the purchase
+    customer_name: str           # Customer name for receipt
+    customer_email: str          # Customer email for receipt
     items: List[TransactionItem] # List of items purchased (snapshot from cart)
     total_price: float           # Total cost of all items (sum of price * quantity)
     timestamp: str               # ISO format timestamp of when purchase was made
+    estimated_delivery: str      # Estimated delivery date (YYYY-MM-DD format)
     status: str = "completed"    # Status of transaction. this is always "completed" since there is no payment processing.
 
 
