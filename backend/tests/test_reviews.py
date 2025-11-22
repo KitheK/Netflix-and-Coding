@@ -131,3 +131,32 @@ def test_add_review_request_validation():
             review_title="Missing Required Fields",
             review_content="Invalid"
         )
+import pytest
+from backend.models.review_model import AddReviewRequest
+from backend.services.admin_delete_reviews import Delete_Review
+from pydantic import ValidationError
+
+
+def test_admin_delete_review(mocker):
+    """Tests that an existing review is retrieved then deleted."""
+
+    # Create a valid review request
+    todel = AddReviewRequest(
+        
+        review_id="REVIEW123",
+        user_id="USER234",
+        user_name="Jane Doe",
+        review_title="I like it!",
+        review_content="This product is great, recommend"
+    )
+
+    # Act
+    response_get = Delete_Review.get_review(todel.user_id, todel.review_id)
+    response_delete = Delete_Review.delete_review(todel.review_id)
+
+    # Assert
+
+    assert response_get["exists"] is True
+    assert response_delete is True
+
+
