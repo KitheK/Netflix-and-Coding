@@ -202,9 +202,10 @@ PRODUCT_PURCHASED = "B07JW9H4J1"      # User has purchased this product
 PRODUCT_NOT_PURCHASED = "B08KT5LMRX"   # User has not purchased this product
 
 @pytest.mark.integration
-def test_post_review_success():
+def test_post_review_success(monkeypatch):
     """Test that a user who purchased the product can post a review"""
-    review_data = {
+    product_id = "TEST_PRODUCT_UNIQUE"
+    review_req_data = {
         "user_id": USER_WITH_PURCHASE,
         "user_name": "John Doe",
         "review_title": "Great Product!",
@@ -216,6 +217,24 @@ def test_post_review_success():
 
     # Monkeypatch get_all to return empty reviews for the product
     monkeypatch.setattr(service.review_repository, "get_all", lambda: {product_id: []})
+
+    # Monkeypatch save_all to do nothing (we're not testing file writing here)
+    monkeypatch.setattr(service.review_repository, "save_all", lambda data: None)
+
+    # Monkeypatch user_has_purchased to always True
+    monkeypatch.setattr(service, "user_has_purchased", lambda u, p: True)
+
+    # Create AddReviewRequest object
+    review_req = AddReviewRequest(**review_req_data)
+
+    # Call add_review
+    new_review = service.add_review(product_id, review_req)
+
+    # Check returned review
+    assert new_review.user_id == review_req_data["user_id"]
+    assert new_review.review_title == review_req_data["review_title"]
+    assert new_review.review_content == review_req_data["review_content"]
+    assert len(new_review.review_id) == 14
 
 @pytest.mark.integration
 def test_post_review_failure_not_purchased():

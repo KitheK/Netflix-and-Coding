@@ -1,3 +1,7 @@
+# For async test support
+pytest-asyncio
+# For running FastAPI with ASGI server
+uvicorn[standard]
 annotated-types==0.7.0
 anyio==4.11.0
 bcrypt==4.2.1
