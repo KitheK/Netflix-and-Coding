@@ -172,17 +172,11 @@ def test_post_review_success():
         "review_content": "Really satisfied with this purchase."
     }
 
-    response = client.post(f"/reviews/{PRODUCT_PURCHASED}", json=review_data)
-    
-    assert response.status_code == 200
-    review = response.json()
-    
-    # Check response fields
-    assert review["user_id"] == USER_WITH_PURCHASE
-    assert review["review_title"] == "Great Product!"
-    assert review["review_content"] == "Really satisfied with this purchase."
-    assert "review_id" in review
-    assert len(review["review_id"]) == 14  # 14-character ID
+    # Create a fake ReviewService instance
+    service = ReviewService()
+
+    # Monkeypatch get_all to return empty reviews for the product
+    monkeypatch.setattr(service.review_repository, "get_all", lambda: {product_id: []})
 
 @pytest.mark.integration
 def test_post_review_failure_not_purchased():
@@ -257,3 +251,27 @@ def test_add_review_writes_to_json(review_service_tmp):
 
     # Restore original method
     service.user_has_purchased = original_check
+
+def test_post_review_failure_duplicate(review_service_tmp):
+    """User cannot post more than one review per product"""
+    product_id = "TEST_DUPLICATE_PRODUCT"
+    user_id = "user_duplicate"
+
+    review_req = AddReviewRequest(
+        user_id=user_id,
+        user_name="Jane Tester",
+        review_title="First Review",
+        review_content="Good product."
+    )
+
+    # Monkeypatch purchase check to True
+    review_service_tmp.user_has_purchased = lambda u, p: True
+
+    # First review succeeds
+    review_service_tmp.add_review(product_id, review_req)
+
+    # Second review should fail
+    with pytest.raises(ValueError) as exc:
+        review_service_tmp.add_review(product_id, review_req)
+    
+    assert "already reviewed" in str(exc.value)

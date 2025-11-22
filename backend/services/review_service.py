@@ -32,9 +32,16 @@ class ReviewService:
     def add_review(self, product_id: str, review_req: AddReviewRequest) -> Review:
         """Add a review if the user has purchased the product"""
         
-        # Check purchase
+        # Check if user has purchased this item
         if not self.user_has_purchased(review_req.user_id, product_id):
             raise ValueError("User has not purchased this product")
+
+        #check if user has already reviewed this product
+        all_reviews = self.review_repository.get_all()
+        product_reviews = all_reviews.get(product_id, [])
+        for review in product_reviews:
+            if review["user_id"] == review_req.user_id:
+                raise ValueError("User has already reviewed this product")
 
          # Create Review object
         new_review = Review(
