@@ -2,6 +2,8 @@
 
 import json
 import os
+import pytest
+from unittest.mock import Mock, patch, MagicMock
 from pathlib import Path
 
 # Set environment variables BEFORE importing app
@@ -11,6 +13,8 @@ os.environ["CARTS_FILE"] = "cart.json"
 
 from fastapi.testclient import TestClient
 from backend.main import app
+from backend.services.cart_service import CartService
+from backend.models.cart_model import CartItem, CartResponse
 
 # TODO: still using backend/data/cart.json and users.json for tests
 # should move to backend/data/test/ so we dont touch production data
@@ -195,7 +199,73 @@ def teardown_function():
         products_file.unlink()
 
 
+# ============================================================================
+# UNIT TESTS - Testing CartService with mocked dependencies
+# ============================================================================
+
+class TestCartServiceUnit:
+    """UNIT TESTS: Test CartService business logic with mocked dependencies"""
+    
+    def setup_method(self):
+        """Set up test service with mocked dependencies"""
+        self.mock_product_service = Mock()
+        self.mock_cart_repo = Mock()
+        self.mock_user_repo = Mock()
+        self.mock_transaction_repo = Mock()
+        
+        self.service = CartService(self.mock_product_service)
+        self.service.cart_repository = self.mock_cart_repo
+        self.service.user_repository = self.mock_user_repo
+        self.service.transaction_repository = self.mock_transaction_repo
+    
+    @pytest.mark.unit
+    def test_add_to_cart_success(self):
+        """UNIT TEST: Add item to cart successfully"""
+        from backend.models.product_model import Product
+        
+        user_id = "test-user-id"
+        product_id = "B07JW9H4J1"
+        quantity = 2
+        
+        # Mock dependencies - create a Product object
+        mock_product = Product(
+            product_id=product_id,
+            product_name="Test Product",
+            category="Electronics",
+            discounted_price=299.0,
+            actual_price=599.0,
+            discount_percentage=50.0,
+            about_product="Test product",
+            img_link="https://example.com/img.jpg",
+            product_link="https://example.com/product",
+            rating=4.5,
+            rating_count=100
+        )
+        
+        self.mock_user_repo.get_all.return_value = [
+            {"user_id": user_id, "user_token": "token123"}
+        ]
+        self.mock_product_service.get_product_by_id.return_value = mock_product
+        self.mock_cart_repo.get_all.return_value = {}
+        
+        # Add to cart - service method expects user_id, not token
+        result = self.service.add_to_cart(user_id, product_id, quantity)
+        
+        # Verify result
+        assert result["message"] == "Item added to cart"
+        assert result["product_id"] == product_id
+        assert result["quantity"] == quantity
+        
+        # Verify repository was called
+        self.mock_cart_repo.save_all.assert_called_once()
+
+
+# ============================================================================
+# INTEGRATION TESTS - Testing full API endpoints with TestClient
+# ============================================================================
+
 # Test 1: Add item to cart
+@pytest.mark.integration
 def test_add_to_cart():
     """Test adding a product to the cart"""
     response = client.post("/cart/add", json={
@@ -211,6 +281,7 @@ def test_add_to_cart():
 
 
 # Test 2: Get cart
+@pytest.mark.integration
 def test_get_cart():
     """Test getting a user's cart"""
     # First add an item
@@ -230,6 +301,7 @@ def test_get_cart():
 
 
 # Test 3: Get empty cart
+@pytest.mark.integration
 def test_get_empty_cart():
     """Test getting cart for user with no items"""
     # Use a test user that hasn't added anything yet
@@ -242,6 +314,7 @@ def test_get_empty_cart():
 
 
 # Test 4: Add same item twice (should increase quantity)
+@pytest.mark.integration
 def test_add_same_item_increases_quantity():
     """Test that adding the same item twice increases quantity"""
     # Add item first time
@@ -268,6 +341,7 @@ def test_add_same_item_increases_quantity():
 
 
 # Test 5: Remove item from cart
+@pytest.mark.integration
 def test_remove_from_cart():
     """Test removing an item from cart"""
     # Add item
@@ -290,6 +364,7 @@ def test_remove_from_cart():
 
 
 # Test 6: Update cart item quantity
+@pytest.mark.integration
 def test_update_cart_item():
     """Test updating quantity of an item in cart"""
     # Add item
@@ -315,6 +390,7 @@ def test_update_cart_item():
 
 
 # Test 7: Update quantity to 0 removes item
+@pytest.mark.integration
 def test_update_quantity_zero_removes_item():
     """Test that updating quantity to 0 removes the item"""
     # Add item
@@ -338,6 +414,7 @@ def test_update_quantity_zero_removes_item():
 
 
 # Test 8: Add invalid product
+@pytest.mark.integration
 def test_add_invalid_product():
     """Test adding a product that doesn't exist - should raise ValueError"""
     # This will raise ValueError which FastAPI doesn't catch by default
@@ -356,6 +433,7 @@ def test_add_invalid_product():
 
 
 # Test 9: Calculate total price correctly
+@pytest.mark.integration
 def test_calculate_total_price():
     """Test that total price is calculated correctly"""
     # Add multiple items

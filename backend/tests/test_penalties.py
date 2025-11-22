@@ -59,6 +59,7 @@ class TestPenaltyServiceUnit:
         if hasattr(self, 'temp_dir'):
             shutil.rmtree(self.temp_dir, ignore_errors=True)
     
+    @pytest.mark.unit
     def test_apply_penalty_success(self):
         """UNIT TEST: Apply penalty creates valid penalty record"""
         user_id = str(uuid.uuid4())
@@ -87,6 +88,7 @@ class TestPenaltyServiceUnit:
         assert saved_penalties[0]["user_id"] == user_id
         assert saved_penalties[0]["reason"] == reason
     
+    @pytest.mark.unit
     def test_apply_penalty_empty_user_id(self):
         """UNIT TEST: Apply penalty with empty user_id raises ValueError"""
         with pytest.raises(ValueError, match="user_id cannot be empty"):
@@ -95,6 +97,7 @@ class TestPenaltyServiceUnit:
         with pytest.raises(ValueError, match="user_id cannot be empty"):
             self.service.apply_penalty(user_id="   ", reason="Some reason")
     
+    @pytest.mark.unit
     def test_apply_penalty_empty_reason(self):
         """UNIT TEST: Apply penalty with empty reason raises ValueError"""
         user_id = str(uuid.uuid4())
@@ -105,6 +108,7 @@ class TestPenaltyServiceUnit:
         with pytest.raises(ValueError, match="reason cannot be empty"):
             self.service.apply_penalty(user_id=user_id, reason="   ")
 
+    @pytest.mark.unit
     def test_get_user_penalties_filters_by_status(self):
         """UNIT TEST: Service can filter penalties by status (active vs resolved)"""
         user_id = str(uuid.uuid4())
@@ -262,6 +266,7 @@ class TestPenaltyAPIIntegration:
         """Helper: Hash password with bcrypt"""
         return bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
     
+    @pytest.mark.integration
     def test_apply_penalty_success_integration(self):
         """INTEGRATION TEST: Admin can successfully apply penalty via API"""
         headers = {"Authorization": f"Bearer {self.admin_token}"}
@@ -298,6 +303,7 @@ class TestPenaltyAPIIntegration:
         assert penalties[0]["penalty_id"] == penalty["penalty_id"]
         assert penalties[0]["user_id"] == TEST_USER_ID_1
     
+    @pytest.mark.integration
     def test_apply_penalty_forbidden_for_customer(self):
         """INTEGRATION TEST: Non-admin user cannot apply penalties"""
         headers = {"Authorization": f"Bearer {self.user1_token}"}
@@ -314,6 +320,7 @@ class TestPenaltyAPIIntegration:
         assert response.status_code == 403
         assert "admin" in response.json()["detail"].lower()
     
+    @pytest.mark.integration
     def test_apply_penalty_empty_user_id_integration(self):
         """INTEGRATION TEST: Apply penalty with empty user_id returns 400"""
         headers = {"Authorization": f"Bearer {self.admin_token}"}
@@ -330,6 +337,7 @@ class TestPenaltyAPIIntegration:
         assert response.status_code == 400
         assert "user_id cannot be empty" in response.json()["detail"]
 
+    @pytest.mark.integration
     def test_get_penalties_for_user_success(self):
         """INTEGRATION TEST: Admin can list all penalties for a specific user"""
         headers = {"Authorization": f"Bearer {self.admin_token}"}
@@ -367,6 +375,7 @@ class TestPenaltyAPIIntegration:
         assert len(penalties) == 2
         assert all(p["user_id"] == TEST_USER_ID_1 for p in penalties)
 
+    @pytest.mark.integration
     def test_get_penalties_for_user_no_penalties(self):
         """INTEGRATION TEST: Getting penalties for a user with no penalties returns empty list"""
         headers = {"Authorization": f"Bearer {self.admin_token}"}
@@ -378,6 +387,7 @@ class TestPenaltyAPIIntegration:
         assert isinstance(penalties, list)
         assert len(penalties) == 0
 
+    @pytest.mark.integration
     def test_get_penalties_for_user_forbidden_for_customer(self):
         """INTEGRATION TEST: Non-admin user cannot view another user's penalties"""
         headers_customer = {"Authorization": f"Bearer {self.user1_token}"}
@@ -387,6 +397,7 @@ class TestPenaltyAPIIntegration:
         assert resp.status_code == 403
         assert "admin" in resp.json()["detail"].lower()
 
+    @pytest.mark.integration
     def test_get_penalties_filtered_active(self):
         """INTEGRATION TEST: GET /penalties/{user_id}?status=active filters to active penalties only"""
         headers = {"Authorization": f"Bearer {self.admin_token}"}
@@ -423,6 +434,7 @@ class TestPenaltyAPIIntegration:
         assert len(body) == 2
         assert all(p["status"] == "active" for p in body)
 
+    @pytest.mark.integration
     def test_get_penalties_filtered_resolved(self):
         """INTEGRATION TEST: GET /penalties/{user_id}?status=resolved filters to resolved penalties only"""
         headers = {"Authorization": f"Bearer {self.admin_token}"}
@@ -460,6 +472,7 @@ class TestPenaltyAPIIntegration:
         assert len(body) >= 2
         assert all(p["status"] == "resolved" for p in body)
 
+    @pytest.mark.integration
     def test_get_penalties_invalid_status_returns_400(self):
         """INTEGRATION TEST: Unknown status value returns 400 Bad Request"""
         headers = {"Authorization": f"Bearer {self.admin_token}"}
@@ -473,6 +486,7 @@ class TestPenaltyAPIIntegration:
         assert "active" in resp_invalid.json()["detail"].lower()
         assert "resolved" in resp_invalid.json()["detail"].lower()
 
+    @pytest.mark.integration
     def test_get_penalties_invalid_status_no_penalties_returns_400(self):
         """INTEGRATION TEST: Invalid status with user having no penalties returns 400, not misleading 404"""
         headers = {"Authorization": f"Bearer {self.admin_token}"}
@@ -488,6 +502,7 @@ class TestPenaltyAPIIntegration:
         # Should NOT contain misleading message like "No invalid_status penalties found"
         assert "no invalid_status penalties" not in resp_invalid.json()["detail"].lower()
 
+    @pytest.mark.integration
     def test_get_penalties_invalid_user(self):
         """INTEGRATION TEST: Invalid user ID returns 404 with message"""
         headers = {"Authorization": f"Bearer {self.admin_token}"}
@@ -497,6 +512,7 @@ class TestPenaltyAPIIntegration:
         assert resp.status_code == 404
         assert "not found" in resp.json()["detail"].lower()
 
+    @pytest.mark.integration
     def test_get_penalties_filter_no_results(self):
         """INTEGRATION TEST: Status filter with no matching penalties returns 404"""
         headers = {"Authorization": f"Bearer {self.admin_token}"}
@@ -520,6 +536,7 @@ class TestPenaltyAPIIntegration:
         assert resp_filtered.status_code == 404
         assert "no resolved penalties" in resp_filtered.json()["detail"].lower()
 
+    @pytest.mark.integration
     def test_resolve_penalty_success(self):
         """INTEGRATION TEST: Admin can resolve a penalty"""
         headers = {"Authorization": f"Bearer {self.admin_token}"}
@@ -550,6 +567,7 @@ class TestPenaltyAPIIntegration:
         assert active_resp.status_code == 404
         assert "no active penalties found" in active_resp.json()["detail"].lower()
 
+    @pytest.mark.integration
     def test_resolve_penalty_not_found(self):
         """INTEGRATION TEST: Resolving non-existent penalty returns 404"""
         headers = {"Authorization": f"Bearer {self.admin_token}"}
@@ -559,6 +577,7 @@ class TestPenaltyAPIIntegration:
         assert resp.status_code == 404
         assert "not found" in resp.json()["detail"].lower()
 
+    @pytest.mark.integration
     def test_resolve_penalty_already_resolved(self):
         """INTEGRATION TEST: Resolving an already resolved penalty returns 400"""
         headers = {"Authorization": f"Bearer {self.admin_token}"}

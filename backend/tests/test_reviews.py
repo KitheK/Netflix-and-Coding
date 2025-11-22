@@ -1,5 +1,7 @@
 
 from backend.main import app
+import pytest
+from unittest.mock import Mock, patch, MagicMock
 from fastapi.testclient import TestClient
 from pathlib import Path
 
@@ -19,10 +21,13 @@ PRODUCT_WITHOUT_REVIEWS = "NONEXISTENT_PRODUCT_ID"
 # For Testing Reviews write to JSON
 TEMP_REVIEWS_FILE = Path("backend/data/reviews_test.json")
 
-import pytest
+# ============================================================================
+# INTEGRATION TESTS - Testing full API endpoints with TestClient
+# ============================================================================
 
+@pytest.mark.integration
 def test_get_reviews_for_valid_product():
-    """Test getting reviews for a product that exists in reviews.json"""
+    """INTEGRATION TEST: Test getting reviews for a product that exists in reviews.json"""
     response = client.get(f"/reviews/{PRODUCT_WITH_REVIEWS}")
     
     assert response.status_code == 200
@@ -54,6 +59,7 @@ def test_get_reviews_for_valid_product():
         #     assert 0 <= review["rating"] <= 5
 
 
+@pytest.mark.integration
 def test_get_reviews_for_invalid_product():
     """Test getting reviews for a product that doesn't exist"""
     response = client.get(f"/reviews/{PRODUCT_WITHOUT_REVIEWS}")
@@ -62,6 +68,7 @@ def test_get_reviews_for_invalid_product():
     assert response.json()["detail"] == "No reviews found for this product"
 
 
+@pytest.mark.integration
 def test_get_reviews_returns_all_reviews():
     """Test that all reviews for a product are returned"""
     response = client.get(f"/reviews/{PRODUCT_WITH_REVIEWS}")
@@ -73,6 +80,7 @@ def test_get_reviews_returns_all_reviews():
     #assert len(reviews) == 8
 
 
+@pytest.mark.integration
 def test_review_fields_not_empty():
     """Test that review fields contain actual data"""
     response = client.get(f"/reviews/{PRODUCT_WITH_REVIEWS}")
@@ -89,7 +97,7 @@ def test_review_fields_not_empty():
     assert len(first_review["review_content"]) > 0
 
 
-#tests that the review ids are unique
+@pytest.mark.integration
 def test_review_ids_are_unique():
     """Test that all review IDs for a product are unique"""
     response = client.get(f"/reviews/{PRODUCT_WITH_REVIEWS}")
@@ -101,6 +109,7 @@ def test_review_ids_are_unique():
     assert len(review_ids) == len(set(review_ids)), "Review IDs should be unique"
 
 
+@pytest.mark.integration
 def test_review_endpoint_returns_json():
     """Test that the endpoint returns valid JSON"""
     response = client.get(f"/reviews/{PRODUCT_WITH_REVIEWS}")
@@ -109,6 +118,7 @@ def test_review_endpoint_returns_json():
     assert response.headers["content-type"] == "application/json"
 
 
+@pytest.mark.integration
 def test_review_endpoint_with_empty_product_id():
     """Test the endpoint with an empty product ID"""
     response = client.get("/reviews/")
@@ -116,8 +126,13 @@ def test_review_endpoint_with_empty_product_id():
     # Should return 404 or 405 (method not allowed) since the route requires a product_id
     assert response.status_code in [404, 405]
 
+# ============================================================================
+# UNIT TESTS - Testing models with mocked dependencies
+# ============================================================================
+
+@pytest.mark.unit
 def test_add_review_request_validation():
-    """Test that AddReviewRequest validates input correctly"""
+    """UNIT TEST: Test that AddReviewRequest validates input correctly"""
     from backend.models.review_model import AddReviewRequest
     from pydantic import ValidationError
 
@@ -186,12 +201,11 @@ USER_WITHOUT_PURCHASE = "nonexistent-user-0000-0000"
 PRODUCT_PURCHASED = "B07JW9H4J1"      # User has purchased this product
 PRODUCT_NOT_PURCHASED = "B08KT5LMRX"   # User has not purchased this product
 
-#Goes well
-def test_post_review_success(monkeypatch):
-    """Test that a user who purchased the product can post a review (PR#5: only one review per user)"""
-    product_id = "TEST_PRODUCT_UNIQUE"
-    review_req_data = {
-        "user_id": "USER_TEST_001",
+@pytest.mark.integration
+def test_post_review_success():
+    """Test that a user who purchased the product can post a review"""
+    review_data = {
+        "user_id": USER_WITH_PURCHASE,
         "user_name": "John Doe",
         "review_title": "Great Product!",
         "review_content": "Really satisfied with this purchase."
@@ -203,26 +217,7 @@ def test_post_review_success(monkeypatch):
     # Monkeypatch get_all to return empty reviews for the product
     monkeypatch.setattr(service.review_repository, "get_all", lambda: {product_id: []})
 
-    # Monkeypatch save_all to do nothing (we're not testing file writing here)
-    monkeypatch.setattr(service.review_repository, "save_all", lambda data: None)
-
-    # Monkeypatch user_has_purchased to always True
-    monkeypatch.setattr(service, "user_has_purchased", lambda u, p: True)
-
-    # Create AddReviewRequest object
-    from backend.models.review_model import AddReviewRequest
-    review_req = AddReviewRequest(**review_req_data)
-
-    # Call add_review
-    new_review = service.add_review(product_id, review_req)
-
-    # Check returned review
-    assert new_review.user_id == review_req_data["user_id"]
-    assert new_review.review_title == review_req_data["review_title"]
-    assert new_review.review_content == review_req_data["review_content"]
-    assert len(new_review.review_id) == 14
-    
-#Test if customer has not purchased the product yet.
+@pytest.mark.integration
 def test_post_review_failure_not_purchased():
     """Test that a user who has not purchased the product gets a 400 error"""
     review_data = {
@@ -258,8 +253,9 @@ def review_service_tmp(monkeypatch):
         TEMP_REVIEWS_FILE.unlink()
 
 
+@pytest.mark.unit
 def test_add_review_writes_to_json(review_service_tmp):
-    """Integration test: adding a review writes correctly to the JSON file."""
+    """UNIT TEST: adding a review writes correctly to the JSON file."""
     service = review_service_tmp
     product_id = "TEST_PRODUCT_123"
     

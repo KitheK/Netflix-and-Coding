@@ -86,8 +86,7 @@ class ReviewService:
         if product_id not in all_reviews:
             all_reviews[product_id] = []
     
-        # Use Pydantic v2 API `model_dump()` to get a dict representation
-        all_reviews[product_id].append(review.model_dump())
+        all_reviews[product_id].append(review.model_dump())  # convert Pydantic model to dict
 
         # Write back to file
         self.review_repository.save_all(all_reviews)
