@@ -60,6 +60,41 @@ def _write_test_user(email: str, plain_password: str, name: str = "Test User", r
         json.dump([user], f, indent=2)
     return user, plain_password
 
+def _write_multiple_users(*users_data):
+    """Helper: write multiple users to TEST_DB_PATH at once.
+    Each item in users_data should be a tuple: (email, password, name, role)
+    Returns list of (user_dict, password) tuples.
+    """
+    all_users = []
+    result = []
+    for user_data in users_data:
+        if len(user_data) == 2:
+            email, password = user_data
+            name, role = "Test User", "customer"
+        elif len(user_data) == 3:
+            email, password, name = user_data
+            role = "customer"
+        else:
+            email, password, name, role = user_data
+        
+        hashed = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
+        alphabet = string.ascii_letters + string.digits
+        token = "".join(secrets.choice(alphabet) for _ in range(28))
+        user = {
+            "user_id": str(uuid.uuid4()),
+            "name": name,
+            "email": email.lower(),
+            "password_hash": hashed,
+            "user_token": token,
+            "role": role
+        }
+        all_users.append(user)
+        result.append((user, password))
+    
+    with open(TEST_DB_PATH, "w", encoding="utf-8") as f:
+        json.dump(all_users, f, indent=2)
+    return result
+
 # ============================================================================
 # UNIT TESTS - Testing AuthService with mocked dependencies
 # ============================================================================
@@ -262,6 +297,126 @@ class TestAuthServiceUnit:
         
         user = self.service.get_user_by_token("invalid_token")
         assert user is None
+    
+    @pytest.mark.unit
+    def test_set_user_role_success(self):
+        """UNIT TEST: Set user role successfully updates role"""
+        user_id = str(uuid.uuid4())
+        user_data = {
+            "user_id": user_id,
+            "name": "Test User",
+            "email": "test@example.com",
+            "password_hash": "hashed",
+            "user_token": "token123",
+            "role": "customer"
+        }
+        # Store saved data so get_all() can return it after save_all() is called
+        saved_data_store = [user_data]
+        
+        def save_all(data):
+            saved_data_store.clear()
+            saved_data_store.extend(data)
+        
+        def get_all():
+            return saved_data_store
+        
+        self.mock_repository.get_all = Mock(side_effect=get_all)
+        self.mock_repository.save_all = Mock(side_effect=save_all)
+        
+        updated_user = self.service.set_user_role(user_id=user_id, role="admin")
+        
+        assert updated_user.role == "admin"
+        assert updated_user.user_id == user_id
+        # Verify repository save was called
+        self.mock_repository.save_all.assert_called_once()
+        # Verify the saved data has updated role
+        assert saved_data_store[0]["role"] == "admin"
+    
+    @pytest.mark.unit
+    def test_set_user_role_customer(self):
+        """UNIT TEST: Set user role to customer successfully"""
+        user_id = str(uuid.uuid4())
+        user_data = {
+            "user_id": user_id,
+            "name": "Admin User",
+            "email": "admin@example.com",
+            "password_hash": "hashed",
+            "user_token": "token123",
+            "role": "admin"
+        }
+        # Store saved data so get_all() can return it after save_all() is called
+        saved_data_store = [user_data]
+        
+        def save_all(data):
+            saved_data_store.clear()
+            saved_data_store.extend(data)
+        
+        def get_all():
+            return saved_data_store
+        
+        self.mock_repository.get_all = Mock(side_effect=get_all)
+        self.mock_repository.save_all = Mock(side_effect=save_all)
+        
+        updated_user = self.service.set_user_role(user_id=user_id, role="customer")
+        
+        assert updated_user.role == "customer"
+        self.mock_repository.save_all.assert_called_once()
+        assert saved_data_store[0]["role"] == "customer"
+    
+    @pytest.mark.unit
+    def test_set_user_role_invalid_role(self):
+        """UNIT TEST: Set user role with invalid role raises ValueError"""
+        user_id = str(uuid.uuid4())
+        user_data = {
+            "user_id": user_id,
+            "name": "Test User",
+            "email": "test@example.com",
+            "password_hash": "hashed",
+            "user_token": "token123",
+            "role": "customer"
+        }
+        self.mock_repository.get_all.return_value = [user_data]
+        
+        with pytest.raises(ValueError, match="Invalid role"):
+            self.service.set_user_role(user_id=user_id, role="invalid_role")
+    
+    @pytest.mark.unit
+    def test_set_user_role_user_not_found(self):
+        """UNIT TEST: Set user role for non-existent user raises ValueError"""
+        self.mock_repository.get_all.return_value = []
+        
+        with pytest.raises(ValueError, match="not found"):
+            self.service.set_user_role(user_id=str(uuid.uuid4()), role="admin")
+    
+    @pytest.mark.unit
+    def test_set_user_role_case_insensitive(self):
+        """UNIT TEST: Role is normalized to lowercase"""
+        user_id = str(uuid.uuid4())
+        user_data = {
+            "user_id": user_id,
+            "name": "Test User",
+            "email": "test@example.com",
+            "password_hash": "hashed",
+            "user_token": "token123",
+            "role": "customer"
+        }
+        # Store saved data so get_all() can return it after save_all() is called
+        saved_data_store = [user_data]
+        
+        def save_all(data):
+            saved_data_store.clear()
+            saved_data_store.extend(data)
+        
+        def get_all():
+            return saved_data_store
+        
+        self.mock_repository.get_all = Mock(side_effect=get_all)
+        self.mock_repository.save_all = Mock(side_effect=save_all)
+        
+        updated_user = self.service.set_user_role(user_id=user_id, role="ADMIN")
+        
+        assert updated_user.role == "admin"
+        assert saved_data_store[0]["role"] == "admin"
 
 
 # ============================================================================
@@ -452,3 +607,152 @@ def test_me_endpoint_admin_user():
     resp = client.get("/auth/me", headers=headers)
     assert resp.status_code == 200
     assert resp.json()["role"] == "admin"
+
+# --- Tests for promoting users to admin ---
+@pytest.mark.integration
+def test_promote_user_to_admin_success():
+    """INTEGRATION TEST: Admin can promote customer user to admin"""
+    # Create admin and customer users together
+    users = _write_multiple_users(
+        ("admin@example.com", "Admin@Pass1", "Admin User", "admin"),
+        ("customer@example.com", "Cust@Pass1", "Customer User", "customer")
+    )
+    admin, _ = users[0]
+    customer, _ = users[1]
+    admin_headers = {"Authorization": f"Bearer {admin['user_token']}"}
+    
+    # Promote customer to admin
+    resp = client.post(
+        f"/auth/users/{customer['user_id']}/promote-admin",
+        headers=admin_headers
+    )
+    
+    assert resp.status_code == 200
+    assert resp.json()["message"] == "User promoted to admin successfully"
+    assert resp.json()["user"]["user_id"] == customer["user_id"]
+    assert resp.json()["user"]["role"] == "admin"
+    assert resp.json()["user"]["email"] == "customer@example.com"
+    
+    # Verify the user can now access admin routes
+    customer_token = customer["user_token"]
+    customer_headers = {"Authorization": f"Bearer {customer_token}"}
+    admin_route_resp = client.get("/auth/admin-only", headers=customer_headers)
+    assert admin_route_resp.status_code == 200
+
+@pytest.mark.integration
+def test_promote_user_to_admin_forbidden_for_customer():
+    """INTEGRATION TEST: Customer cannot promote users to admin"""
+    users = _write_multiple_users(
+        ("customer1@example.com", "Cust1@Pass1", "Customer 1", "customer"),
+        ("customer2@example.com", "Cust2@Pass1", "Customer 2", "customer")
+    )
+    customer1, _ = users[0]
+    customer2, _ = users[1]
+    
+    customer1_headers = {"Authorization": f"Bearer {customer1['user_token']}"}
+    
+    resp = client.post(
+        f"/auth/users/{customer2['user_id']}/promote-admin",
+        headers=customer1_headers
+    )
+    
+    assert resp.status_code == 403
+    assert "admin" in resp.json()["detail"].lower()
+
+@pytest.mark.integration
+def test_promote_user_to_admin_missing_token():
+    """INTEGRATION TEST: Promoting user without token returns 401"""
+    customer, _ = _write_test_user("customer@example.com", "Cust@Pass1", "Customer User", "customer")
+    
+    resp = client.post(f"/auth/users/{customer['user_id']}/promote-admin")
+    
+    assert resp.status_code == 401
+
+@pytest.mark.integration
+def test_promote_user_to_admin_user_not_found():
+    """INTEGRATION TEST: Promoting non-existent user returns 400"""
+    admin, _ = _write_test_user("admin@example.com", "Admin@Pass1", "Admin User", "admin")
+    admin_headers = {"Authorization": f"Bearer {admin['user_token']}"}
+    
+    fake_user_id = str(uuid.uuid4())
+    resp = client.post(
+        f"/auth/users/{fake_user_id}/promote-admin",
+        headers=admin_headers
+    )
+    
+    assert resp.status_code == 400
+    assert "not found" in resp.json()["detail"].lower()
+
+@pytest.mark.integration
+def test_promote_already_admin_user():
+    """INTEGRATION TEST: Promoting an already-admin user still succeeds"""
+    users = _write_multiple_users(
+        ("admin1@example.com", "Admin1@Pass1", "Admin 1", "admin"),
+        ("admin2@example.com", "Admin2@Pass1", "Admin 2", "admin")
+    )
+    admin1, _ = users[0]
+    admin2, _ = users[1]
+    
+    admin1_headers = {"Authorization": f"Bearer {admin1['user_token']}"}
+    
+    resp = client.post(
+        f"/auth/users/{admin2['user_id']}/promote-admin",
+        headers=admin1_headers
+    )
+    
+    assert resp.status_code == 200
+    assert resp.json()["user"]["role"] == "admin"
+
+@pytest.mark.integration
+def test_assign_role_to_user_success():
+    """INTEGRATION TEST: Admin can assign any valid role to user via /users/{user_id}/role"""
+    users = _write_multiple_users(
+        ("admin@example.com", "Admin@Pass1", "Admin User", "admin"),
+        ("customer@example.com", "Cust@Pass1", "Customer User", "customer")
+    )
+    admin, _ = users[0]
+    customer, _ = users[1]
+    
+    admin_headers = {"Authorization": f"Bearer {admin['user_token']}"}
+    
+    # Assign admin role
+    resp = client.post(
+        f"/auth/users/{customer['user_id']}/role",
+        headers=admin_headers,
+        json={"role": "admin"}
+    )
+    
+    assert resp.status_code == 200
+    assert resp.json()["message"] == "role updated"
+    assert resp.json()["user"]["role"] == "admin"
+    
+    # Assign customer role back
+    resp2 = client.post(
+        f"/auth/users/{customer['user_id']}/role",
+        headers=admin_headers,
+        json={"role": "customer"}
+    )
+    
+    assert resp2.status_code == 200
+    assert resp2.json()["user"]["role"] == "customer"
+
+@pytest.mark.integration
+def test_assign_role_to_user_invalid_role():
+    """INTEGRATION TEST: Assigning invalid role returns 400"""
+    users = _write_multiple_users(
+        ("admin@example.com", "Admin@Pass1", "Admin User", "admin"),
+        ("customer@example.com", "Cust@Pass1", "Customer User", "customer")
+    )
+    admin, _ = users[0]
+    customer, _ = users[1]
+    
+    admin_headers = {"Authorization": f"Bearer {admin['user_token']}"}
+    
+    resp = client.post(
+        f"/auth/users/{customer['user_id']}/role",
+        headers=admin_headers,
+        json={"role": "invalid_role"}
+    )
+    
+    assert resp.status_code == 400
+    assert "invalid" in resp.json()["detail"].lower()
