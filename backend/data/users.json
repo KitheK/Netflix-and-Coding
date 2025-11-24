@@ -1,10 +1,18 @@
 [
   {
-    "user_id": "5feb7f04-e73e-414f-86b5-0c3ae279715c",
+    "user_id": "922d97c1-93d6-4764-a6d0-429ac7309ed6",
     "name": "Admin",
     "email": "admin@example.com",
-    "password_hash": "$2b$12$4Ro0M3aJh8dGc8TTDce1uesgRow44.cQvGNhuwtuul3qSQFSQ1l6O",
-    "user_token": "uuOLcQOVTxXmhm2rjHMqUSvTI2K0",
-    "role": "admin"
+    "password_hash": "$2b$12$jGFNELfho4kfGBL5MGsE8e1lKh/.iDAvpwWvbvjZeRDSDaLqWNVu6",
+    "role": "admin",
+    "user_token": "qvPGy02s2aQj3MgXClxdBmXAWlPg"
+  },
+  {
+    "user_id": "3804dbe3-ea5d-4b04-bca4-53df8ea1b7ca",
+    "name": "string",
+    "email": "user@example.com",
+    "password_hash": "$2b$12$YpGy94kSXVsOkHbBPvMFK.PREBpzC/oP68zNXzHX6sQVnWfVzrA4S",
+    "role": "admin",
+    "user_token": "hXALDaKmt6WBfea2ZHJtlj0ShmUm"
   }
 ]

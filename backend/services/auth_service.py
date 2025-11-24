@@ -109,6 +109,36 @@ class AuthService:
                 return user
         return None
 
+    def set_user_role(self, user_id: str, role: str) -> User:
+        """
+        Update a user's role by user_id.
+        Valid roles: 'admin' or 'customer'
+        Raises ValueError if user not found or invalid role.
+        """
+        if role.lower() not in ["admin", "customer"]:
+            raise ValueError(f"Invalid role '{role}'. Must be 'admin' or 'customer'")
+        
+        users = self._load_all_users()
+        user_found = False
+        
+        for user in users:
+            if user.user_id == user_id:
+                user_found = True
+                # Update the role
+                user.role = role.lower()
+                break
+        
+        if not user_found:
+            raise ValueError(f"User with ID '{user_id}' not found")
+        
+        # Save updated users back to repository
+        updated_list = [u.model_dump() for u in users]
+        self._repo_save(updated_list)
+        
+        # Return the updated user
+        updated_user = self.get_user_by_id(user_id)
+        return updated_user
+
 # --- Dependency helpers (use these in routers, no separate file required) ---
 
 # HTTP bearer instance used by the dependency

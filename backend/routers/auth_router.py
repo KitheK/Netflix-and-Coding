@@ -161,3 +161,24 @@ async def assign_role_to_user(user_id: str, body: RoleRequest, current_user: Use
         }
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.post("/users/{user_id}/promote-admin")
+async def promote_user_to_admin(user_id: str, current_user: User = Depends(admin_required_dep)):
+    """
+    Admin-only: promote a customer user to admin role.
+    This is a convenience endpoint specifically for promoting users to admin.
+    """
+    try:
+        updated = auth_service.set_user_role(user_id=user_id, role="admin")
+        return {
+            "message": "User promoted to admin successfully",
+            "user": {
+                "user_id": updated.user_id,
+                "name": updated.name,
+                "email": updated.email,
+                "role": updated.role
+            }
+        }
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
