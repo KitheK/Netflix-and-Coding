@@ -75,7 +75,7 @@ class ExportService:
             file_key: Key from ALLOWED_FILES
             
         Returns:
-            Filename with timestamp (e.g., 'users_export_2025-12-01_143022.json')
+            Filename with timestamp (e.g., 'users_export_2025-12-01_14:30:22.json')
         """
-        timestamp = datetime.now().strftime("%Y-%m-%d_%H%M%S")
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
         return f"{file_key}_export_{timestamp}.json"
