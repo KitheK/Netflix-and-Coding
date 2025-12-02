@@ -1,5 +1,6 @@
 """Tests for transaction endpoints (checkout and viewing transaction history)"""
 
+import os
 import json
 import pytest
 from unittest.mock import Mock, patch, MagicMock
@@ -60,6 +61,9 @@ def setup_function():
     cart_file = Path("backend/data/cart.json")
     transactions_file = Path("backend/data/transactions.json")
     products_test_file = Path("backend/data/products_test.json")
+    
+    # Set environment variable to use test products file
+    os.environ["PRODUCTS_FILE"] = "products_test.json"
     
     # Write test products to products_test.json
     with open(products_test_file, 'w') as f:
@@ -153,7 +157,7 @@ def setup_function():
 
 
 def teardown_function():
-    """Remove test users after tests"""
+    """Remove test users after tests and clean up environment variables"""
     users_file = Path("backend/data/users.json")
     
     test_user_ids = {
@@ -173,6 +177,9 @@ def teardown_function():
         
         with open(users_file, 'w') as f:
             json.dump(users, f, indent=2)
+    
+    # Clean up environment variable
+    os.environ.pop("PRODUCTS_FILE", None)
 
 
 # ============================================================================
