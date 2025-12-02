@@ -229,7 +229,7 @@ def test_customer_create_refund_request():
     """Test customer can create refund request via API"""
     response = client.post(
         "/refunds",
-        headers={"user-token": TEST_CUSTOMER_TOKEN},
+        headers={"Authorization": f"Bearer {TEST_CUSTOMER_TOKEN}"},
         json={
             "transaction_id": TEST_TRANSACTION_ID,
             "message": "Product is defective"
@@ -249,7 +249,7 @@ def test_customer_cannot_create_duplicate_refund():
     # Create first refund
     client.post(
         "/refunds",
-        headers={"user-token": TEST_CUSTOMER_TOKEN},
+        headers={"Authorization": f"Bearer {TEST_CUSTOMER_TOKEN}"},
         json={
             "transaction_id": TEST_TRANSACTION_ID,
             "message": "First request"
@@ -259,7 +259,7 @@ def test_customer_cannot_create_duplicate_refund():
     # Try duplicate
     response = client.post(
         "/refunds",
-        headers={"user-token": TEST_CUSTOMER_TOKEN},
+        headers={"Authorization": f"Bearer {TEST_CUSTOMER_TOKEN}"},
         json={
             "transaction_id": TEST_TRANSACTION_ID,
             "message": "Second request"
@@ -275,7 +275,7 @@ def test_customer_cannot_refund_nonexistent_transaction():
     """Test customer cannot create refund for transaction that doesn't exist"""
     response = client.post(
         "/refunds",
-        headers={"user-token": TEST_CUSTOMER_TOKEN},
+        headers={"Authorization": f"Bearer {TEST_CUSTOMER_TOKEN}"},
         json={
             "transaction_id": "fake-transaction-id",
             "message": "This won't work"
@@ -305,7 +305,7 @@ def test_admin_view_all_refunds():
     # Create a refund first
     client.post(
         "/refunds",
-        headers={"user-token": TEST_CUSTOMER_TOKEN},
+        headers={"Authorization": f"Bearer {TEST_CUSTOMER_TOKEN}"},
         json={
             "transaction_id": TEST_TRANSACTION_ID,
             "message": "Need refund"
@@ -315,7 +315,7 @@ def test_admin_view_all_refunds():
     # Admin views all
     response = client.get(
         "/refunds/all",
-        headers={"user-token": TEST_ADMIN_TOKEN}
+        headers={"Authorization": f"Bearer {TEST_ADMIN_TOKEN}"}
     )
     
     assert response.status_code == 200
@@ -329,7 +329,7 @@ def test_customer_cannot_view_all_refunds():
     """Test customer cannot view all refund requests (admin only)"""
     response = client.get(
         "/refunds/all",
-        headers={"user-token": TEST_CUSTOMER_TOKEN}
+        headers={"Authorization": f"Bearer {TEST_CUSTOMER_TOKEN}"}
     )
     
     assert response.status_code == 403
@@ -341,7 +341,7 @@ def test_customer_view_own_refunds():
     # Create a refund
     client.post(
         "/refunds",
-        headers={"user-token": TEST_CUSTOMER_TOKEN},
+        headers={"Authorization": f"Bearer {TEST_CUSTOMER_TOKEN}"},
         json={
             "transaction_id": TEST_TRANSACTION_ID,
             "message": "I want my money back"
@@ -351,7 +351,7 @@ def test_customer_view_own_refunds():
     # View own refunds
     response = client.get(
         "/refunds/my-requests",
-        headers={"user-token": TEST_CUSTOMER_TOKEN}
+        headers={"Authorization": f"Bearer {TEST_CUSTOMER_TOKEN}"}
     )
     
     assert response.status_code == 200
@@ -366,7 +366,7 @@ def test_admin_approve_refund():
     # Create refund
     create_response = client.post(
         "/refunds",
-        headers={"user-token": TEST_CUSTOMER_TOKEN},
+        headers={"Authorization": f"Bearer {TEST_CUSTOMER_TOKEN}"},
         json={
             "transaction_id": TEST_TRANSACTION_ID,
             "message": "Approve this please"
@@ -377,7 +377,7 @@ def test_admin_approve_refund():
     # Admin approves
     response = client.put(
         f"/refunds/{refund_id}/approve",
-        headers={"user-token": TEST_ADMIN_TOKEN}
+        headers={"Authorization": f"Bearer {TEST_ADMIN_TOKEN}"}
     )
     
     assert response.status_code == 200
@@ -392,7 +392,7 @@ def test_admin_deny_refund():
     # Create refund
     create_response = client.post(
         "/refunds",
-        headers={"user-token": TEST_CUSTOMER_TOKEN},
+        headers={"Authorization": f"Bearer {TEST_CUSTOMER_TOKEN}"},
         json={
             "transaction_id": TEST_TRANSACTION_ID,
             "message": "Deny this"
@@ -403,7 +403,7 @@ def test_admin_deny_refund():
     # Admin denies
     response = client.put(
         f"/refunds/{refund_id}/deny",
-        headers={"user-token": TEST_ADMIN_TOKEN}
+        headers={"Authorization": f"Bearer {TEST_ADMIN_TOKEN}"}
     )
     
     assert response.status_code == 200
@@ -418,7 +418,7 @@ def test_customer_cannot_approve_refund():
     # Create refund
     create_response = client.post(
         "/refunds",
-        headers={"user-token": TEST_CUSTOMER_TOKEN},
+        headers={"Authorization": f"Bearer {TEST_CUSTOMER_TOKEN}"},
         json={
             "transaction_id": TEST_TRANSACTION_ID,
             "message": "Customer shouldn't approve"
@@ -429,7 +429,7 @@ def test_customer_cannot_approve_refund():
     # Customer tries to approve
     response = client.put(
         f"/refunds/{refund_id}/approve",
-        headers={"user-token": TEST_CUSTOMER_TOKEN}
+        headers={"Authorization": f"Bearer {TEST_CUSTOMER_TOKEN}"}
     )
     
     assert response.status_code == 403
@@ -441,7 +441,7 @@ def test_cannot_approve_already_processed_refund():
     # Create and approve refund
     create_response = client.post(
         "/refunds",
-        headers={"user-token": TEST_CUSTOMER_TOKEN},
+        headers={"Authorization": f"Bearer {TEST_CUSTOMER_TOKEN}"},
         json={
             "transaction_id": TEST_TRANSACTION_ID,
             "message": "First approval"
@@ -451,13 +451,13 @@ def test_cannot_approve_already_processed_refund():
     
     client.put(
         f"/refunds/{refund_id}/approve",
-        headers={"user-token": TEST_ADMIN_TOKEN}
+        headers={"Authorization": f"Bearer {TEST_ADMIN_TOKEN}"}
     )
     
     # Try to approve again
     response = client.put(
         f"/refunds/{refund_id}/approve",
-        headers={"user-token": TEST_ADMIN_TOKEN}
+        headers={"Authorization": f"Bearer {TEST_ADMIN_TOKEN}"}
     )
     
     assert response.status_code == 400
@@ -470,7 +470,7 @@ def test_transaction_status_updated_on_approval():
     # Create and approve refund
     create_response = client.post(
         "/refunds",
-        headers={"user-token": TEST_CUSTOMER_TOKEN},
+        headers={"Authorization": f"Bearer {TEST_CUSTOMER_TOKEN}"},
         json={
             "transaction_id": TEST_TRANSACTION_ID,
             "message": "Check transaction status"
@@ -480,7 +480,7 @@ def test_transaction_status_updated_on_approval():
     
     client.put(
         f"/refunds/{refund_id}/approve",
-        headers={"user-token": TEST_ADMIN_TOKEN}
+        headers={"Authorization": f"Bearer {TEST_ADMIN_TOKEN}"}
     )
     
     # Check transaction status
