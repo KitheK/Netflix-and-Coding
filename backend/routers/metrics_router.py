@@ -39,3 +39,22 @@ async def get_chart_data(current_user: User = Depends(admin_required_dep)):
     chart_data = metrics_service.get_chart_data()
     return chart_data
 
+
+@router.get("/anomalies")
+async def get_anomalies(current_user: User = Depends(admin_required_dep)):
+    """
+    Admin-only: Get basic anomaly alerts.
+    
+    Detects:
+    - Sudden spike in penalties (last 24 hours vs historical average)
+    - Products with unusually high number of reviews (compared to average)
+    
+    Returns:
+    - penalty_spike: Alert if penalties in last 24h are 3x+ historical average
+    - review_anomalies: List of products with review counts 2x+ the average
+    
+    Note: All checks are rule-based and generated on request (no persistent storage)
+    """
+    anomalies = metrics_service.get_anomalies()
+    return anomalies
+

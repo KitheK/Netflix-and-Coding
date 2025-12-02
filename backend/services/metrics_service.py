@@ -2,10 +2,14 @@
 
 from typing import Dict, List, Any
 from collections import defaultdict
+from datetime import datetime, timezone, timedelta
 from backend.repositories.transaction_repository import TransactionRepository
 from backend.repositories.user_repository import UserRepository
 from backend.repositories.product_repository import ProductRepository
+from backend.repositories.penalty_repository import PenaltyRepository
+from backend.repositories.review_repository import ReviewRepository
 from backend.models.transaction_model import Transaction
+from backend.models.penalty_model import Penalty
 
 
 class MetricsService:
@@ -15,6 +19,8 @@ class MetricsService:
         self.transaction_repository = TransactionRepository()
         self.user_repository = UserRepository()
         self.product_repository = ProductRepository()
+        self.penalty_repository = PenaltyRepository()
+        self.review_repository = ReviewRepository()
     
     def _load_all_transactions(self) -> Dict[str, List[Dict[str, Any]]]:
         """Load all transactions from repository"""
@@ -263,3 +269,135 @@ class MetricsService:
             "category_distribution": category_distribution,
             "new_vs_returning_users": new_vs_returning_users
         }
+    
+    def get_anomalies(self) -> Dict[str, Any]:
+        """
+        Detect basic anomalies in the system.
+        Simple rule-based checks - no persistent storage.
+        
+        Returns:
+        - penalty_spike: Detects sudden spike in penalties (last 24h vs historical average)
+        - review_anomalies: Products with unusually high number of reviews
+        """
+        anomalies = {
+            "penalty_spike": None,
+            "review_anomalies": []
+        }
+        
+        # 1. Check for penalty spike
+        all_penalties_data = self.penalty_repository.get_all() or []
+        
+        if all_penalties_data:
+            # Parse penalties
+            penalties = []
+            for penalty_dict in all_penalties_data:
+                try:
+                    penalty = Penalty(**penalty_dict)
+                    penalties.append(penalty)
+                except Exception:
+                    continue
+            
+            if len(penalties) > 0:
+                # Get current time and 24 hours ago
+                now = datetime.now(timezone.utc)
+                last_24h = now - timedelta(hours=24)
+                
+                # Count penalties in last 24 hours
+                recent_penalties = []
+                older_penalties = []
+                
+                for penalty in penalties:
+                    try:
+                        # Parse timestamp
+                        timestamp_str = penalty.timestamp
+                        if timestamp_str.endswith('Z'):
+                            timestamp_str = timestamp_str[:-1] + '+00:00'
+                        
+                        penalty_time = datetime.fromisoformat(timestamp_str.replace('Z', '+00:00'))
+                        
+                        if penalty_time >= last_24h:
+                            recent_penalties.append(penalty)
+                        else:
+                            older_penalties.append(penalty)
+                    except Exception:
+                        continue
+                
+                recent_count = len(recent_penalties)
+                
+                # Calculate historical average (penalties per day)
+                if len(older_penalties) > 0:
+                    # Find oldest penalty to calculate time range
+                    oldest_time = None
+                    for penalty in older_penalties:
+                        try:
+                            timestamp_str = penalty.timestamp
+                            if timestamp_str.endswith('Z'):
+                                timestamp_str = timestamp_str[:-1] + '+00:00'
+                            penalty_time = datetime.fromisoformat(timestamp_str.replace('Z', '+00:00'))
+                            
+                            if oldest_time is None or penalty_time < oldest_time:
+                                oldest_time = penalty_time
+                        except Exception:
+                            continue
+                    
+                    if oldest_time:
+                        time_range_days = (now - oldest_time).total_seconds() / 86400
+                        if time_range_days > 0:
+                            historical_avg_per_day = len(older_penalties) / time_range_days
+                            
+                            # Alert if recent count is 3x or more than historical average per day
+                            threshold = historical_avg_per_day * 3
+                            if recent_count >= threshold and recent_count >= 3:
+                                anomalies["penalty_spike"] = {
+                                    "message": f"Sudden spike detected: {recent_count} penalties in last 24 hours",
+                                    "recent_count": recent_count,
+                                    "historical_average_per_day": round(historical_avg_per_day, 2),
+                                    "threshold": round(threshold, 2)
+                                }
+                elif recent_count >= 3:
+                    # If no historical data but we have 3+ recent penalties, flag it
+                    anomalies["penalty_spike"] = {
+                        "message": f"Sudden spike detected: {recent_count} penalties in last 24 hours (no historical data for comparison)",
+                        "recent_count": recent_count,
+                        "historical_average_per_day": 0,
+                        "threshold": 3
+                    }
+        
+        # 2. Check for review anomalies
+        all_reviews = self.review_repository.get_all() or {}
+        products_lookup = self._load_all_products()
+        
+        # Calculate review counts per product
+        product_review_counts = {}
+        for product_id, reviews_list in all_reviews.items():
+            if isinstance(reviews_list, list):
+                product_review_counts[product_id] = len(reviews_list)
+        
+        if product_review_counts:
+            # Calculate average and standard deviation
+            review_counts = list(product_review_counts.values())
+            if len(review_counts) > 0:
+                avg_reviews = sum(review_counts) / len(review_counts)
+                
+                # Calculate simple threshold (2x average or more)
+                threshold = avg_reviews * 2
+                
+                # Find products exceeding threshold
+                for product_id, count in product_review_counts.items():
+                    if count >= threshold and count >= 5:  # At least 5 reviews to be considered
+                        product = products_lookup.get(product_id, {})
+                        anomalies["review_anomalies"].append({
+                            "product_id": product_id,
+                            "product_name": product.get("product_name", "Unknown Product"),
+                            "review_count": count,
+                            "average_reviews": round(avg_reviews, 2),
+                            "threshold": round(threshold, 2),
+                            "message": f"Unusually high number of reviews: {count} (average: {avg_reviews:.1f})"
+                        })
+                
+                # Sort by review count (descending)
+                anomalies["review_anomalies"].sort(key=lambda x: x["review_count"], reverse=True)
+                # Limit to top 5
+                anomalies["review_anomalies"] = anomalies["review_anomalies"][:5]
+        
+        return anomalies

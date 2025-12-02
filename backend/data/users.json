@@ -1,26 +1,10 @@
 [
   {
-    "user_id": "922d97c1-93d6-4764-a6d0-429ac7309ed6",
+    "user_id": "d6ca4ef2-c57f-4f3b-8f7a-81e80ab00d7d",
     "name": "Admin",
     "email": "admin@example.com",
-    "password_hash": "$2b$12$jGFNELfho4kfGBL5MGsE8e1lKh/.iDAvpwWvbvjZeRDSDaLqWNVu6",
-    "role": "admin",
-    "user_token": "qvPGy02s2aQj3MgXClxdBmXAWlPg"
-  },
-  {
-    "user_id": "3804dbe3-ea5d-4b04-bca4-53df8ea1b7ca",
-    "name": "string",
-    "email": "user@example.com",
-    "password_hash": "$2b$12$YpGy94kSXVsOkHbBPvMFK.PREBpzC/oP68zNXzHX6sQVnWfVzrA4S",
-    "role": "admin",
-    "user_token": "hXALDaKmt6WBfea2ZHJtlj0ShmUm"
-  },
-  {
-    "user_id": "3eac6f54-9dd2-4145-9948-e29d9ef9c062",
-    "name": "lab man",
-    "email": "labman@example.com",
-    "password_hash": "$2b$12$.cX347qafb9kYnoe5Sb7ge8OmXdB3VUD.M/KcCFzi/syV.C/n8GVy",
-    "role": "customer",
-    "user_token": "H5Vwstf98f8xqwCIUQyGedJeSy1c"
+    "password_hash": "$2b$12$/nPbcBtWeBuDoPKP.RyTyuE3mQXD93CqyNXZfNUGAep6duZMQR556",
+    "user_token": "lIGOPPGs6JGo14XinMU2JM8zMqGH",
+    "role": "admin"
   }
 ]
