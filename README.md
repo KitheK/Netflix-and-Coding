@@ -13,7 +13,7 @@ Docker compose up -d
     Dependencies: A complete list of required tools, libraries, and services (with version details):
 For a full list of requirements for the system, please see requirements.txt . We recommend running:
 pip3 install -r "requirements.txt"
-upon loading the system into a virtual environment.
+upon loading into a virtual environment to ensure no conflicting packages and minimal running package load.
 
         Maintenance Requirements: Details on ongoing maintenance, including:
 
