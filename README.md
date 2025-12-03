@@ -7,8 +7,11 @@ Fraser Muller
 Harrison Kayihura
 
     Installation Instructions: Step-by-step setup procedures for running the system using Docker:
-Running the system using docker requires a few steps. BLAH BLAH BLAH. You must then run the following commands:
+Since we are containerized, running the system using docker requires a few steps. Assuming you have Docker desktop. You must then run the following commands:
 Docker compose up -d
+OR
+Docker -compose up 
+Depending on system running the program.
 
     Dependencies: A complete list of required tools, libraries, and services (with version details):
 For a full list of requirements for the system, please see requirements.txt . We recommend running:
