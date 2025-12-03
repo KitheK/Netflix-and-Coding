@@ -7,14 +7,14 @@ Fraser Muller
 Harrison Kayihura
 
     Installation Instructions: Step-by-step setup procedures for running the system using Docker:
-
+Running the system using docker requires a few steps. BLAH BLAH BLAH. You must then run the following commands:
 Docker compose up -d
 
     Dependencies: A complete list of required tools, libraries, and services (with version details):
 For a full list of requirements for the system, please see requirements.txt . We recommend running
 pip3 install -r "requirements.txt" upon loading the system into a virtual environment.
 
-    Maintenance Requirements: Details on ongoing maintenance, including:
+        Maintenance Requirements: Details on ongoing maintenance, including:
 
     Account credentials (if applicable):
 
