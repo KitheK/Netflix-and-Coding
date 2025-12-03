@@ -17,6 +17,13 @@ pip3 install -r "requirements.txt" upon loading the system into a virtual enviro
         Maintenance Requirements: Details on ongoing maintenance, including:
 
     Account credentials (if applicable):
+Admin user login details:
+email:admin@example.com
+password:AdminPass1
+The user dashboard/account can be switched to using the login feature - once logged out, when you try to process an add to cart or add to feature process, you will be prompted to login.
+Example User login credentials:
+email:user@gmail.com
+password:User@123.com
 
     Database management procedures:
 In our systems configuration, all read and writes from or two any of our JSON files includle checks for duplicates and safety checks for removals. We recommend using the built in functions to create or remove any data entries from the database. However, if you wish to add entries manually, please follow the HashMap/Dict structure of the files. We have a key (either the product or user code depending) which relates to data entries 'under' the umbrella of what the key represents. This changed depending on case but is evident when reading the file with this given background knowledge.
