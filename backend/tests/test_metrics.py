@@ -168,6 +168,79 @@ class TestMetricsServiceUnit:
         assert chart_data["top_products_by_sales"][0]["product_name"] == "Product 2"
         assert chart_data["top_products_by_sales"][0]["sales"] == 10
         assert chart_data["top_products_by_sales"][1]["sales"] == 5
+    
+    @pytest.mark.unit
+    def test_get_anomalies_penalty_spike(self):
+        """UNIT TEST: Detects penalty spike when recent penalties exceed threshold"""
+        from backend.models.penalty_model import Penalty
+        from datetime import datetime, timezone, timedelta
+        
+        # Create old penalties (10 days ago)
+        old_time = datetime.now(timezone.utc) - timedelta(days=10)
+        old_penalties = [
+            Penalty(
+                penalty_id=str(uuid.uuid4()),
+                user_id=str(uuid.uuid4()),
+                reason="Test",
+                timestamp=old_time.isoformat(),
+                status="active"
+            ) for _ in range(5)
+        ]
+        
+        # Create recent penalties (last 24h) - should trigger spike
+        recent_time = datetime.now(timezone.utc) - timedelta(hours=12)
+        recent_penalties = [
+            Penalty(
+                penalty_id=str(uuid.uuid4()),
+                user_id=str(uuid.uuid4()),
+                reason="Test",
+                timestamp=recent_time.isoformat(),
+                status="active"
+            ) for _ in range(10)  # 10 penalties in 24h vs 5 in 10 days = spike
+        ]
+        
+        all_penalties = [p.model_dump() for p in old_penalties + recent_penalties]
+        
+        self.service.penalty_repository = Mock()
+        self.service.review_repository = Mock()
+        self.service.penalty_repository.get_all.return_value = all_penalties
+        self.service.review_repository.get_all.return_value = {}
+        self.service.product_repository.get_all.return_value = []  # No products needed for penalty test
+        
+        anomalies = self.service.get_anomalies()
+        
+        assert anomalies["penalty_spike"] is not None
+        assert anomalies["penalty_spike"]["recent_count"] == 10
+        assert anomalies["review_anomalies"] == []
+    
+    @pytest.mark.unit
+    def test_get_anomalies_review_anomalies(self):
+        """UNIT TEST: Detects products with unusually high review counts"""
+        # Mock reviews: one product with many reviews, others with few
+        reviews_data = {
+            "B07JW9H4J1": [{"review_id": f"R{i}", "user_id": str(uuid.uuid4()), "user_name": "Test", "review_title": "Test", "review_content": "Test"} for i in range(20)],  # 20 reviews
+            "B08KT5LMRX": [{"review_id": f"R{i}", "user_id": str(uuid.uuid4()), "user_name": "Test", "review_title": "Test", "review_content": "Test"} for i in range(2)],   # 2 reviews
+            "B09NX5K7QP": [{"review_id": f"R{i}", "user_id": str(uuid.uuid4()), "user_name": "Test", "review_title": "Test", "review_content": "Test"} for i in range(3)]    # 3 reviews
+        }
+        
+        products_data = [
+            {"product_id": "B07JW9H4J1", "product_name": "Product 1"},
+            {"product_id": "B08KT5LMRX", "product_name": "Product 2"},
+            {"product_id": "B09NX5K7QP", "product_name": "Product 3"}
+        ]
+        
+        self.service.penalty_repository = Mock()
+        self.service.review_repository = Mock()
+        self.service.penalty_repository.get_all.return_value = []
+        self.service.review_repository.get_all.return_value = reviews_data
+        self.service.product_repository.get_all.return_value = products_data
+        
+        anomalies = self.service.get_anomalies()
+        
+        # Product 1 should be flagged (20 reviews vs avg of ~8)
+        assert len(anomalies["review_anomalies"]) > 0
+        assert anomalies["review_anomalies"][0]["product_id"] == "B07JW9H4J1"
+        assert anomalies["review_anomalies"][0]["review_count"] == 20
 
 
 # ============================================================================
@@ -311,3 +384,17 @@ class TestMetricsAPIIntegration:
         assert "new_vs_returning_users" in data
         assert isinstance(data["top_products_by_sales"], list)
         assert len(data["new_vs_returning_users"]) == 2
+    
+    @pytest.mark.integration
+    def test_get_anomalies_success(self):
+        """INTEGRATION TEST: Admin can successfully get anomalies"""
+        headers = {"Authorization": f"Bearer {self.admin_token}"}
+        
+        response = client.get("/admin/metrics/anomalies", headers=headers)
+        
+        assert response.status_code == 200
+        data = response.json()
+        
+        assert "penalty_spike" in data
+        assert "review_anomalies" in data
+        assert isinstance(data["review_anomalies"], list)
