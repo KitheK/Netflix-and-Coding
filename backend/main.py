@@ -2,7 +2,7 @@
 
 from fastapi import FastAPI
 from backend.routers import product_router
-from backend.routers import auth_router, cart_router, transaction_router, penalty_router, review_router, external_router, refund_router, export_router, wishlist_router
+from backend.routers import auth_router, cart_router, transaction_router, penalty_router, review_router, external_router, refund_router, export_router, wishlist_router, metrics_router
 
 # Create app
 app = FastAPI(title="Netflix and Coding Store API")
@@ -17,6 +17,7 @@ app.include_router(review_router.router)
 app.include_router(external_router.router)  # Enable external router (currency conversion)
 app.include_router(refund_router.router)  # Enable refund router
 app.include_router(export_router.router)  # Enable export router (admin only)
+app.include_router(metrics_router.router)  # Enable metrics router (admin only)
 app.include_router(wishlist_router.router)  # Enable wishlist router
 
 # Root endpoint.
