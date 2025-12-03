@@ -600,3 +600,33 @@ class TestPenaltyAPIIntegration:
         second = client.post(f"/penalties/{penalty_id}/resolve", headers=headers)
         assert second.status_code == 400
         assert "already resolved" in second.json()["detail"].lower()
+    @pytest.mark.integration
+    def test_disputed_penalty_success(self):
+        """INTEGRATION TEST: Admin can dispute and resolve a penalty"""
+        headers = {"Authorization": f"Bearer {self.admin_token}"}
+        fake_penalty_id = "00000000-0000-0000-0000-999999999999"
+        # Create penalty for TEST_USER_ID_1
+        resp = client.post(
+            "/penalties/apply",
+            json={
+                "user_id": TEST_USER_ID_1,
+                "reason": "Dispute me",
+            },
+            headers=headers,
+        )
+        penalty_id = resp.json()["penalty"]["penalty_id"]
+        # Dispute penalty (success appeoved)
+        first = client.post(f"/penalties/{penalty_id}/dispute", headers=headers)
+        assert first.status_code == 200
+
+        # Dispute penalty (success denied)
+        second = client.post(f"/penalties/{penalty_id}/dispute", headers=headers)
+        assert second.status_code == 200
+    def test_disputed_penalty_not_found(self):
+        """INTEGRATION TEST: Disputing non-existent penalty returns 404"""
+        headers = {"Authorization": f"Bearer {self.admin_token}"}
+        fake_penalty_id = "00000000-0000-0000-0000-999999999999"
+
+        resp = client.post(f"/penalties/{fake_penalty_id}/dispute", headers=headers)
+        assert resp.status_code == 404
+        assert "not found" in resp.json()["detail"].lower()

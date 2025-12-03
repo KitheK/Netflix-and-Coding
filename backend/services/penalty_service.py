@@ -155,4 +155,37 @@ class PenaltyService:
 
         self.penalty_repository.save_all(all_penalties)
         return updated_penalty
-
+def disputed_penalty(self, user_id: str, penalty_id: str) -> Optional[Penalty]:
+    """
+    Review and resolve a disputed penalty.
+    
+    Args:
+        user_id: UUID of the user with the disputed penalty
+        penalty_id: ID of the penalty being disputed
+        
+    Returns:
+        Optional[Penalty]: The resolved penalty if approved, None if denied
+    """
+    # Get penalties for the user
+    user_penalties = self.get_user_penalties(user_id)
+    
+    # Find the specific penalty
+    penalty = None
+    for p in user_penalties:
+        if p.penalty_id == penalty_id:
+            penalty = p
+            break
+    
+    if penalty is None:
+        raise ValueError(f"Penalty {penalty_id} not found for user {user_id}")
+    
+    print(f"Reviewing penalty: {penalty}")
+    decision = input("Approve request (yes/no): ")
+    
+    if decision.lower() == "no":
+        print("Request denied")
+        return None
+    
+    resolved_penalty = self.resolve_penalty(penalty_id)
+    print("Request approved")
+    return resolved_penalty
