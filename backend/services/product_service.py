@@ -5,6 +5,7 @@ import string
 import random
 from typing import List, Optional
 from backend.models.product_model import Product
+from backend.services.image_scraper_service import ImageScraperService
 from backend.repositories.product_repository import ProductRepository
 
 
@@ -15,6 +16,7 @@ class ProductService:
         # Create our own ProductRepository internally
         # ProductRepository is locked to products.json (or products_test.json in tests)
         self.repository = ProductRepository()
+        self.image_scraper = ImageScraperService()
 
     # Load all products from repository
     def _repo_load(self) -> List[dict]:
@@ -264,3 +266,71 @@ class ProductService:
             return sorted(products, key=lambda p: p.discount_percentage, reverse=True)
         else:
             return products  # no sorting if invalid option
+    
+    def fetch_and_update_image(self, product_id: str) -> Product:
+        """
+        Fetch the product image from Amazon and update the product.
+        
+        Args:
+            product_id: ID of the product to update
+            
+        Returns:
+            Updated Product with new image URL
+            
+        Raises:
+            ValueError: If product not found or image fetch fails
+        """
+        # Get the product first
+        product = self.get_product_by_id(product_id)
+        if product is None:
+            raise ValueError(f"Product with ID {product_id} not found")
+        
+        # Fetch the image URL from Amazon
+        new_image_url = self.image_scraper.fetch_image_url(product.product_link)
+        
+        if not new_image_url:
+            raise ValueError(f"Failed to fetch image from product link: {product.product_link}")
+        
+        # Update the product with the new image URL
+        updated_product = self.update_product(
+            product_id=product_id,
+            img_link=new_image_url
+        )
+        
+        return updated_product
+    
+    def fetch_all_images(self) -> dict:
+        """
+        Fetch images for all products and update them.
+        
+        Returns:
+            Dictionary with statistics about the operation:
+            - total: Total number of products
+            - updated: Number of products successfully updated
+            - failed: Number of products that failed to update
+            - errors: List of product IDs that failed
+        """
+        products = self._load_all_products()
+        total = len(products)
+        updated = 0
+        failed = 0
+        errors = []
+        
+        for product in products:
+            try:
+                self.fetch_and_update_image(product.product_id)
+                updated += 1
+            except Exception as e:
+                failed += 1
+                errors.append({
+                    "product_id": product.product_id,
+                    "product_name": product.product_name,
+                    "error": str(e)
+                })
+        
+        return {
+            "total": total,
+            "updated": updated,
+            "failed": failed,
+            "errors": errors
+        }

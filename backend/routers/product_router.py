@@ -28,18 +28,6 @@ async def get_all_products(sort: Optional[str] = None):
 
     return products
 
-# Endpoint to get product by ID.  url would be like /products/B07JW9H4J1 for product with ID B07JW9H4J1
-@router.get("/{product_id}")
-async def get_product_by_id(product_id: str):
-    # call product_service's method to find the product by id
-    product = product_service.get_product_by_id(product_id)
-    
-    # if not found, return 404 error
-    if product is None:
-        raise HTTPException(status_code=404, detail="Product not found")
-    # Return the product
-    return product
-
 # Endpoint to search products by keyword in name or category.  url would be like /products/search/laptop to search for "laptop"
 @router.get("/search/{keyword}")
 async def search_products(keyword: str, sort: Optional[str] = None):
@@ -52,6 +40,47 @@ async def search_products(keyword: str, sort: Optional[str] = None):
 
     # return the list (empty if no matches - for frontend to handle "no results" case)
     return products
+
+# ADMIN ONLY: Fetch and update product image from Amazon
+# This route must come before /{product_id} to avoid route conflicts
+@router.get("/{product_id}/fetch-image", response_model=Product)
+async def fetch_product_image(
+    product_id: str,
+    current_user: dict = Depends(admin_required_dep)
+):
+    """
+    ADMIN ONLY: Fetch the product image from Amazon and update the product.
+    
+    This endpoint:
+    - Scrapes the Amazon product page using the product_link
+    - Extracts the main product image (landingImage)
+    - Updates the product's img_link in products.json
+    
+    Returns the updated product with the new image URL.
+    """
+    try:
+        updated_product = product_service.fetch_and_update_image(product_id)
+        return updated_product
+    except ValueError as e:
+        if "not found" in str(e).lower():
+            raise HTTPException(status_code=404, detail=str(e))
+        else:
+            raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch image: {str(e)}")
+
+# Endpoint to get product by ID.  url would be like /products/B07JW9H4J1 for product with ID B07JW9H4J1
+# Note: This must come after more specific routes like /search/{keyword} and /{id}/fetch-image
+@router.get("/{product_id}")
+async def get_product_by_id(product_id: str):
+    # call product_service's method to find the product by id
+    product = product_service.get_product_by_id(product_id)
+    
+    # if not found, return 404 error
+    if product is None:
+        raise HTTPException(status_code=404, detail="Product not found")
+    # Return the product
+    return product
 
 
 # ADMIN ONLY: Create a new product
@@ -154,3 +183,29 @@ async def delete_product(
             raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to delete product: {str(e)}")
+
+
+# ADMIN ONLY: Fetch images for all products
+@router.post("/fetch-images-all")
+async def fetch_all_product_images(
+    current_user: dict = Depends(admin_required_dep)
+):
+    """
+    ADMIN ONLY: Fetch images for all products in products.json.
+    
+    This endpoint:
+    - Iterates through all products
+    - Fetches images from Amazon for each product
+    - Updates products.json with new image URLs
+    
+    Returns statistics about the operation:
+    - total: Total number of products
+    - updated: Number of products successfully updated
+    - failed: Number of products that failed
+    - errors: List of failed products with error details
+    """
+    try:
+        result = product_service.fetch_all_images()
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch images: {str(e)}")
