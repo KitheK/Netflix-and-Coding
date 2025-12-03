@@ -41,24 +41,30 @@ class AuthService:
         return users
 
     def register_user(self, name: str, email: str, password: str) -> User:
+        # load users
         users = self._load_all_users()
         email_normalized = email.strip().lower()
 
+        # pass validation
         if len(password) < 6:
             raise ValueError("Password must be at least 6 characters long")
         if not any(c.isdigit() for c in password):
             raise ValueError("Password must include at least one digit")
 
+        # check if email exists
         if any(u.email.lower() == email_normalized for u in users):
             raise ValueError("Email already exists")
 
+        # hash the password
         hashed_pwd = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
 
+        # Generate a unique user token
         existing_tokens = {getattr(u, "user_token", None) for u in users}
         user_token = self._generate_user_token()
         while user_token in existing_tokens:
             user_token = self._generate_user_token()
 
+        # Create the new user object
         new_user = User(
             user_id=str(uuid.uuid4()),
             name=name,
@@ -68,10 +74,12 @@ class AuthService:
             role="customer"
         )
 
+        # Add new user to the list and save to repository
         updated_list = [u.model_dump() for u in users]
         updated_list.append(new_user.model_dump())
         self._repo_save(updated_list)
 
+        # Return the new user object
         return new_user
 
     def login_user(self, email: str, password: str) -> Optional[User]:
