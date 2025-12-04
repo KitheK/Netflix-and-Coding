@@ -58,3 +58,17 @@ async def get_anomalies(current_user: User = Depends(admin_required_dep)):
     anomalies = metrics_service.get_anomalies()
     return anomalies
 
+
+@router.get("/users")
+async def get_user_metrics(current_user: User = Depends(admin_required_dep)):
+    """
+    Admin-only: Get comprehensive user metrics and analytics.
+    
+    Returns:
+    - Summary: Total users, admin count, customer count, active/inactive users
+    - Engagement: User activity metrics, average transactions, average spending
+    - Top customers: Top 10 customers by total spending
+    - User activity breakdown: Users grouped by transaction count
+    """
+    user_metrics = metrics_service.get_user_metrics()
+    return user_metrics

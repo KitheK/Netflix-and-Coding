@@ -11,7 +11,37 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  timeout: 10000, // 10 second timeout
 });
+
+// Add request interceptor for debugging
+api.interceptors.request.use(
+  (config) => {
+    console.log(`[API] ${config.method?.toUpperCase()} ${config.url}`);
+    return config;
+  },
+  (error) => {
+    console.error('[API] Request error:', error);
+    return Promise.reject(error);
+  }
+);
+
+// Add response interceptor for error handling
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.code === 'ECONNABORTED') {
+      console.error('[API] Request timeout - Backend may be slow or unavailable');
+    } else if (error.message === 'Network Error') {
+      console.error('[API] Network Error - Backend is not reachable. Please ensure the backend is running on', API_BASE_URL);
+    } else if (error.response) {
+      console.error('[API] Response error:', error.response.status, error.response.data);
+    } else {
+      console.error('[API] Error:', error.message);
+    }
+    return Promise.reject(error);
+  }
+);
 
 // Auth API
 export const authAPI = {
@@ -34,12 +64,26 @@ export const authAPI = {
 // Products API
 export const productsAPI = {
   getAll: async (sort?: string): Promise<Product[]> => {
-    const response = await api.get('/products', { params: { sort } });
-    return response.data;
+    try {
+      const response = await api.get('/products', { params: { sort } });
+      return response.data;
+    } catch (error: any) {
+      if (error.message === 'Network Error' || error.code === 'ECONNABORTED') {
+        throw new Error('Unable to connect to the server. Please ensure the backend is running on http://localhost:8000');
+      }
+      throw error;
+    }
   },
   getById: async (productId: string): Promise<Product> => {
-    const response = await api.get(`/products/${productId}`);
-    return response.data;
+    try {
+      const response = await api.get(`/products/${productId}`);
+      return response.data;
+    } catch (error: any) {
+      if (error.message === 'Network Error' || error.code === 'ECONNABORTED') {
+        throw new Error('Unable to connect to the server. Please ensure the backend is running on http://localhost:8000');
+      }
+      throw error;
+    }
   },
   search: async (keyword: string, sort?: string): Promise<Product[]> => {
     const response = await api.get(`/products/search/${keyword}`, { params: { sort } });
@@ -116,6 +160,10 @@ export const reviewsAPI = {
     } catch (error: any) {
       if (error.response?.status === 404) {
         return [];
+      }
+      if (error.message === 'Network Error' || error.code === 'ECONNABORTED') {
+        console.warn('Unable to load reviews - backend may be unavailable');
+        return []; // Return empty array instead of throwing for reviews
       }
       throw error;
     }
@@ -231,8 +279,15 @@ export const adminAPI = {
 // Currency API
 export const currencyAPI = {
   convert: async (to: string): Promise<Product[]> => {
-    const response = await api.get('/external/currency', { params: { to } });
-    return response.data;
+    try {
+      const response = await api.get('/external/currency', { params: { to } });
+      return response.data;
+    } catch (error: any) {
+      if (error.message === 'Network Error' || error.code === 'ECONNABORTED') {
+        throw new Error('Unable to connect to the server. Please ensure the backend is running on http://localhost:8000');
+      }
+      throw error;
+    }
   },
 };
 

@@ -47,8 +47,11 @@ export default function ProductDetailPage() {
         data = found || await productsAPI.getById(productId);
       }
       setProduct(data);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to load product:', error);
+      if (error.message?.includes('Unable to connect')) {
+        alert('Backend server is not running. Please start the backend server on http://localhost:8000');
+      }
     } finally {
       setLoading(false);
     }
@@ -58,8 +61,9 @@ export default function ProductDetailPage() {
     try {
       const data = await reviewsAPI.getByProduct(productId);
       setReviews(data);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to load reviews:', error);
+      // Reviews are optional, so we don't show an alert for network errors
     }
   };
 

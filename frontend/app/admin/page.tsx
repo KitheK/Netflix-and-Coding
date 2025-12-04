@@ -8,15 +8,21 @@ import Navbar from '@/components/Navbar';
 import { useRouter } from 'next/navigation';
 import { Package, DollarSign, Users, TrendingUp, Plus, Edit, Trash2, Check, X } from 'lucide-react';
 import Link from 'next/link';
+import MetricsCharts from '@/components/MetricsCharts';
+import AnomaliesAlert from '@/components/AnomaliesAlert';
+import ReviewManagement from '@/components/ReviewManagement';
+import CategoryPieChart from '@/components/CategoryPieChart';
 
 export default function AdminDashboard() {
   const { user, isAdmin, loading: authLoading } = useAuth();
   const router = useRouter();
   const [metrics, setMetrics] = useState<any>(null);
+  const [chartData, setChartData] = useState<any>(null);
+  const [anomalies, setAnomalies] = useState<any>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [refunds, setRefunds] = useState<Refund[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'refunds'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'refunds' | 'reviews'>('overview');
 
   useEffect(() => {
     if (authLoading) {
@@ -36,12 +42,16 @@ export default function AdminDashboard() {
   const loadData = async () => {
     if (!user) return;
     try {
-      const [metricsData, productsData, refundsData] = await Promise.all([
+      const [metricsData, chartDataResult, anomaliesData, productsData, refundsData] = await Promise.all([
         adminAPI.getMetrics(user.user_token).catch(() => null),
+        adminAPI.getChartData(user.user_token).catch(() => null),
+        adminAPI.getAnomalies(user.user_token).catch(() => null),
         productsAPI.getAll().catch(() => []),
         refundsAPI.getAll(user.user_token).catch(() => []),
       ]);
       setMetrics(metricsData);
+      setChartData(chartDataResult);
+      setAnomalies(anomaliesData);
       setProducts(productsData);
       setRefunds(refundsData);
     } catch (error) {
@@ -50,6 +60,7 @@ export default function AdminDashboard() {
       setLoading(false);
     }
   };
+
 
   const handleDeleteProduct = async (productId: string) => {
     if (!user || !confirm('Are you sure you want to delete this product?')) return;
@@ -127,71 +138,110 @@ export default function AdminDashboard() {
           >
             Refunds
           </button>
+          <button
+            onClick={() => setActiveTab('reviews')}
+            className={`px-4 py-2 font-semibold ${
+              activeTab === 'reviews'
+                ? 'border-b-2 border-primary-600 text-primary-600'
+                : 'text-gray-600'
+            }`}
+          >
+            Reviews
+          </button>
         </div>
 
         {activeTab === 'overview' && (
-          <div>
+          <div className="space-y-6">
+            {/* Summary Cards */}
             {metrics && (
-              <div className="grid md:grid-cols-4 gap-6 mb-8">
-                <div className="bg-white rounded-lg shadow-md p-6">
+              <div className="grid md:grid-cols-4 gap-6">
+                <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-gray-600 text-sm">Total Revenue</p>
-                      <p className="text-2xl font-bold text-gray-900">
+                      <p className="text-gray-600 text-sm font-medium">Total Revenue</p>
+                      <p className="text-3xl font-bold text-gray-900 mt-2">
                         ₹{metrics.summary?.total_revenue?.toLocaleString() || 0}
                       </p>
+                      <p className="text-xs text-gray-500 mt-1">All time revenue</p>
                     </div>
-                    <DollarSign className="h-8 w-8 text-primary-600" />
+                    <DollarSign className="h-12 w-12 text-green-500 opacity-20" />
                   </div>
                 </div>
-                <div className="bg-white rounded-lg shadow-md p-6">
+                <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-gray-600 text-sm">Total Products</p>
-                      <p className="text-2xl font-bold text-gray-900">{products.length}</p>
+                      <p className="text-gray-600 text-sm font-medium">Total Products</p>
+                      <p className="text-3xl font-bold text-gray-900 mt-2">{products.length}</p>
+                      <p className="text-xs text-gray-500 mt-1">Products in catalog</p>
                     </div>
-                    <Package className="h-8 w-8 text-primary-600" />
+                    <Package className="h-12 w-12 text-blue-500 opacity-20" />
                   </div>
                 </div>
-                <div className="bg-white rounded-lg shadow-md p-6">
+                <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-purple-500">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-gray-600 text-sm">Total Users</p>
-                      <p className="text-2xl font-bold text-gray-900">
-                        {metrics.summary?.total_users || 0}
+                      <p className="text-gray-600 text-sm font-medium">Active Users</p>
+                      <p className="text-3xl font-bold text-gray-900 mt-2">
+                        {metrics.summary?.total_users_with_transactions || metrics.summary?.total_users || 0}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {metrics.summary?.returning_users || 0} returning
                       </p>
                     </div>
-                    <Users className="h-8 w-8 text-primary-600" />
+                    <Users className="h-12 w-12 text-purple-500 opacity-20" />
                   </div>
                 </div>
-                <div className="bg-white rounded-lg shadow-md p-6">
+                <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-yellow-500">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-gray-600 text-sm">Transactions</p>
-                      <p className="text-2xl font-bold text-gray-900">
+                      <p className="text-gray-600 text-sm font-medium">Transactions</p>
+                      <p className="text-3xl font-bold text-gray-900 mt-2">
                         {metrics.summary?.total_transactions || 0}
                       </p>
+                      <p className="text-xs text-gray-500 mt-1">Total orders</p>
                     </div>
-                    <TrendingUp className="h-8 w-8 text-primary-600" />
+                    <TrendingUp className="h-12 w-12 text-yellow-500 opacity-20" />
                   </div>
                 </div>
               </div>
             )}
 
-            {metrics?.categories && (
-              <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-                <h2 className="text-xl font-bold text-gray-900 mb-4">Category Breakdown</h2>
+            {/* Anomalies Alert */}
+            <AnomaliesAlert anomalies={anomalies} loading={loading} />
+
+            {/* Category Pie Chart */}
+            {chartData?.category_distribution && (
+              <CategoryPieChart data={chartData.category_distribution} />
+            )}
+
+            {/* Other Charts */}
+            <MetricsCharts chartData={chartData} loading={loading} />
+
+            {/* Category Breakdown */}
+            {metrics?.categories && Object.keys(metrics.categories).length > 0 && (
+              <div className="bg-white rounded-lg shadow-md p-6">
+                <h2 className="text-xl font-bold text-gray-900 mb-4">Category Revenue Breakdown</h2>
                 <div className="space-y-4">
                   {Object.entries(metrics.categories).map(([category, data]: [string, any]) => (
                     <div key={category} className="border-b pb-4 last:border-0">
-                      <div className="flex justify-between items-center">
+                      <div className="flex justify-between items-center mb-2">
                         <h3 className="font-semibold text-gray-900">{category}</h3>
                         <div className="text-right">
-                          <p className="text-primary-600 font-bold">
-                            ₹{data.revenue?.toLocaleString() || 0}
+                          <p className="text-primary-600 font-bold text-lg">
+                            ₹{(data.total_revenue || data.revenue || 0).toLocaleString()}
                           </p>
-                          <p className="text-sm text-gray-600">{data.transaction_count || 0} transactions</p>
                         </div>
+                      </div>
+                      <div className="flex items-center gap-4 text-sm text-gray-600">
+                        <span>{data.transaction_count || 0} transactions</span>
+                        {data.most_purchased_products && data.most_purchased_products.length > 0 && (
+                          <>
+                            <span className="text-gray-400">•</span>
+                            <span>
+                              Top: {data.most_purchased_products[0]?.product_name || 'N/A'}
+                            </span>
+                          </>
+                        )}
                       </div>
                     </div>
                   ))}
@@ -337,6 +387,12 @@ export default function AdminDashboard() {
                 </table>
               </div>
             </div>
+          </div>
+        )}
+
+        {activeTab === 'reviews' && user && (
+          <div>
+            <ReviewManagement token={user.user_token} />
           </div>
         )}
       </div>
