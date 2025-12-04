@@ -4,7 +4,15 @@
     "name": "Admin",
     "email": "admin@example.com",
     "password_hash": "$2b$12$qqc7JMx01v45LICVN927q.VJplJyzmlZXZmQclZaag0uiuw2BxkeW",
-    "user_token": "lk6E4rp4RPu9MSq4wviWgEbbtgLK",
-    "role": "admin"
+    "role": "admin",
+    "user_token": "lk6E4rp4RPu9MSq4wviWgEbbtgLK"
+  },
+  {
+    "user_id": "428391c9-ec68-4a25-9d66-0580cec3ce6a",
+    "name": "testing",
+    "email": "testing@ubc.ca",
+    "password_hash": "$2b$12$pNaCctPqFzTnbn4XbhqlyuF520KRlpIMQyhE5ZTaViiGDCzqVsHFW",
+    "role": "customer",
+    "user_token": "p26qpkNUF4NAq6TlVAmIf65bQuVP"
   }
 ]

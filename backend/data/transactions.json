@@ -20,5 +20,67 @@
       "estimated_delivery": "2025-12-08",
       "status": "completed"
     }
+  ],
+  "428391c9-ec68-4a25-9d66-0580cec3ce6a": [
+    {
+      "transaction_id": "6dd4050a-e56a-4303-ad37-ec5bae2fbbfc",
+      "user_id": "428391c9-ec68-4a25-9d66-0580cec3ce6a",
+      "customer_name": "testing",
+      "customer_email": "testing@ubc.ca",
+      "items": [
+        {
+          "product_id": "B08HDJ86NZ",
+          "product_name": "boAt Deuce USB 300 2 in 1 Type-C & Micro USB Stress Resistant, Tangle-Free, Sturdy Cable with 3A Fast Charging & 480mbps Data Transmission, 10000+ Bends Lifespan and Extended 1.5m Length(Martian Red)",
+          "img_link": "https://m.media-amazon.com/images/I/41V5FtEWPkL._SY300_SX300_QL70_FMwebp_.jpg",
+          "product_link": "https://www.amazon.in/Deuce-300-Resistant-Tangle-Free-Transmission/dp/B08HDJ86NZ/ref=sr_1_4?qid=1672909124&s=electronics&sr=1-4",
+          "discounted_price": 329.0,
+          "quantity": 1
+        }
+      ],
+      "total_price": 329.0,
+      "timestamp": "2025-12-04T01:47:28.127454+00:00",
+      "estimated_delivery": "2025-12-09",
+      "status": "completed"
+    },
+    {
+      "transaction_id": "356cb008-30f7-453c-b5e2-fa56a7006c9a",
+      "user_id": "428391c9-ec68-4a25-9d66-0580cec3ce6a",
+      "customer_name": "testing",
+      "customer_email": "testing@ubc.ca",
+      "items": [
+        {
+          "product_id": "B098NS6PVG",
+          "product_name": "Ambrane Unbreakable 60W / 3A Fast Charging 1.5m Braided Type C Cable for Smartphones, Tablets, Laptops & other Type C devices, PD Technology, 480Mbps Data Sync, Quick Charge 3.0 (RCT15A, Black)",
+          "img_link": "https://m.media-amazon.com/images/I/41lJ8x1yeIL._SY300_SX300_QL70_FMwebp_.jpg",
+          "product_link": "https://www.amazon.in/Ambrane-Unbreakable-Charging-Braided-Cable/dp/B098NS6PVG/ref=sr_1_2?qid=1672909124&s=electronics&sr=1-2",
+          "discounted_price": 199.0,
+          "quantity": 3
+        }
+      ],
+      "total_price": 597.0,
+      "timestamp": "2025-12-04T01:53:18.216490+00:00",
+      "estimated_delivery": "2025-12-09",
+      "status": "completed"
+    },
+    {
+      "transaction_id": "6687dda3-0598-4de0-ad13-a12921e44f9f",
+      "user_id": "428391c9-ec68-4a25-9d66-0580cec3ce6a",
+      "customer_name": "testing",
+      "customer_email": "testing@ubc.ca",
+      "items": [
+        {
+          "product_id": "B098NS6PVG",
+          "product_name": "Ambrane Unbreakable 60W / 3A Fast Charging 1.5m Braided Type C Cable for Smartphones, Tablets, Laptops & other Type C devices, PD Technology, 480Mbps Data Sync, Quick Charge 3.0 (RCT15A, Black)",
+          "img_link": "https://m.media-amazon.com/images/I/41lJ8x1yeIL._SY300_SX300_QL70_FMwebp_.jpg",
+          "product_link": "https://www.amazon.in/Ambrane-Unbreakable-Charging-Braided-Cable/dp/B098NS6PVG/ref=sr_1_2?qid=1672909124&s=electronics&sr=1-2",
+          "discounted_price": 199.0,
+          "quantity": 1
+        }
+      ],
+      "total_price": 199.0,
+      "timestamp": "2025-12-04T02:06:14.000714+00:00",
+      "estimated_delivery": "2025-12-09",
+      "status": "refunded"
+    }
   ]
 }

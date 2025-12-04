@@ -1,11 +1,21 @@
 # Main FastAPI application
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from backend.routers import product_router
 from backend.routers import auth_router, cart_router, transaction_router, penalty_router, review_router, external_router, refund_router, export_router, wishlist_router, metrics_router
 
 # Create app
 app = FastAPI(title="Netflix and Coding Store API")
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000", "http://frontend:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 #all routers
 app.include_router(product_router.router)
