@@ -6,6 +6,7 @@ import { ShoppingCart, Star, Heart } from 'lucide-react';
 import { Product } from '@/types';
 import { cartAPI, wishlistAPI } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
+import { useCurrency, formatPrice, convertPrice } from '@/contexts/CurrencyContext';
 
 interface ProductCardProps {
   product: Product;
@@ -14,6 +15,7 @@ interface ProductCardProps {
 
 const ProductCard = ({ product, onWishlistChange }: ProductCardProps) => {
   const { user } = useAuth();
+  const { currency, exchangeRate } = useCurrency();
   const [adding, setAdding] = useState(false);
   const [addingToWishlist, setAddingToWishlist] = useState(false);
   const [isInWishlist, setIsInWishlist] = useState(false);
@@ -32,22 +34,18 @@ const ProductCard = ({ product, onWishlistChange }: ProductCardProps) => {
     }
   };
 
-  // Get currency symbol from product or default to ₹
-  const getCurrencySymbol = () => {
-    if ((product as any).currency) {
-      const symbols: { [key: string]: string } = {
-        'INR': '₹',
-        'USD': '$',
-        'CAD': '$',
-        'EUR': '€',
-        'GBP': '£',
-      };
-      return symbols[(product as any).currency] || (product as any).currency;
+  // Get the price - if product has currency info, use it directly, otherwise convert from INR
+  const getDisplayPrice = (price: number) => {
+    if ((product as any).currency && (product as any).currency === currency) {
+      // Product already has the correct currency
+      return price;
     }
-    return '₹'; // Default to INR
+    // Product is in INR, convert to selected currency
+    return convertPrice(price, exchangeRate);
   };
 
-  const currencySymbol = getCurrencySymbol();
+  const displayDiscountedPrice = getDisplayPrice(product.discounted_price);
+  const displayActualPrice = getDisplayPrice(product.actual_price);
 
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault(); // Prevent navigation
@@ -143,12 +141,12 @@ const ProductCard = ({ product, onWishlistChange }: ProductCardProps) => {
           <div className="mt-auto">
             <div className="flex items-center gap-2 mb-3">
               <span className="text-xl font-bold text-gray-900">
-                {currencySymbol}{product.discounted_price}
+                {formatPrice(displayDiscountedPrice, currency)}
               </span>
               {product.discount_percentage > 0 && (
                 <>
                   <span className="text-sm text-gray-500 line-through">
-                    {currencySymbol}{product.actual_price}
+                    {formatPrice(displayActualPrice, currency)}
                   </span>
                   <span className="text-sm font-medium text-green-600">
                     {product.discount_percentage}% off

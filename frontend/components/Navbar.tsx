@@ -5,11 +5,13 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ShoppingCart, Heart, Search, User, LogOut } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useCurrency, getCurrencySymbol } from '@/contexts/CurrencyContext';
 import { cartAPI, wishlistAPI } from '@/lib/api';
 
 const Navbar = () => {
   const router = useRouter();
   const { user, isAdmin, logout } = useAuth();
+  const { currency, setCurrency } = useCurrency();
   const [searchQuery, setSearchQuery] = useState('');
   const [cartCount, setCartCount] = useState(0);
   const [wishlistCount, setWishlistCount] = useState(0);
@@ -94,7 +96,23 @@ const Navbar = () => {
           </form>
 
           {/* Right Side Icons & Actions */}
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-4">
+            {/* Currency Selector */}
+            <div className="flex items-center gap-2">
+              <select
+                value={currency}
+                onChange={(e) => setCurrency(e.target.value as 'INR' | 'USD' | 'CAD' | 'EUR' | 'GBP')}
+                className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-all bg-white"
+                title="Select Currency"
+              >
+                <option value="INR">₹ INR</option>
+                <option value="USD">$ USD</option>
+                <option value="CAD">$ CAD</option>
+                <option value="EUR">€ EUR</option>
+                <option value="GBP">£ GBP</option>
+              </select>
+            </div>
+
             {user ? (
               <>
                 {/* Wishlist */}

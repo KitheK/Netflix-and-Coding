@@ -6,11 +6,13 @@ import { ShoppingCart, Heart, Star, ExternalLink } from 'lucide-react';
 import { productAPI, reviewAPI, cartAPI, wishlistAPI } from '@/lib/api';
 import { Product, Review } from '@/types';
 import { useAuth } from '@/contexts/AuthContext';
+import { useCurrency, formatPrice, convertPrice } from '@/contexts/CurrencyContext';
 
 export default function ProductDetailPage() {
   const router = useRouter();
   const params = useParams();
   const { user } = useAuth();
+  const { currency, exchangeRate } = useCurrency();
   const productId = params.id as string;
 
   const [product, setProduct] = useState<Product | null>(null);
@@ -179,10 +181,24 @@ export default function ProductDetailPage() {
 
             {/* Price */}
             <div className="flex items-center gap-3 mb-6">
-              <span className="text-4xl font-bold text-gray-900">${product.discounted_price}</span>
+              <span className="text-4xl font-bold text-gray-900">
+                {formatPrice(
+                  (product as any).currency && (product as any).currency === currency
+                    ? product.discounted_price
+                    : convertPrice(product.discounted_price, exchangeRate),
+                  currency
+                )}
+              </span>
               {product.discount_percentage > 0 && (
                 <>
-                  <span className="text-xl text-gray-500 line-through">${product.actual_price}</span>
+                  <span className="text-xl text-gray-500 line-through">
+                    {formatPrice(
+                      (product as any).currency && (product as any).currency === currency
+                        ? product.actual_price
+                        : convertPrice(product.actual_price, exchangeRate),
+                      currency
+                    )}
+                  </span>
                   <span className="text-lg font-semibold text-green-600">
                     {product.discount_percentage}% off
                   </span>
