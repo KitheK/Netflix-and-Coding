@@ -1,9 +1,7 @@
+// API client for backend communication
 import axios from 'axios';
-import type { User, Product, Cart, Transaction, Review, Refund, Penalty, Metrics, CreateProductRequest, UpdateProductRequest } from '@/types';
+import type { User, Product, Cart, Transaction, Review, Refund, Penalty } from '@/types';
 
-// Use environment variable if set, otherwise default to localhost for client-side
-// In Docker, NEXT_PUBLIC_API_URL will be set to http://backend:8000
-// For local development, it will use http://localhost:8000
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 const api = axios.create({
@@ -11,39 +9,18 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 10000, // 10 second timeout
 });
 
-// Add request interceptor for debugging
-api.interceptors.request.use(
-  (config) => {
-    console.log(`[API] ${config.method?.toUpperCase()} ${config.url}`);
-    return config;
-  },
-  (error) => {
-    console.error('[API] Request error:', error);
-    return Promise.reject(error);
+// Add auth token to requests
+api.interceptors.request.use((config) => {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
   }
-);
+  return config;
+});
 
-// Add response interceptor for error handling
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.code === 'ECONNABORTED') {
-      console.error('[API] Request timeout - Backend may be slow or unavailable');
-    } else if (error.message === 'Network Error') {
-      console.error('[API] Network Error - Backend is not reachable. Please ensure the backend is running on', API_BASE_URL);
-    } else if (error.response) {
-      console.error('[API] Response error:', error.response.status, error.response.data);
-    } else {
-      console.error('[API] Error:', error.message);
-    }
-    return Promise.reject(error);
-  }
-);
-
-// Auth API
+// Auth
 export const authAPI = {
   register: async (name: string, email: string, password: string) => {
     const response = await api.post('/auth/register', { name, email, password });
@@ -53,241 +30,217 @@ export const authAPI = {
     const response = await api.post('/auth/login', { email, password });
     return response.data;
   },
-  getCurrentUser: async (token: string) => {
-    const response = await api.get('/auth/me', {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+  getMe: async () => {
+    const response = await api.get('/auth/me');
+    return response.data;
+  },
+  getAllUsers: async () => {
+    const response = await api.get('/auth/users');
+    return response.data;
+  },
+  promoteToAdmin: async (user_id: string) => {
+    const response = await api.post(`/auth/users/${user_id}/promote-admin`);
+    return response.data;
+  },
+  setUserRole: async (user_id: string, role: 'admin' | 'customer') => {
+    const response = await api.post(`/auth/users/${user_id}/role`, { role });
     return response.data;
   },
 };
 
-// Products API
-export const productsAPI = {
+// Products
+export const productAPI = {
   getAll: async (sort?: string): Promise<Product[]> => {
-    try {
-      const response = await api.get('/products', { params: { sort } });
-      return response.data;
-    } catch (error: any) {
-      if (error.message === 'Network Error' || error.code === 'ECONNABORTED') {
-        throw new Error('Unable to connect to the server. Please ensure the backend is running on http://localhost:8000');
-      }
-      throw error;
-    }
-  },
-  getById: async (productId: string): Promise<Product> => {
-    try {
-      const response = await api.get(`/products/${productId}`);
-      return response.data;
-    } catch (error: any) {
-      if (error.message === 'Network Error' || error.code === 'ECONNABORTED') {
-        throw new Error('Unable to connect to the server. Please ensure the backend is running on http://localhost:8000');
-      }
-      throw error;
-    }
+    const response = await api.get('/products/', { params: { sort } });
+    return response.data;
   },
   search: async (keyword: string, sort?: string): Promise<Product[]> => {
     const response = await api.get(`/products/search/${keyword}`, { params: { sort } });
     return response.data;
   },
-  create: async (product: CreateProductRequest, token: string): Promise<Product> => {
-    const response = await api.post('/products', product, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+  getById: async (id: string): Promise<Product> => {
+    const response = await api.get(`/products/${id}`);
     return response.data;
   },
-  update: async (productId: string, product: UpdateProductRequest, token: string): Promise<Product> => {
-    const response = await api.put(`/products/${productId}`, product, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+  createProduct: async (productData: Omit<Product, 'product_id'>) => {
+    const response = await api.post('/products/', productData);
     return response.data;
   },
-  delete: async (productId: string, token: string): Promise<Product> => {
-    const response = await api.delete(`/products/${productId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+  updateProduct: async (product_id: string, productData: Partial<Product>) => {
+    const response = await api.put(`/products/${product_id}`, productData);
     return response.data;
   },
-  fetchImage: async (productId: string, token: string): Promise<Product> => {
-    const response = await api.get(`/products/${productId}/fetch-image`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+  deleteProduct: async (product_id: string) => {
+    const response = await api.delete(`/products/${product_id}`);
     return response.data;
   },
 };
 
-// Cart API
+// Cart
 export const cartAPI = {
-  get: async (token: string): Promise<Cart> => {
-    const response = await api.get('/cart', { params: { user_token: token } });
+  getCart: async (user_id: string): Promise<Cart> => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : '';
+    const response = await api.get('/cart/', { params: { user_token: token } });
     return response.data;
   },
-  add: async (productId: string, quantity: number, token: string) => {
-    const response = await api.post('/cart/add', { user_token: token, product_id: productId, quantity });
+  addToCart: async (user_id: string, product_id: string, quantity: number) => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : '';
+    const response = await api.post('/cart/add', { user_token: token, product_id, quantity });
     return response.data;
   },
-  update: async (productId: string, quantity: number, token: string) => {
-    const response = await api.put(`/cart/update/${productId}`, { user_token: token, quantity });
+  updateCart: async (user_id: string, product_id: string, quantity: number) => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : '';
+    const response = await api.put(`/cart/update/${product_id}`, { user_token: token, quantity });
     return response.data;
   },
-  remove: async (productId: string, token: string) => {
-    const response = await api.delete(`/cart/remove/${productId}`, { params: { user_token: token } });
+  removeFromCart: async (user_id: string, product_id: string) => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : '';
+    const response = await api.delete(`/cart/remove/${product_id}`, { params: { user_token: token } });
     return response.data;
   },
-  checkout: async (token: string): Promise<Transaction> => {
+  checkout: async (user_id: string) => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : '';
     const response = await api.post('/cart/checkout', null, { params: { user_token: token } });
     return response.data;
   },
 };
 
-// Transactions API
-export const transactionsAPI = {
-  getAll: async (token: string): Promise<Transaction[]> => {
-    const response = await api.get('/transactions', { params: { user_token: token } });
+// Transactions
+export const transactionAPI = {
+  getMyTransactions: async (user_id: string): Promise<Transaction[]> => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : '';
+    const response = await api.get('/transactions/', { params: { user_token: token } });
     return response.data;
   },
-  getById: async (transactionId: string, token: string): Promise<Transaction> => {
-    const response = await api.get(`/transactions/${transactionId}`, { params: { user_token: token } });
-    return response.data;
-  },
-};
-
-// Reviews API
-export const reviewsAPI = {
-  getByProduct: async (productId: string): Promise<Review[]> => {
-    try {
-      const response = await api.get(`/reviews/${productId}`);
-      return response.data;
-    } catch (error: any) {
-      if (error.response?.status === 404) {
-        return [];
-      }
-      if (error.message === 'Network Error' || error.code === 'ECONNABORTED') {
-        console.warn('Unable to load reviews - backend may be unavailable');
-        return []; // Return empty array instead of throwing for reviews
-      }
-      throw error;
-    }
-  },
-  add: async (productId: string, userId: string, userName: string, reviewTitle: string, reviewContent: string) => {
-    const response = await api.post(`/reviews/${productId}`, {
-      user_id: userId,
-      user_name: userName,
-      review_title: reviewTitle,
-      review_content: reviewContent
-    });
-    return response.data;
-  },
-  delete: async (productId: string, reviewId: string, token: string) => {
-    const response = await api.delete(`/reviews/${productId}/${reviewId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+  getById: async (transaction_id: string): Promise<Transaction> => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : '';
+    const response = await api.get(`/transactions/${transaction_id}`, { params: { user_token: token } });
     return response.data;
   },
 };
 
-// Wishlist API
+// Refunds (uses Bearer token auth)
+export const refundAPI = {
+  createRefund: async (user_id: string, refundRequest: { transaction_id: string; message: string }): Promise<Refund> => {
+    const response = await api.post('/refunds', refundRequest);
+    return response.data.refund;
+  },
+  getMyRefunds: async (user_id: string): Promise<Refund[]> => {
+    const response = await api.get('/refunds/my-requests');
+    return response.data;
+  },
+  getAllRefunds: async (): Promise<Refund[]> => {
+    const response = await api.get('/refunds/all');
+    return response.data;
+  },
+  approveRefund: async (refund_id: string): Promise<Refund> => {
+    const response = await api.put(`/refunds/${refund_id}/approve`);
+    return response.data.refund;
+  },
+  denyRefund: async (refund_id: string): Promise<Refund> => {
+    const response = await api.put(`/refunds/${refund_id}/deny`);
+    return response.data.refund;
+  },
+};
+
+// Wishlist
 export const wishlistAPI = {
-  get: async (userId: string): Promise<string[]> => {
-    const response = await api.get(`/wishlist/${userId}`);
+  getWishlist: async (user_id: string): Promise<string[]> => {
+    const response = await api.get(`/wishlist/${user_id}`);
     return response.data;
   },
-  add: async (productId: string, userId: string) => {
-    const response = await api.post('/wishlist/add', { user_id: userId, product_id: productId });
+  addToWishlist: async (user_id: string, product_id: string) => {
+    const response = await api.post('/wishlist/add', { user_id, product_id });
     return response.data;
   },
-  remove: async (productId: string, userId: string) => {
-    const response = await api.delete(`/wishlist/${userId}/${productId}`);
+  removeFromWishlist: async (user_id: string, product_id: string) => {
+    const response = await api.delete(`/wishlist/${user_id}/${product_id}`);
     return response.data;
   },
 };
 
-// Refunds API
-export const refundsAPI = {
-  create: async (transactionId: string, reason: string, token: string): Promise<Refund> => {
-    const response = await api.post('/refunds', { transaction_id: transactionId, message: reason }, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    return response.data.refund;
+// Reviews
+export const reviewAPI = {
+  getReviews: async (product_id: string): Promise<Review[]> => {
+    const response = await api.get(`/reviews/${product_id}`);
+    return response.data;
   },
-  getMyRequests: async (token: string): Promise<Refund[]> => {
-    const response = await api.get('/refunds/my-requests', {
-      headers: { Authorization: `Bearer ${token}` },
+  addReview: async (product_id: string, user_id: string, user_name: string, review_title: string, review_content: string) => {
+    const response = await api.post(`/reviews/${product_id}`, { 
+      user_id, 
+      user_name,
+      review_title, 
+      review_content
     });
     return response.data;
   },
-  getAll: async (token: string): Promise<Refund[]> => {
-    const response = await api.get('/refunds/all', {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+  deleteReview: async (product_id: string, review_id: string) => {
+    const response = await api.delete(`/reviews/${product_id}/${review_id}`);
     return response.data;
-  },
-  approve: async (refundId: string, token: string): Promise<Refund> => {
-    const response = await api.put(`/refunds/${refundId}/approve`, {}, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    return response.data.refund;
-  },
-  deny: async (refundId: string, token: string): Promise<Refund> => {
-    const response = await api.put(`/refunds/${refundId}/deny`, {}, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    return response.data.refund;
   },
 };
 
-// Admin API
-export const adminAPI = {
-  getMetrics: async (token: string) => {
-    const response = await api.get('/admin/metrics/product/category', {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    return response.data;
-  },
-  getChartData: async (token: string) => {
-    const response = await api.get('/admin/metrics/product/charts', {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    return response.data;
-  },
-  getAnomalies: async (token: string) => {
-    const response = await api.get('/admin/metrics/anomalies', {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    return response.data;
-  },
-  exportData: async (file: string, token: string) => {
-    const response = await api.get(`/export?file=${file}`, {
-      headers: { Authorization: `Bearer ${token}` },
-      responseType: 'blob',
-    });
-    return response.data;
-  },
-  getPenalties: async (token: string): Promise<Penalty[]> => {
-    const response = await api.get('/penalties', {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    return response.data;
-  },
-  applyPenalty: async (userId: string, reason: string, token: string): Promise<Penalty> => {
-    const response = await api.post('/penalties/apply', { user_id: userId, reason }, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+// Admin - Penalties
+export const penaltyAPI = {
+  applyPenalty: async (user_id: string, reason: string): Promise<Penalty> => {
+    const response = await api.post('/penalties/apply', { user_id, reason });
     return response.data.penalty;
   },
-};
-
-// Currency API
-export const currencyAPI = {
-  convert: async (to: string): Promise<Product[]> => {
-    try {
-      const response = await api.get('/external/currency', { params: { to } });
-      return response.data;
-    } catch (error: any) {
-      if (error.message === 'Network Error' || error.code === 'ECONNABORTED') {
-        throw new Error('Unable to connect to the server. Please ensure the backend is running on http://localhost:8000');
-      }
-      throw error;
-    }
+  getUserPenalties: async (user_id: string): Promise<Penalty[]> => {
+    const response = await api.get(`/penalties/${user_id}`);
+    return response.data;
+  },
+  getMyPenalties: async (): Promise<Penalty[]> => {
+    const response = await api.get('/penalties/my-penalties');
+    return response.data;
+  },
+  resolvePenalty: async (penalty_id: string) => {
+    const response = await api.post(`/penalties/${penalty_id}/resolve`);
+    return response.data;
   },
 };
+
+// Admin - Export
+export const exportAPI = {
+  getAvailableFiles: async (): Promise<string[]> => {
+    const response = await api.get('/export/available');
+    return response.data;
+  },
+  exportFile: async (filename: string) => {
+    // Extract file key from filename (e.g., "users.json" -> "users")
+    const fileKey = filename.replace('.json', '');
+    const response = await api.get(`/export?file=${fileKey}`);
+    return response.data;
+  },
+};
+
+// Admin - Metrics
+export const metricsAPI = {
+  getProductsByCategory: async () => {
+    const response = await api.get('/admin/metrics/product/category');
+    return response.data;
+  },
+  getProductCharts: async () => {
+    const response = await api.get('/admin/metrics/product/charts');
+    return response.data;
+  },
+  getAnomalies: async () => {
+    const response = await api.get('/admin/metrics/anomalies');
+    return response.data;
+  },
+  getUserMetrics: async () => {
+    const response = await api.get('/admin/metrics/users');
+    return response.data;
+  },
+};
+
+// Currency
+export const currencyAPI = {
+  getProductsInCurrency: async (currency: string) => {
+    const response = await api.get('/external/currency', { params: { to: currency } });
+    return response.data;
+  },
+};
+
+export default api;
 

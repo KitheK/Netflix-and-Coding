@@ -5,7 +5,7 @@ from fastapi import APIRouter, HTTPException, Depends, Query
 from backend.models.penalty_model import ApplyPenaltyRequest, PenaltyResponse, Penalty
 from backend.models.user_model import User
 from backend.services.penalty_service import PenaltyService
-from backend.services.auth_service import admin_required_dep, AuthService
+from backend.services.auth_service import admin_required_dep, get_current_user_dep, AuthService
 
 # Create router with prefix /penalties and tag "penalties"
 # All endpoints in this router will be accessible at /penalties/*
@@ -14,6 +14,46 @@ router = APIRouter(prefix="/penalties", tags=["penalties"])
 # Initialize dependencies (services create their own repositories internally)
 penalty_service = PenaltyService()
 auth_service = AuthService()
+
+
+# GET /penalties/my-penalties - Get penalties for the authenticated user (Customer-accessible)
+@router.get("/my-penalties", response_model=List[Penalty])
+async def get_my_penalties(
+    status: Optional[str] = Query(
+        None,
+        description="Optional status filter: 'active' or 'resolved'. If omitted, returns all.",
+    ),
+    current_user: User = Depends(get_current_user_dep),
+):
+    """
+    Customer-accessible: list penalties for the authenticated user.
+    
+    - IN (optional): query param status = 'active' | 'resolved'
+    - OUT: JSON array of Penalty objects for the current user, sorted newest first
+    """
+    try:
+        # Validate status parameter if provided
+        if status is not None:
+            normalized_status = status.lower()
+            if normalized_status not in {"active", "resolved"}:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Invalid status value: '{status}'. Must be 'active' or 'resolved'.",
+                )
+
+        # Use the service to load and optionally filter penalties by status
+        penalties = penalty_service.get_user_penalties(user_id=current_user.user_id, status=status)
+        
+        return penalties
+    except HTTPException:
+        # Re-raise HTTPException (404, etc.) without wrapping
+        raise
+    except Exception as e:
+        # Generic error handler (e.g., file read issues)
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to retrieve penalties: {str(e)}",
+        )
 
 
 # POST /penalties/apply - Apply a penalty to a user (Admin-only)

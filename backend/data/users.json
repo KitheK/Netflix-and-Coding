@@ -22,5 +22,21 @@
     "password_hash": "$2b$12$U/RCnvijhaHtapuhY4GaIuXy.eWyCtFGU.8.pnQl6QhGoP78c6DAK",
     "role": "customer",
     "user_token": "Cwb2TLiTujfZMAyhDUuo2teVnB02"
+  },
+  {
+    "user_id": "79be980f-d83d-4c63-b3b6-77c13193e1a5",
+    "name": "Fraser Muller",
+    "email": "frasermuller2005@gmail.com",
+    "password_hash": "$2b$12$0WBVrzELlsKw6Vez3bEViO1pdYXNeeNGzYHu0ZiR8oLKW/EEpdPT.",
+    "role": "customer",
+    "user_token": "7xf3lzPO8xV2D6UUfNquoWifPK1N"
+  },
+  {
+    "user_id": "1cb86309-e8b2-45e3-8da7-1c2f54c65ae5",
+    "name": "promote me",
+    "email": "promoteme@gmail.com",
+    "password_hash": "$2b$12$AeRCEl0GyH3aWZ0E8zDnZebtkk04jQIcr/hu/vqYp9E7IrGpYqlvO",
+    "role": "customer",
+    "user_token": "VoooH4Eb0DBF9BOJwQvfW2dM0heB"
   }
 ]

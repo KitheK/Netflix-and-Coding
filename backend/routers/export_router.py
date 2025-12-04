@@ -70,10 +70,7 @@ async def get_available_exports(
     Admin-only: Get list of available files that can be exported.
     
     Returns:
-        List of file keys that can be used in the /export endpoint
+        List of filenames that can be downloaded
     """
-    available = export_service.get_available_files()
-    return {
-        "available_files": available,
-        "total": len(available)
-    }
+    # Return list of actual filenames (e.g., users.json, products.json)
+    return [export_service.ALLOWED_FILES[key] for key in export_service.get_available_files()]

@@ -22,7 +22,7 @@ async def get_all_products(sort: Optional[str] = None):
     products = product_service.get_all_products()
     # Return all products
 
-    #sort if requested
+    # Only sort if explicitly requested (don't apply default sorting)
     if sort:
         products = product_service.sort_products(products, sort)
 
@@ -34,7 +34,7 @@ async def search_products(keyword: str, sort: Optional[str] = None):
     # call product_service's method to search products by keyword
     products = product_service.get_product_by_keyword(keyword)
 
-    # sort if requested
+    # Only sort if explicitly requested (don't default to popularity for search)
     if sort:
         products = product_service.sort_products(products, sort)
 

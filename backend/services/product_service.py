@@ -5,7 +5,6 @@ import string
 import random
 from typing import List, Optional
 from backend.models.product_model import Product
-from backend.services.image_scraper_service import ImageScraperService
 from backend.repositories.product_repository import ProductRepository
 
 
@@ -16,7 +15,6 @@ class ProductService:
         # Create our own ProductRepository internally
         # ProductRepository is locked to products.json (or products_test.json in tests)
         self.repository = ProductRepository()
-        self.image_scraper = ImageScraperService()
 
     # Load all products from repository
     def _repo_load(self) -> List[dict]:
@@ -233,10 +231,12 @@ class ProductService:
         # Load all products using helper method
         products = self._load_all_products()
         
-        # checks if keyword is in product name or category (case insensitive) and adds to the list of matching products then returns all matches (the list)
+        # Search only in product name (case insensitive) for exact matches
+        # Returns products where the keyword appears in the product name
         matching_products = []
+        keyword_lower = keyword.lower()
         for product in products:
-            if keyword.lower() in product.product_name.lower() or keyword.lower() in product.category.lower():
+            if keyword_lower in product.product_name.lower():
                 matching_products.append(product)
             
         return matching_products
@@ -245,14 +245,21 @@ class ProductService:
     def sort_products(self, products: List[Product], sort_by: str) -> List[Product]:
         # Sort a list of products by the specified field.
         # sort_by options:
+        # - 'name_asc': Name A-Z
+        # - 'name_desc': Name Z-A
         # - 'price_asc': Price low to high
         # - 'price_desc': Price high to low
         # - 'rating_asc': Rating low to high
         # - 'rating_desc': Rating high to low
         # - 'discount_asc': Discount low to high
         # - 'discount_desc': Discount high to low
+        # If invalid option provided, return products unsorted (natural order from JSON)
         
-        if sort_by == "price_asc":
+        if sort_by == "name_asc":
+            return sorted(products, key=lambda p: p.product_name.lower())
+        elif sort_by == "name_desc":
+            return sorted(products, key=lambda p: p.product_name.lower(), reverse=True)
+        elif sort_by == "price_asc":
             return sorted(products, key=lambda p: p.discounted_price)
         elif sort_by == "price_desc":
             return sorted(products, key=lambda p: p.discounted_price, reverse=True)
@@ -265,7 +272,8 @@ class ProductService:
         elif sort_by == "discount_desc":
             return sorted(products, key=lambda p: p.discount_percentage, reverse=True)
         else:
-            return products  # no sorting if invalid option
+            # Return unsorted if invalid option (natural order from products.json)
+            return products
     
     def fetch_and_update_image(self, product_id: str) -> Product:
         """
@@ -285,19 +293,8 @@ class ProductService:
         if product is None:
             raise ValueError(f"Product with ID {product_id} not found")
         
-        # Fetch the image URL from Amazon
-        new_image_url = self.image_scraper.fetch_image_url(product.product_link)
-        
-        if not new_image_url:
-            raise ValueError(f"Failed to fetch image from product link: {product.product_link}")
-        
-        # Update the product with the new image URL
-        updated_product = self.update_product(
-            product_id=product_id,
-            img_link=new_image_url
-        )
-        
-        return updated_product
+        # Image scraping functionality has been removed
+        raise NotImplementedError("Image fetching functionality is not available")
     
     def fetch_all_images(self) -> dict:
         """

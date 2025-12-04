@@ -1,402 +1,152 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { adminAPI, productsAPI, refundsAPI } from '@/lib/api';
-import type { Product, Refund } from '@/types';
-import Navbar from '@/components/Navbar';
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Package, DollarSign, Users, TrendingUp, Plus, Edit, Trash2, Check, X } from 'lucide-react';
 import Link from 'next/link';
-import MetricsCharts from '@/components/MetricsCharts';
-import AnomaliesAlert from '@/components/AnomaliesAlert';
-import ReviewManagement from '@/components/ReviewManagement';
-import CategoryPieChart from '@/components/CategoryPieChart';
+import { FileText, TrendingUp, Download, AlertTriangle, UserPlus, Package, BarChart3, AlertCircle } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
-export default function AdminDashboard() {
-  const { user, isAdmin, loading: authLoading } = useAuth();
+export default function AdminDashboardPage() {
   const router = useRouter();
-  const [metrics, setMetrics] = useState<any>(null);
-  const [chartData, setChartData] = useState<any>(null);
-  const [anomalies, setAnomalies] = useState<any>(null);
-  const [products, setProducts] = useState<Product[]>([]);
-  const [refunds, setRefunds] = useState<Refund[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'refunds' | 'reviews'>('overview');
+  const { user, isAdmin, loading } = useAuth();
 
   useEffect(() => {
-    if (authLoading) {
-      return; // Wait for auth to finish loading
+    if (!loading) {
+      if (!user) {
+        router.push('/login');
+      } else if (!isAdmin) {
+        router.push('/dashboard');
+      }
     }
-    if (!user) {
-      router.push('/login');
-      return;
-    }
-    if (!isAdmin) {
-      router.push('/dashboard');
-      return;
-    }
-    loadData();
-  }, [user, isAdmin, authLoading]);
+  }, [user, isAdmin, loading, router]);
 
-  const loadData = async () => {
-    if (!user) return;
-    try {
-      const [metricsData, chartDataResult, anomaliesData, productsData, refundsData] = await Promise.all([
-        adminAPI.getMetrics(user.user_token).catch(() => null),
-        adminAPI.getChartData(user.user_token).catch(() => null),
-        adminAPI.getAnomalies(user.user_token).catch(() => null),
-        productsAPI.getAll().catch(() => []),
-        refundsAPI.getAll(user.user_token).catch(() => []),
-      ]);
-      setMetrics(metricsData);
-      setChartData(chartDataResult);
-      setAnomalies(anomaliesData);
-      setProducts(productsData);
-      setRefunds(refundsData);
-    } catch (error) {
-      console.error('Failed to load data:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-
-  const handleDeleteProduct = async (productId: string) => {
-    if (!user || !confirm('Are you sure you want to delete this product?')) return;
-    try {
-      await productsAPI.delete(productId, user.user_token);
-      loadData();
-    } catch (error) {
-      alert('Failed to delete product');
-    }
-  };
-
-  const handleApproveRefund = async (refundId: string) => {
-    if (!user) return;
-    try {
-      await refundsAPI.approve(refundId, user.user_token);
-      loadData();
-    } catch (error) {
-      alert('Failed to approve refund');
-    }
-  };
-
-  const handleDenyRefund = async (refundId: string) => {
-    if (!user) return;
-    try {
-      await refundsAPI.deny(refundId, user.user_token);
-      loadData();
-    } catch (error) {
-      alert('Failed to deny refund');
-    }
-  };
-
-  if (authLoading || loading) {
+  if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <Navbar />
-        <div className="max-w-7xl mx-auto px-4 py-8">Loading...</div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <p className="text-gray-600">Loading...</p>
       </div>
     );
   }
 
+  if (!isAdmin) {
+    return null;
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Admin Dashboard</h1>
-
-        <div className="flex space-x-4 mb-8 border-b">
-          <button
-            onClick={() => setActiveTab('overview')}
-            className={`px-4 py-2 font-semibold ${
-              activeTab === 'overview'
-                ? 'border-b-2 border-primary-600 text-primary-600'
-                : 'text-gray-600'
-            }`}
-          >
-            Overview
-          </button>
-          <button
-            onClick={() => setActiveTab('products')}
-            className={`px-4 py-2 font-semibold ${
-              activeTab === 'products'
-                ? 'border-b-2 border-primary-600 text-primary-600'
-                : 'text-gray-600'
-            }`}
-          >
-            Products
-          </button>
-          <button
-            onClick={() => setActiveTab('refunds')}
-            className={`px-4 py-2 font-semibold ${
-              activeTab === 'refunds'
-                ? 'border-b-2 border-primary-600 text-primary-600'
-                : 'text-gray-600'
-            }`}
-          >
-            Refunds
-          </button>
-          <button
-            onClick={() => setActiveTab('reviews')}
-            className={`px-4 py-2 font-semibold ${
-              activeTab === 'reviews'
-                ? 'border-b-2 border-primary-600 text-primary-600'
-                : 'text-gray-600'
-            }`}
-          >
-            Reviews
-          </button>
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Admin Dashboard</h1>
+          <p className="text-gray-600">Manage your e-commerce platform</p>
         </div>
 
-        {activeTab === 'overview' && (
-          <div className="space-y-6">
-            {/* Summary Cards */}
-            {metrics && (
-              <div className="grid md:grid-cols-4 gap-6">
-                <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-gray-600 text-sm font-medium">Total Revenue</p>
-                      <p className="text-3xl font-bold text-gray-900 mt-2">
-                        ₹{metrics.summary?.total_revenue?.toLocaleString() || 0}
-                      </p>
-                      <p className="text-xs text-gray-500 mt-1">All time revenue</p>
-                    </div>
-                    <DollarSign className="h-12 w-12 text-green-500 opacity-20" />
-                  </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* My Orders */}
+          <Link href="/transactions">
+            <div className="card hover:shadow-lg transition-shadow cursor-pointer h-full">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="p-3 bg-indigo-100 rounded-lg">
+                  <Package className="w-8 h-8 text-indigo-600" />
                 </div>
-                <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-gray-600 text-sm font-medium">Total Products</p>
-                      <p className="text-3xl font-bold text-gray-900 mt-2">{products.length}</p>
-                      <p className="text-xs text-gray-500 mt-1">Products in catalog</p>
-                    </div>
-                    <Package className="h-12 w-12 text-blue-500 opacity-20" />
-                  </div>
-                </div>
-                <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-purple-500">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-gray-600 text-sm font-medium">Active Users</p>
-                      <p className="text-3xl font-bold text-gray-900 mt-2">
-                        {metrics.summary?.total_users_with_transactions || metrics.summary?.total_users || 0}
-                      </p>
-                      <p className="text-xs text-gray-500 mt-1">
-                        {metrics.summary?.returning_users || 0} returning
-                      </p>
-                    </div>
-                    <Users className="h-12 w-12 text-purple-500 opacity-20" />
-                  </div>
-                </div>
-                <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-yellow-500">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-gray-600 text-sm font-medium">Transactions</p>
-                      <p className="text-3xl font-bold text-gray-900 mt-2">
-                        {metrics.summary?.total_transactions || 0}
-                      </p>
-                      <p className="text-xs text-gray-500 mt-1">Total orders</p>
-                    </div>
-                    <TrendingUp className="h-12 w-12 text-yellow-500 opacity-20" />
-                  </div>
-                </div>
+                <h2 className="text-xl font-bold text-gray-900">My Orders</h2>
               </div>
-            )}
-
-            {/* Anomalies Alert */}
-            <AnomaliesAlert anomalies={anomalies} loading={loading} />
-
-            {/* Category Pie Chart */}
-            {chartData?.category_distribution && (
-              <CategoryPieChart data={chartData.category_distribution} />
-            )}
-
-            {/* Other Charts */}
-            <MetricsCharts chartData={chartData} loading={loading} />
-
-            {/* Category Breakdown */}
-            {metrics?.categories && Object.keys(metrics.categories).length > 0 && (
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-4">Category Revenue Breakdown</h2>
-                <div className="space-y-4">
-                  {Object.entries(metrics.categories).map(([category, data]: [string, any]) => (
-                    <div key={category} className="border-b pb-4 last:border-0">
-                      <div className="flex justify-between items-center mb-2">
-                        <h3 className="font-semibold text-gray-900">{category}</h3>
-                        <div className="text-right">
-                          <p className="text-primary-600 font-bold text-lg">
-                            ₹{(data.total_revenue || data.revenue || 0).toLocaleString()}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-4 text-sm text-gray-600">
-                        <span>{data.transaction_count || 0} transactions</span>
-                        {data.most_purchased_products && data.most_purchased_products.length > 0 && (
-                          <>
-                            <span className="text-gray-400">•</span>
-                            <span>
-                              Top: {data.most_purchased_products[0]?.product_name || 'N/A'}
-                            </span>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {activeTab === 'products' && (
-          <div>
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">Products</h2>
-              <Link
-                href="/admin/products/new"
-                className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 flex items-center space-x-2"
-              >
-                <Plus className="h-5 w-5" />
-                <span>Add Product</span>
-              </Link>
+              <p className="text-gray-600">
+                View your personal purchase history and order status as an admin user.
+              </p>
             </div>
-            <div className="bg-white rounded-lg shadow-md overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Product
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Category
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Price
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {products.map((product) => (
-                      <tr key={product.product_id}>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-medium text-gray-900">{product.product_name}</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-500">{product.category}</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">₹{((product.discounted_price || 0)).toLocaleString()}</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                          <Link
-                            href={`/admin/products/${product.product_id}/edit`}
-                            className="text-primary-600 hover:text-primary-900"
-                          >
-                            <Edit className="h-5 w-5 inline" />
-                          </Link>
-                          <button
-                            onClick={() => handleDeleteProduct(product.product_id)}
-                            className="text-red-600 hover:text-red-900"
-                          >
-                            <Trash2 className="h-5 w-5 inline" />
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        )}
+          </Link>
 
-        {activeTab === 'refunds' && (
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Refund Requests</h2>
-            <div className="bg-white rounded-lg shadow-md overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Transaction ID
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Reason
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Status
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {refunds.map((refund) => (
-                      <tr key={refund.refund_id}>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-medium text-gray-900">
-                            {refund.transaction_id.slice(0, 8)}...
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="text-sm text-gray-500">{refund.message}</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span
-                            className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                              refund.status === 'approved'
-                                ? 'bg-green-100 text-green-800'
-                                : refund.status === 'denied'
-                                ? 'bg-red-100 text-red-800'
-                                : 'bg-yellow-100 text-yellow-800'
-                            }`}
-                          >
-                            {refund.status}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                          {refund.status === 'pending' && (
-                            <>
-                              <button
-                                onClick={() => handleApproveRefund(refund.refund_id)}
-                                className="text-green-600 hover:text-green-900"
-                              >
-                                <Check className="h-5 w-5 inline" />
-                              </button>
-                              <button
-                                onClick={() => handleDenyRefund(refund.refund_id)}
-                                className="text-red-600 hover:text-red-900"
-                              >
-                                <X className="h-5 w-5 inline" />
-                              </button>
-                            </>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+          {/* Manage Refunds */}
+          <Link href="/admin/refunds">
+            <div className="card hover:shadow-lg transition-shadow cursor-pointer h-full">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="p-3 bg-purple-100 rounded-lg">
+                  <FileText className="w-8 h-8 text-purple-600" />
+                </div>
+                <h2 className="text-xl font-bold text-gray-900">Manage Refunds</h2>
               </div>
+              <p className="text-gray-600">
+                Review and process customer refund requests. Approve or deny refunds based on policies.
+              </p>
             </div>
-          </div>
-        )}
+          </Link>
 
-        {activeTab === 'reviews' && user && (
-          <div>
-            <ReviewManagement token={user.user_token} />
-          </div>
-        )}
+          {/* Manage Products */}
+          <Link href="/admin/products">
+            <div className="card hover:shadow-lg transition-shadow cursor-pointer h-full">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="p-3 bg-teal-100 rounded-lg">
+                  <Package className="w-8 h-8 text-teal-600" />
+                </div>
+                <h2 className="text-xl font-bold text-gray-900">Manage Products</h2>
+              </div>
+              <p className="text-gray-600">
+                Add new products, update existing listings, or remove products from the catalog.
+              </p>
+            </div>
+          </Link>
+
+          {/* View Metrics */}
+          <Link href="/admin/metrics">
+            <div className="card hover:shadow-lg transition-shadow cursor-pointer h-full">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="p-3 bg-blue-100 rounded-lg">
+                  <BarChart3 className="w-8 h-8 text-blue-600" />
+                </div>
+                <h2 className="text-xl font-bold text-gray-900">View Metrics</h2>
+              </div>
+              <p className="text-gray-600">
+                Analyze sales data, product performance, and customer behavior with detailed charts and reports.
+              </p>
+            </div>
+          </Link>
+
+          {/* Export Data */}
+          <Link href="/admin/export">
+            <div className="card hover:shadow-lg transition-shadow cursor-pointer h-full">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="p-3 bg-green-100 rounded-lg">
+                  <Download className="w-8 h-8 text-green-600" />
+                </div>
+                <h2 className="text-xl font-bold text-gray-900">Export Data</h2>
+              </div>
+              <p className="text-gray-600">
+                Download system data including users, products, transactions, and more in JSON format.
+              </p>
+            </div>
+          </Link>
+
+          {/* Apply Penalties */}
+          <Link href="/admin/penalties">
+            <div className="card hover:shadow-lg transition-shadow cursor-pointer h-full">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="p-3 bg-red-100 rounded-lg">
+                  <AlertCircle className="w-8 h-8 text-red-600" />
+                </div>
+                <h2 className="text-xl font-bold text-gray-900">Apply Penalties</h2>
+              </div>
+              <p className="text-gray-600">
+                Manage user penalties for policy violations. Apply fines or sanctions as needed.
+              </p>
+            </div>
+          </Link>
+
+          {/* Promote Users */}
+          <Link href="/admin/promote">
+            <div className="card hover:shadow-lg transition-shadow cursor-pointer h-full">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="p-3 bg-yellow-100 rounded-lg">
+                  <UserPlus className="w-8 h-8 text-yellow-600" />
+                </div>
+                <h2 className="text-xl font-bold text-gray-900">Promote Users</h2>
+              </div>
+              <p className="text-gray-600">
+                Upgrade customer accounts to admin status. Grant administrative privileges to trusted users.
+              </p>
+            </div>
+          </Link>
+        </div>
       </div>
     </div>
   );
 }
-

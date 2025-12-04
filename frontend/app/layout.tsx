@@ -1,22 +1,11 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
-import { CurrencyProvider } from "@/contexts/CurrencyContext";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import Navbar from "@/components/Navbar";
 
 export const metadata: Metadata = {
-  title: "flores",
-  description: "Modern tech gadgets and accessories",
+  title: "Web Shopping Service - Your One-Stop Shopping Destination",
+  description: "Discover thousands of products at great prices. Fast shipping, secure checkout, and excellent customer service.",
 };
 
 export default function RootLayout({
@@ -26,11 +15,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className="antialiased">
         <AuthProvider>
-          <CurrencyProvider>{children}</CurrencyProvider>
+          <Navbar />
+          <main className="min-h-screen">
+            {children}
+          </main>
         </AuthProvider>
       </body>
     </html>

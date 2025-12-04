@@ -7,5 +7,41 @@
     "status": "approved",
     "created_at": "2025-12-04T02:06:23.538296",
     "updated_at": "2025-12-04T02:06:39.740320"
+  },
+  {
+    "refund_id": "53a14e4e-79b4-42e2-911f-a2092fd0cca1",
+    "transaction_id": "29ce33c7-ccc3-48b2-b1ed-e4bc0c88ad82",
+    "user_id": "79be980f-d83d-4c63-b3b6-77c13193e1a5",
+    "message": "These chargers do no work\n",
+    "status": "approved",
+    "created_at": "2025-12-04T08:36:22.238907",
+    "updated_at": "2025-12-04T08:39:12.578734"
+  },
+  {
+    "refund_id": "d2ef512f-9992-4e1a-b55e-864688ada23c",
+    "transaction_id": "9b099db3-fe2c-48b2-afbb-f55ccfd678f3",
+    "user_id": "79be980f-d83d-4c63-b3b6-77c13193e1a5",
+    "message": "no work\n",
+    "status": "denied",
+    "created_at": "2025-12-04T08:52:08.053921",
+    "updated_at": "2025-12-04T09:21:09.454366"
+  },
+  {
+    "refund_id": "4f54ec90-d394-4492-aad0-a675a248c6db",
+    "transaction_id": "a8506de4-375e-44a5-ba48-b65859cbe3cc",
+    "user_id": "79be980f-d83d-4c63-b3b6-77c13193e1a5",
+    "message": "refund me pls",
+    "status": "denied",
+    "created_at": "2025-12-04T09:20:19.147848",
+    "updated_at": "2025-12-04T09:21:06.675910"
+  },
+  {
+    "refund_id": "a9542e94-2679-443a-92bd-3d09cb3d570d",
+    "transaction_id": "e0db5af0-bd0e-476a-b86d-1bb743cb609f",
+    "user_id": "ae993132-12a6-40c6-a91a-3fe889d95edd",
+    "message": "me no want\n",
+    "status": "approved",
+    "created_at": "2025-12-04T10:12:33.057054",
+    "updated_at": "2025-12-04T10:12:45.085243"
   }
 ]

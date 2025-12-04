@@ -1,7 +1,10 @@
+// Type definitions for the application
+
 export interface User {
   user_id: string;
   name: string;
   email: string;
+  password_hash: string;
   user_token: string;
   role: 'customer' | 'admin';
 }
@@ -22,8 +25,11 @@ export interface Product {
 
 export interface CartItem {
   product_id: string;
+  product_name: string;
+  img_link: string;
+  product_link: string;
+  discounted_price: number;
   quantity: number;
-  product?: Product;
 }
 
 export interface Cart {
@@ -32,13 +38,25 @@ export interface Cart {
   total_price: number;
 }
 
+export interface TransactionItem {
+  product_id: string;
+  product_name: string;
+  img_link: string;
+  product_link: string;
+  discounted_price: number;
+  quantity: number;
+}
+
 export interface Transaction {
   transaction_id: string;
   user_id: string;
-  items: CartItem[];
+  customer_name: string;
+  customer_email: string;
+  items: TransactionItem[];
   total_price: number;
   timestamp: string;
-  receipt?: string;
+  estimated_delivery: string;
+  status: string;
 }
 
 export interface Review {
@@ -56,7 +74,7 @@ export interface Refund {
   message: string;
   status: 'pending' | 'approved' | 'denied';
   created_at: string;
-  updated_at?: string;
+  updated_at: string | null;
 }
 
 export interface Penalty {
@@ -64,39 +82,6 @@ export interface Penalty {
   user_id: string;
   reason: string;
   timestamp: string;
-}
-
-export interface Metrics {
-  total_products: number;
-  total_users: number;
-  total_transactions: number;
-  total_revenue: number;
-  category_breakdown: Record<string, number>;
-}
-
-export interface CreateProductRequest {
-  product_name: string;
-  category: string;
-  discounted_price: number;
-  actual_price: number;
-  discount_percentage: number;
-  about_product: string;
-  img_link: string;
-  product_link: string;
-  rating: number;
-  rating_count: number;
-}
-
-export interface UpdateProductRequest {
-  product_name?: string;
-  category?: string;
-  discounted_price?: number;
-  actual_price?: number;
-  discount_percentage?: number;
-  about_product?: string;
-  img_link?: string;
-  product_link?: string;
-  rating?: number;
-  rating_count?: number;
+  status: string;
 }
 

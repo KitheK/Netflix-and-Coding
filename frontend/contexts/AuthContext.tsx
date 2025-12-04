@@ -20,14 +20,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('user_token');
+    const token = localStorage.getItem('token');
     if (token) {
-      authAPI.getCurrentUser(token)
-        .then((data) => {
-          setUser(data);
-        })
+      authAPI.getMe()
+        .then((data) => setUser(data))
         .catch(() => {
-          localStorage.removeItem('user_token');
+          localStorage.removeItem('token');
         })
         .finally(() => setLoading(false));
     } else {
@@ -36,29 +34,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const login = async (email: string, password: string) => {
-    try {
-      const response = await authAPI.login(email, password);
-      localStorage.setItem('user_token', response.user.user_token);
-      setUser(response.user);
-    } catch (error) {
-      // Re-throw so the component can handle it
-      throw error;
-    }
+    const response = await authAPI.login(email, password);
+    localStorage.setItem('token', response.user.user_token);
+    setUser(response.user);
   };
 
   const register = async (name: string, email: string, password: string) => {
-    try {
-      const response = await authAPI.register(name, email, password);
-      localStorage.setItem('user_token', response.user.user_token);
-      setUser(response.user);
-    } catch (error) {
-      // Re-throw so the component can handle it
-      throw error;
-    }
+    const response = await authAPI.register(name, email, password);
+    localStorage.setItem('token', response.user.user_token);
+    setUser(response.user);
   };
 
   const logout = () => {
-    localStorage.removeItem('user_token');
+    localStorage.removeItem('token');
     setUser(null);
   };
 

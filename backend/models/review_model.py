@@ -26,5 +26,4 @@ class AddReviewRequest(BaseModel):
     user_id: str
     user_name: str
     review_title: str
-    review_content: str 
-    # rating: float  # Optional rating
+    review_content: str
