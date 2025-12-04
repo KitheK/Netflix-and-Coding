@@ -29,3 +29,5 @@ typing-inspection==0.4.2
 typing_extensions==4.15.0
 unicorn==2.1.4
 pandas==2.3.3
+beautifulsoup4==4.12.3
+lxml==5.3.0
