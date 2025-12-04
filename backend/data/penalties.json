@@ -1,1 +1,37 @@
-[]
+[
+  {
+    "penalty_id": "7449b7ee-a743-425c-8e70-7b0bf2833e6a",
+    "user_id": "79be980f-d83d-4c63-b3b6-77c13193e1a5",
+    "reason": "refunding too many products",
+    "timestamp": "2025-12-04T09:35:08.730552+00:00",
+    "status": "resolved"
+  },
+  {
+    "penalty_id": "00c7296d-00c0-40ee-a31d-710c52403f92",
+    "user_id": "1cb86309-e8b2-45e3-8da7-1c2f54c65ae5",
+    "reason": "you are spamming",
+    "timestamp": "2025-12-04T09:43:45.939387+00:00",
+    "status": "resolved"
+  },
+  {
+    "penalty_id": "25e7bb8e-a632-4c95-8867-eae62d624923",
+    "user_id": "79be980f-d83d-4c63-b3b6-77c13193e1a5",
+    "reason": "youve been bad",
+    "timestamp": "2025-12-04T09:46:06.251422+00:00",
+    "status": "resolved"
+  },
+  {
+    "penalty_id": "dcbd8143-49c9-4ed1-900a-5c00839afb1f",
+    "user_id": "79be980f-d83d-4c63-b3b6-77c13193e1a5",
+    "reason": "this is a test\n",
+    "timestamp": "2025-12-04T09:51:32.112239+00:00",
+    "status": "active"
+  },
+  {
+    "penalty_id": "fcc4f1f7-b804-47b7-aabd-df60422581e1",
+    "user_id": "79be980f-d83d-4c63-b3b6-77c13193e1a5",
+    "reason": "this will be resolved\n",
+    "timestamp": "2025-12-04T09:51:39.294157+00:00",
+    "status": "resolved"
+  }
+]

@@ -134,6 +134,22 @@ async def read_current_user(current_user: User = Depends(get_current_user_dep)):
     }
 
 
+@router.get("/users")
+async def get_all_users(current_user: User = Depends(admin_required_dep)):
+    """Admin-only: Get list of all users"""
+    users = auth_service._load_all_users()
+    return [
+        {
+            "user_id": u.user_id,
+            "name": u.name,
+            "email": u.email,
+            "user_token": u.user_token,
+            "role": u.role
+        }
+        for u in users
+    ]
+
+
 @router.get("/admin-only")
 async def admin_only_route(current_user: User = Depends(admin_required_dep)):
     """ Endpoint protected by admin_required dependency."""

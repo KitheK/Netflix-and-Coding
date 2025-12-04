@@ -1,22 +1,17 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { useCurrency } from '@/contexts/CurrencyContext';
-import { cartAPI, productsAPI, currencyAPI } from '@/lib/api';
-import type { Cart, Product } from '@/types';
-import Navbar from '@/components/Navbar';
-import Image from 'next/image';
-import { Trash2, Plus, Minus, ShoppingBag } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { formatPrice } from '@/lib/currency';
+import { Trash2, Plus, Minus } from 'lucide-react';
+import { cartAPI } from '@/lib/api';
+import { Cart, CartItem } from '@/types';
+import { useAuth } from '@/contexts/AuthContext';
+import Link from 'next/link';
 
 export default function CartPage() {
-  const { user } = useAuth();
-  const { currency, symbol } = useCurrency();
   const router = useRouter();
+  const { user } = useAuth();
   const [cart, setCart] = useState<Cart | null>(null);
-  const [products, setProducts] = useState<Record<string, Product>>({});
   const [loading, setLoading] = useState(true);
   const [checkingOut, setCheckingOut] = useState(false);
 
@@ -25,90 +20,53 @@ export default function CartPage() {
       router.push('/login');
       return;
     }
-    loadCart();
-  }, [user, currency]);
+    fetchCart();
+  }, [user]);
 
-  const loadCart = async () => {
+  const fetchCart = async () => {
     if (!user) return;
+    setLoading(true);
     try {
-      const cartData = await cartAPI.get(user.user_token);
+      const cartData = await cartAPI.getCart(user.user_id);
       setCart(cartData);
-      const productIds = cartData.items.map((item) => item.product_id);
-      
-      let productData: Product[];
-      if (currency === 'INR') {
-        productData = await Promise.all(productIds.map((id) => productsAPI.getById(id)));
-      } else {
-        // Get converted products
-        const converted = await currencyAPI.convert(currency);
-        productData = productIds.map((id) => {
-          const found = converted.find(p => p.product_id === id);
-          return found || { product_id: id } as Product;
-        });
-        // Fetch any missing products
-        const missingIds = productData.filter(p => !p.product_name).map(p => p.product_id);
-        if (missingIds.length > 0) {
-          const missing = await Promise.all(missingIds.map((id) => productsAPI.getById(id)));
-          missing.forEach((p, i) => {
-            const idx = productData.findIndex(prod => prod.product_id === missingIds[i]);
-            if (idx >= 0) productData[idx] = p;
-          });
-        }
-      }
-      
-      const productMap: Record<string, Product> = {};
-      productData.forEach((p) => {
-        if (p.product_id) productMap[p.product_id] = p;
-      });
-      setProducts(productMap);
-      
-      // Recalculate cart total with converted prices if currency is not INR
-      if (currency !== 'INR' && cartData) {
-        const newTotal = cartData.items.reduce((sum, item) => {
-          const product = productMap[item.product_id];
-          if (product && product.discounted_price) {
-            return sum + (product.discounted_price * item.quantity);
-          }
-          return sum;
-        }, 0);
-        setCart({ ...cartData, total_price: newTotal });
-      }
     } catch (error) {
-      console.error('Failed to load cart:', error);
+      console.error('Failed to fetch cart:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleUpdateQuantity = async (productId: string, quantity: number) => {
-    if (!user) return;
+  const handleUpdateQuantity = async (productId: string, newQuantity: number) => {
+    if (!user || newQuantity < 1) return;
     try {
-      await cartAPI.update(productId, quantity, user.user_token);
-      loadCart();
+      await cartAPI.updateCart(user.user_id, productId, newQuantity);
+      fetchCart();
     } catch (error) {
-      console.error('Failed to update cart:', error);
+      console.error('Failed to update quantity:', error);
+      alert('Failed to update quantity');
     }
   };
 
-  const handleRemove = async (productId: string) => {
+  const handleRemoveItem = async (productId: string) => {
     if (!user) return;
     try {
-      await cartAPI.remove(productId, user.user_token);
-      loadCart();
+      await cartAPI.removeFromCart(user.user_id, productId);
+      fetchCart();
     } catch (error) {
       console.error('Failed to remove item:', error);
+      alert('Failed to remove item');
     }
   };
 
   const handleCheckout = async () => {
-    if (!user) return;
+    if (!user || !cart || cart.items.length === 0) return;
     setCheckingOut(true);
     try {
-      const transaction = await cartAPI.checkout(user.user_token);
-      alert('Order placed successfully!');
-      router.push(`/transactions/${transaction.transaction_id}`);
-    } catch (error) {
-      alert('Checkout failed. Please try again.');
+      const response = await cartAPI.checkout(user.user_id);
+      router.push(`/checkout?transaction_id=${response.transaction.transaction_id}`);
+    } catch (error: any) {
+      console.error('Failed to checkout:', error);
+      alert(error.response?.data?.detail || 'Failed to complete checkout');
     } finally {
       setCheckingOut(false);
     }
@@ -116,9 +74,8 @@ export default function CartPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <Navbar />
-        <div className="max-w-7xl mx-auto px-4 py-8">Loading...</div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <p className="text-gray-600">Loading cart...</p>
       </div>
     );
   }
@@ -126,18 +83,13 @@ export default function CartPage() {
   if (!cart || cart.items.length === 0) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Navbar />
-        <div className="max-w-7xl mx-auto px-4 py-8">
-          <div className="bg-white rounded-lg shadow-lg p-12 text-center">
-            <ShoppingBag className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Your cart is empty</h2>
-            <p className="text-gray-600 mb-6">Add some products to get started!</p>
-            <button
-              onClick={() => router.push('/')}
-              className="px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
-            >
-              Continue Shopping
-            </button>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center py-12">
+            <h1 className="text-3xl font-bold text-gray-900 mb-4">Your Cart is Empty</h1>
+            <p className="text-gray-600 mb-8">Add some products to get started!</p>
+            <Link href="/products" className="btn-primary">
+              Browse Products
+            </Link>
           </div>
         </div>
       </div>
@@ -146,97 +98,120 @@ export default function CartPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-8">Shopping Cart</h1>
-        <div className="grid lg:grid-cols-3 gap-8">
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Cart Items */}
           <div className="lg:col-span-2 space-y-4">
-            {cart.items.map((item) => {
-              const product = products[item.product_id];
-              if (!product) return null;
-              return (
-                <div key={item.product_id} className="bg-white rounded-lg shadow-md p-6 flex gap-6">
-                  <div className="relative w-32 h-32 bg-gray-100 rounded-lg flex-shrink-0">
-                    {product.img_link ? (
-                      <Image
-                        src={product.img_link}
-                        alt={product.product_name}
-                        fill
-                        className="object-contain"
-                        unoptimized
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-gray-400 text-sm">
-                        No Image
-                      </div>
-                    )}
-                  </div>
+            {cart.items.map((item: CartItem) => (
+              <div key={item.product_id} className="card">
+                <div className="flex gap-4">
+                  {/* Product Image */}
+                  <Link href={`/products/${item.product_id}`} className="flex-shrink-0">
+                    <div className="w-24 h-24 bg-gray-100 rounded-lg overflow-hidden">
+                      {item.img_link ? (
+                        <img
+                          src={item.img_link}
+                          alt={item.product_name}
+                          className="w-full h-full object-contain"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = 'https://via.placeholder.com/100?text=No+Image';
+                          }}
+                        />
+                      ) : (
+                        <div className="flex items-center justify-center h-full text-gray-400 text-xs">
+                          No Image
+                        </div>
+                      )}
+                    </div>
+                  </Link>
+
+                  {/* Product Details */}
                   <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                      {product.product_name}
-                    </h3>
-                    <p className="text-primary-600 font-bold mb-4">
-                      {formatPrice(product.discounted_price || 0, symbol)}
+                    <Link
+                      href={`/products/${item.product_id}`}
+                      className="font-semibold text-gray-900 hover:text-primary-600 block mb-2"
+                    >
+                      {item.product_name}
+                    </Link>
+                    <p className="text-lg font-bold text-gray-900 mb-4">
+                      ${item.discounted_price}
                     </p>
-                    <div className="flex items-center space-x-4">
-                      <div className="flex items-center border rounded-lg">
+
+                    {/* Quantity Controls */}
+                    <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-2">
                         <button
                           onClick={() => handleUpdateQuantity(item.product_id, item.quantity - 1)}
-                          className="p-2 hover:bg-gray-100"
+                          className="p-1 rounded-lg border border-gray-300 hover:bg-gray-100"
+                          disabled={item.quantity <= 1}
                         >
-                          <Minus className="h-4 w-4" />
+                          <Minus className="w-4 h-4" />
                         </button>
-                        <span className="px-4 py-2">{item.quantity}</span>
+                        <span className="w-12 text-center font-medium">{item.quantity}</span>
                         <button
                           onClick={() => handleUpdateQuantity(item.product_id, item.quantity + 1)}
-                          className="p-2 hover:bg-gray-100"
+                          className="p-1 rounded-lg border border-gray-300 hover:bg-gray-100"
                         >
-                          <Plus className="h-4 w-4" />
+                          <Plus className="w-4 h-4" />
                         </button>
                       </div>
                       <button
-                        onClick={() => handleRemove(item.product_id)}
-                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
+                        onClick={() => handleRemoveItem(item.product_id)}
+                        className="text-red-600 hover:text-red-700 flex items-center gap-1"
                       >
-                        <Trash2 className="h-5 w-5" />
+                        <Trash2 className="w-4 h-4" />
+                        Remove
                       </button>
                     </div>
                   </div>
+
+                  {/* Item Total */}
                   <div className="text-right">
                     <p className="text-lg font-bold text-gray-900">
-                      {formatPrice(((product.discounted_price || 0) * item.quantity), symbol)}
+                      ${(Number(item.discounted_price) * item.quantity).toFixed(2)}
                     </p>
                   </div>
                 </div>
-              );
-            })}
+              </div>
+            ))}
           </div>
+
+          {/* Order Summary */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow-md p-6 sticky top-24">
+            <div className="card sticky top-4">
               <h2 className="text-xl font-bold text-gray-900 mb-4">Order Summary</h2>
+              
               <div className="space-y-2 mb-4">
                 <div className="flex justify-between text-gray-600">
-                  <span>Subtotal</span>
-                  <span>{formatPrice(cart.total_price || 0, symbol)}</span>
+                  <span>Items ({cart.items.reduce((sum, item) => sum + item.quantity, 0)}):</span>
+                  <span>${cart.total_price}</span>
                 </div>
                 <div className="flex justify-between text-gray-600">
-                  <span>Shipping</span>
-                  <span>Free</span>
-                </div>
-                <div className="border-t pt-2 mt-2">
-                  <div className="flex justify-between text-xl font-bold text-gray-900">
-                    <span>Total</span>
-                    <span>{formatPrice(cart.total_price || 0, symbol)}</span>
-                  </div>
+                  <span>Shipping:</span>
+                  <span>FREE</span>
                 </div>
               </div>
+
+              <div className="border-t border-gray-200 pt-4 mb-6">
+                <div className="flex justify-between text-xl font-bold">
+                  <span>Total:</span>
+                  <span className="text-primary-600">${cart.total_price}</span>
+                </div>
+              </div>
+
               <button
                 onClick={handleCheckout}
                 disabled={checkingOut}
-                className="w-full bg-primary-600 text-white py-3 rounded-lg hover:bg-primary-700 transition disabled:opacity-50"
+                className="btn-primary w-full"
               >
-                {checkingOut ? 'Processing...' : 'Proceed to Checkout'}
+                {checkingOut ? 'Processing...' : 'Checkout'}
               </button>
+
+              <Link href="/products" className="block text-center text-primary-600 hover:text-primary-700 mt-4">
+                Continue Shopping
+              </Link>
             </div>
           </div>
         </div>
@@ -244,4 +219,3 @@ export default function CartPage() {
     </div>
   );
 }
-

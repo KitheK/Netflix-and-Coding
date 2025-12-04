@@ -82,5 +82,323 @@
       "estimated_delivery": "2025-12-09",
       "status": "refunded"
     }
+  ],
+  "79be980f-d83d-4c63-b3b6-77c13193e1a5": [
+    {
+      "transaction_id": "d7408dc7-e942-4f6a-86f4-546a6985ade3",
+      "user_id": "79be980f-d83d-4c63-b3b6-77c13193e1a5",
+      "customer_name": "Fraser Muller",
+      "customer_email": "frasermuller2005@gmail.com",
+      "items": [
+        {
+          "product_id": "B008IFXQFU",
+          "product_name": "TP-Link USB WiFi Adapter for PC(TL-WN725N), N150 Wireless Network Adapter for Desktop - Nano Size WiFi Dongle Compatible with Windows 11/10/7/8/8.1/XP/ Mac OS 10.9-10.15 Linux Kernel 2.6.18-4.4.3",
+          "img_link": "https://m.media-amazon.com/images/I/31dDGr5uhaL._SY300_SX300_QL70_FMwebp_.jpg",
+          "product_link": "https://www.amazon.in/TP-Link-TL-WN725N-150Mbps-Wireless-Adapter/dp/B008IFXQFU/ref=sr_1_10?qid=1672909124&s=electronics&sr=1-10",
+          "discounted_price": 499.0,
+          "quantity": 1
+        }
+      ],
+      "total_price": 499.0,
+      "timestamp": "2025-12-04T06:45:30.087624+00:00",
+      "estimated_delivery": "2025-12-09",
+      "status": "completed"
+    },
+    {
+      "transaction_id": "6762713d-37a5-4cf4-a2e9-dda06b41a03a",
+      "user_id": "79be980f-d83d-4c63-b3b6-77c13193e1a5",
+      "customer_name": "Fraser Muller",
+      "customer_email": "frasermuller2005@gmail.com",
+      "items": [
+        {
+          "product_id": "B07KSMBL2H",
+          "product_name": "AmazonBasics Flexible Premium HDMI Cable (Black, 4K@60Hz, 18Gbps), 3-Foot",
+          "img_link": "https://m.media-amazon.com/images/I/51u78zL8y8L._SY300_SX300_QL70_FMwebp_.jpg",
+          "product_link": "https://www.amazon.in/AmazonBasics-Flexible-HDMI-Cable-3-Foot/dp/B07KSMBL2H/ref=sr_1_14?qid=1672909124&s=electronics&sr=1-14",
+          "discounted_price": 219.0,
+          "quantity": 2
+        }
+      ],
+      "total_price": 438.0,
+      "timestamp": "2025-12-04T08:18:13.684292+00:00",
+      "estimated_delivery": "2025-12-09",
+      "status": "completed"
+    },
+    {
+      "transaction_id": "3b14600a-729d-457f-a8b2-8b303c5ae88a",
+      "user_id": "79be980f-d83d-4c63-b3b6-77c13193e1a5",
+      "customer_name": "Fraser Muller",
+      "customer_email": "frasermuller2005@gmail.com",
+      "items": [
+        {
+          "product_id": "B07KSMBL2H",
+          "product_name": "AmazonBasics Flexible Premium HDMI Cable (Black, 4K@60Hz, 18Gbps), 3-Foot",
+          "img_link": "https://m.media-amazon.com/images/I/51u78zL8y8L._SY300_SX300_QL70_FMwebp_.jpg",
+          "product_link": "https://www.amazon.in/AmazonBasics-Flexible-HDMI-Cable-3-Foot/dp/B07KSMBL2H/ref=sr_1_14?qid=1672909124&s=electronics&sr=1-14",
+          "discounted_price": 219.0,
+          "quantity": 1
+        }
+      ],
+      "total_price": 219.0,
+      "timestamp": "2025-12-04T08:18:38.597700+00:00",
+      "estimated_delivery": "2025-12-09",
+      "status": "completed"
+    },
+    {
+      "transaction_id": "844e130c-e8e8-460d-aa98-746ec28433e0",
+      "user_id": "79be980f-d83d-4c63-b3b6-77c13193e1a5",
+      "customer_name": "Fraser Muller",
+      "customer_email": "frasermuller2005@gmail.com",
+      "items": [
+        {
+          "product_id": "B00NH11KIK",
+          "product_name": "AmazonBasics USB 2.0 Cable - A-Male to B-Male - for Personal Computer, Printer- 6 Feet (1.8 Meters), Black",
+          "img_link": "https://m.media-amazon.com/images/I/318RrRPyQcL._SX300_SY300_QL70_FMwebp_.jpg",
+          "product_link": "https://www.amazon.in/AmazonBasics-USB-2-0-Cable-Male/dp/B00NH11KIK/ref=sr_1_44?qid=1672909125&s=electronics&sr=1-44",
+          "discounted_price": 209.0,
+          "quantity": 1
+        }
+      ],
+      "total_price": 209.0,
+      "timestamp": "2025-12-04T08:22:28.531994+00:00",
+      "estimated_delivery": "2025-12-09",
+      "status": "completed"
+    },
+    {
+      "transaction_id": "29ce33c7-ccc3-48b2-b1ed-e4bc0c88ad82",
+      "user_id": "79be980f-d83d-4c63-b3b6-77c13193e1a5",
+      "customer_name": "Fraser Muller",
+      "customer_email": "frasermuller2005@gmail.com",
+      "items": [
+        {
+          "product_id": "B098NS6PVG",
+          "product_name": "Ambrane Unbreakable 60W / 3A Fast Charging 1.5m Braided Type C Cable for Smartphones, Tablets, Laptops & other Type C devices, PD Technology, 480Mbps Data Sync, Quick Charge 3.0 (RCT15A, Black)",
+          "img_link": "https://m.media-amazon.com/images/I/41lJ8x1yeIL._SY300_SX300_QL70_FMwebp_.jpg",
+          "product_link": "https://www.amazon.in/Ambrane-Unbreakable-Charging-Braided-Cable/dp/B098NS6PVG/ref=sr_1_2?qid=1672909124&s=electronics&sr=1-2",
+          "discounted_price": 199.0,
+          "quantity": 1
+        }
+      ],
+      "total_price": 199.0,
+      "timestamp": "2025-12-04T08:36:00.675774+00:00",
+      "estimated_delivery": "2025-12-09",
+      "status": "refunded"
+    },
+    {
+      "transaction_id": "e95d3012-70a3-455a-8964-8346a17e9950",
+      "user_id": "79be980f-d83d-4c63-b3b6-77c13193e1a5",
+      "customer_name": "Fraser Muller",
+      "customer_email": "frasermuller2005@gmail.com",
+      "items": [
+        {
+          "product_id": "B0789LZTCJ",
+          "product_name": "boAt Rugged v3 Extra Tough Unbreakable Braided Micro USB Cable 1.5 Meter (Black)",
+          "img_link": "https://m.media-amazon.com/images/I/41HLa-Z5PrL._SY300_SX300_QL70_FMwebp_.jpg",
+          "product_link": "https://www.amazon.in/Rugged-Extra-Tough-Unbreakable-Braided/dp/B0789LZTCJ/ref=sr_1_13?qid=1672909124&s=electronics&sr=1-13",
+          "discounted_price": 299.0,
+          "quantity": 1
+        },
+        {
+          "product_id": "B08HDJ86NZ",
+          "product_name": "boAt Deuce USB 300 2 in 1 Type-C & Micro USB Stress Resistant, Tangle-Free, Sturdy Cable with 3A Fast Charging & 480mbps Data Transmission, 10000+ Bends Lifespan and Extended 1.5m Length(Martian Red)",
+          "img_link": "https://m.media-amazon.com/images/I/41V5FtEWPkL._SY300_SX300_QL70_FMwebp_.jpg",
+          "product_link": "https://www.amazon.in/Deuce-300-Resistant-Tangle-Free-Transmission/dp/B08HDJ86NZ/ref=sr_1_4?qid=1672909124&s=electronics&sr=1-4",
+          "discounted_price": 329.0,
+          "quantity": 1
+        }
+      ],
+      "total_price": 628.0,
+      "timestamp": "2025-12-04T08:39:57.304385+00:00",
+      "estimated_delivery": "2025-12-09",
+      "status": "completed"
+    },
+    {
+      "transaction_id": "9b099db3-fe2c-48b2-afbb-f55ccfd678f3",
+      "user_id": "79be980f-d83d-4c63-b3b6-77c13193e1a5",
+      "customer_name": "Fraser Muller",
+      "customer_email": "frasermuller2005@gmail.com",
+      "items": [
+        {
+          "product_id": "B01FSYQ2A4",
+          "product_name": "boAt Rockerz 400 Bluetooth On Ear Headphones With Mic With Upto 8 Hours Playback & Soft Padded Ear Cushions(Grey/Green)",
+          "img_link": "https://m.media-amazon.com/images/I/41zejggGzLL._SY300_SX300_QL70_FMwebp_.jpg",
+          "product_link": "https://www.amazon.in/Super-Rockerz-400-Bluetooth-Headphones/dp/B01FSYQ2A4/ref=sr_1_307?qid=1672895835&s=electronics&sr=1-307",
+          "discounted_price": 1399.0,
+          "quantity": 3
+        },
+        {
+          "product_id": "B09MT84WV5",
+          "product_name": "Samsung EVO Plus 128GB microSDXC UHS-I U3 130MB/s Full HD & 4K UHD Memory Card with Adapter (MB-MC128KA), Blue",
+          "img_link": "https://m.media-amazon.com/images/I/31R6RP26dzL._SX300_SY300_QL70_FMwebp_.jpg",
+          "product_link": "https://www.amazon.in/Samsung-microSDXC-Memory-Adapter-MB-MC128KA/dp/B09MT84WV5/ref=sr_1_66?qid=1672895762&s=electronics&sr=1-66",
+          "discounted_price": 1149.0,
+          "quantity": 2
+        }
+      ],
+      "total_price": 6495.0,
+      "timestamp": "2025-12-04T08:51:56.742027+00:00",
+      "estimated_delivery": "2025-12-09",
+      "status": "completed"
+    },
+    {
+      "transaction_id": "036e3b9d-14d6-4738-a2d9-dc327174dbbc",
+      "user_id": "79be980f-d83d-4c63-b3b6-77c13193e1a5",
+      "customer_name": "Fraser Muller",
+      "customer_email": "frasermuller2005@gmail.com",
+      "items": [
+        {
+          "product_id": "B098NS6PVG",
+          "product_name": "Ambrane Unbreakable 60W / 3A Fast Charging 1.5m Braided Type C Cable for Smartphones, Tablets, Laptops & other Type C devices, PD Technology, 480Mbps Data Sync, Quick Charge 3.0 (RCT15A, Black)",
+          "img_link": "https://m.media-amazon.com/images/I/41lJ8x1yeIL._SY300_SX300_QL70_FMwebp_.jpg",
+          "product_link": "https://www.amazon.in/Ambrane-Unbreakable-Charging-Braided-Cable/dp/B098NS6PVG/ref=sr_1_2?qid=1672909124&s=electronics&sr=1-2",
+          "discounted_price": 199.0,
+          "quantity": 1
+        }
+      ],
+      "total_price": 199.0,
+      "timestamp": "2025-12-04T08:53:13.578543+00:00",
+      "estimated_delivery": "2025-12-09",
+      "status": "completed"
+    },
+    {
+      "transaction_id": "d60b3546-ee75-4966-adcb-45f8b4f23a75",
+      "user_id": "79be980f-d83d-4c63-b3b6-77c13193e1a5",
+      "customer_name": "Fraser Muller",
+      "customer_email": "frasermuller2005@gmail.com",
+      "items": [
+        {
+          "product_id": "B098NS6PVG",
+          "product_name": "Ambrane Unbreakable 60W / 3A Fast Charging 1.5m Braided Type C Cable for Smartphones, Tablets, Laptops & other Type C devices, PD Technology, 480Mbps Data Sync, Quick Charge 3.0 (RCT15A, Black)",
+          "img_link": "https://m.media-amazon.com/images/I/41lJ8x1yeIL._SY300_SX300_QL70_FMwebp_.jpg",
+          "product_link": "https://www.amazon.in/Ambrane-Unbreakable-Charging-Braided-Cable/dp/B098NS6PVG/ref=sr_1_2?qid=1672909124&s=electronics&sr=1-2",
+          "discounted_price": 199.0,
+          "quantity": 1
+        }
+      ],
+      "total_price": 199.0,
+      "timestamp": "2025-12-04T09:11:05.709958+00:00",
+      "estimated_delivery": "2025-12-09",
+      "status": "completed"
+    },
+    {
+      "transaction_id": "61d848cf-3a0e-438b-bb2c-3441329c2a81",
+      "user_id": "79be980f-d83d-4c63-b3b6-77c13193e1a5",
+      "customer_name": "Fraser Muller",
+      "customer_email": "frasermuller2005@gmail.com",
+      "items": [
+        {
+          "product_id": "B08HDJ86NZ",
+          "product_name": "boAt Deuce USB 300 2 in 1 Type-C & Micro USB Stress Resistant, Tangle-Free, Sturdy Cable with 3A Fast Charging & 480mbps Data Transmission, 10000+ Bends Lifespan and Extended 1.5m Length(Martian Red)",
+          "img_link": "https://m.media-amazon.com/images/I/41V5FtEWPkL._SY300_SX300_QL70_FMwebp_.jpg",
+          "product_link": "https://www.amazon.in/Deuce-300-Resistant-Tangle-Free-Transmission/dp/B08HDJ86NZ/ref=sr_1_4?qid=1672909124&s=electronics&sr=1-4",
+          "discounted_price": 329.0,
+          "quantity": 1
+        }
+      ],
+      "total_price": 329.0,
+      "timestamp": "2025-12-04T09:12:29.348110+00:00",
+      "estimated_delivery": "2025-12-09",
+      "status": "completed"
+    },
+    {
+      "transaction_id": "a8506de4-375e-44a5-ba48-b65859cbe3cc",
+      "user_id": "79be980f-d83d-4c63-b3b6-77c13193e1a5",
+      "customer_name": "Fraser Muller",
+      "customer_email": "frasermuller2005@gmail.com",
+      "items": [
+        {
+          "product_id": "B098NS6PVG",
+          "product_name": "Ambrane Unbreakable 60W / 3A Fast Charging 1.5m Braided Type C Cable for Smartphones, Tablets, Laptops & other Type C devices, PD Technology, 480Mbps Data Sync, Quick Charge 3.0 (RCT15A, Black)",
+          "img_link": "https://m.media-amazon.com/images/I/41lJ8x1yeIL._SY300_SX300_QL70_FMwebp_.jpg",
+          "product_link": "https://www.amazon.in/Ambrane-Unbreakable-Charging-Braided-Cable/dp/B098NS6PVG/ref=sr_1_2?qid=1672909124&s=electronics&sr=1-2",
+          "discounted_price": 199.0,
+          "quantity": 1
+        }
+      ],
+      "total_price": 199.0,
+      "timestamp": "2025-12-04T09:19:58.266513+00:00",
+      "estimated_delivery": "2025-12-09",
+      "status": "completed"
+    }
+  ],
+  "ae993132-12a6-40c6-a91a-3fe889d95edd": [
+    {
+      "transaction_id": "e0db5af0-bd0e-476a-b86d-1bb743cb609f",
+      "user_id": "ae993132-12a6-40c6-a91a-3fe889d95edd",
+      "customer_name": "Admin",
+      "customer_email": "admin@example.com",
+      "items": [
+        {
+          "product_id": "B08HDJ86NZ",
+          "product_name": "boAt Deuce USB 300 2 in 1 Type-C & Micro USB Stress Resistant, Tangle-Free, Sturdy Cable with 3A Fast Charging & 480mbps Data Transmission, 10000+ Bends Lifespan and Extended 1.5m Length(Martian Red)",
+          "img_link": "https://m.media-amazon.com/images/I/41V5FtEWPkL._SY300_SX300_QL70_FMwebp_.jpg",
+          "product_link": "https://www.amazon.in/Deuce-300-Resistant-Tangle-Free-Transmission/dp/B08HDJ86NZ/ref=sr_1_4?qid=1672909124&s=electronics&sr=1-4",
+          "discounted_price": 329.0,
+          "quantity": 1
+        }
+      ],
+      "total_price": 329.0,
+      "timestamp": "2025-12-04T09:20:52.049183+00:00",
+      "estimated_delivery": "2025-12-09",
+      "status": "refunded"
+    },
+    {
+      "transaction_id": "aed414f4-702d-46bd-ad55-c59d74d4db80",
+      "user_id": "ae993132-12a6-40c6-a91a-3fe889d95edd",
+      "customer_name": "Admin",
+      "customer_email": "admin@example.com",
+      "items": [
+        {
+          "product_id": "B098NS6PVG",
+          "product_name": "Ambrane Unbreakable 60W / 3A Fast Charging 1.5m Braided Type C Cable for Smartphones, Tablets, Laptops & other Type C devices, PD Technology, 480Mbps Data Sync, Quick Charge 3.0 (RCT15A, Black)",
+          "img_link": "https://m.media-amazon.com/images/I/41lJ8x1yeIL._SY300_SX300_QL70_FMwebp_.jpg",
+          "product_link": "https://www.amazon.in/Ambrane-Unbreakable-Charging-Braided-Cable/dp/B098NS6PVG/ref=sr_1_2?qid=1672909124&s=electronics&sr=1-2",
+          "discounted_price": 199.0,
+          "quantity": 1
+        },
+        {
+          "product_id": "B08CF3B7N1",
+          "product_name": "Portronics Konnect L 1.2M Fast Charging 3A 8 Pin USB Cable with Charge & Sync Function for iPhone, iPad (Grey)",
+          "img_link": "https://m.media-amazon.com/images/I/41XfpyH4-JL._SY300_SX300_QL70_FMwebp_.jpg",
+          "product_link": "https://www.amazon.in/Portronics-Konnect-POR-1080-Charging-Function/dp/B08CF3B7N1/ref=sr_1_5?qid=1672909124&s=electronics&sr=1-5",
+          "discounted_price": 154.0,
+          "quantity": 1
+        },
+        {
+          "product_id": "B08HDJ86NZ",
+          "product_name": "boAt Deuce USB 300 2 in 1 Type-C & Micro USB Stress Resistant, Tangle-Free, Sturdy Cable with 3A Fast Charging & 480mbps Data Transmission, 10000+ Bends Lifespan and Extended 1.5m Length(Martian Red)",
+          "img_link": "https://m.media-amazon.com/images/I/41V5FtEWPkL._SY300_SX300_QL70_FMwebp_.jpg",
+          "product_link": "https://www.amazon.in/Deuce-300-Resistant-Tangle-Free-Transmission/dp/B08HDJ86NZ/ref=sr_1_4?qid=1672909124&s=electronics&sr=1-4",
+          "discounted_price": 329.0,
+          "quantity": 1
+        }
+      ],
+      "total_price": 682.0,
+      "timestamp": "2025-12-04T11:50:41.535383+00:00",
+      "estimated_delivery": "2025-12-09",
+      "status": "completed"
+    }
+  ],
+  "1cb86309-e8b2-45e3-8da7-1c2f54c65ae5": [
+    {
+      "transaction_id": "beb1b95f-b910-41b2-9c41-1cc14ee16ae4",
+      "user_id": "1cb86309-e8b2-45e3-8da7-1c2f54c65ae5",
+      "customer_name": "promote me",
+      "customer_email": "promoteme@gmail.com",
+      "items": [
+        {
+          "product_id": "B08HDJ86NZ",
+          "product_name": "boAt Deuce USB 300 2 in 1 Type-C & Micro USB Stress Resistant, Tangle-Free, Sturdy Cable with 3A Fast Charging & 480mbps Data Transmission, 10000+ Bends Lifespan and Extended 1.5m Length(Martian Red)",
+          "img_link": "https://m.media-amazon.com/images/I/41V5FtEWPkL._SY300_SX300_QL70_FMwebp_.jpg",
+          "product_link": "https://www.amazon.in/Deuce-300-Resistant-Tangle-Free-Transmission/dp/B08HDJ86NZ/ref=sr_1_4?qid=1672909124&s=electronics&sr=1-4",
+          "discounted_price": 329.0,
+          "quantity": 1
+        }
+      ],
+      "total_price": 329.0,
+      "timestamp": "2025-12-04T09:43:00.145261+00:00",
+      "estimated_delivery": "2025-12-09",
+      "status": "completed"
+    }
   ]
 }
