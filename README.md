@@ -25,7 +25,7 @@ docker compose down
     Dependencies: A complete list of required tools, libraries, and services (with version details):
 For a full list of requirements for the system, please see requirements.txt . We recommend running:
 pip3 install -r "requirements.txt"
-upon loading into a virtual environment to ensure no conflicting packages and minimal running package load.
+upon loading into a virtual environment to ensure no conflicting packages and minimal running package load. Instructions for how to initialize a virtual environment depend on your operating system and are outside the scope of this handoff.
 
         Maintenance Requirements: Details on ongoing maintenance, including:
 
