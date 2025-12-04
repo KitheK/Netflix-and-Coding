@@ -3,15 +3,18 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { transactionAPI, refundAPI } from '@/lib/api';
+import { transactionAPI, refundAPI, currencyAPI } from '@/lib/api';
 import { Transaction, Refund } from '@/types';
 import { useAuth } from '@/contexts/AuthContext';
+import { useCurrency } from '@/contexts/CurrencyContext';
 
 export default function TransactionsPage() {
   const router = useRouter();
   const { user } = useAuth();
+  const { currency, currencySymbol } = useCurrency();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [refunds, setRefunds] = useState<Refund[]>([]);
+  const [convertedPrices, setConvertedPrices] = useState<{ [key: string]: number }>({});
   const [loading, setLoading] = useState(true);
 
   // Refund modal state
@@ -26,7 +29,7 @@ export default function TransactionsPage() {
       return;
     }
     fetchData();
-  }, [user]);
+  }, [user, currency]);
 
   const fetchData = async () => {
     if (!user) return;
@@ -38,6 +41,18 @@ export default function TransactionsPage() {
       ]);
       setTransactions(transactionsData);
       setRefunds(refundsData);
+
+      // Fetch converted prices if currency is not INR
+      if (currency !== 'INR') {
+        const allProducts = await currencyAPI.getProductsInCurrency(currency);
+        const priceMap: { [key: string]: number } = {};
+        allProducts.forEach((product: any) => {
+          priceMap[product.product_id] = product.discounted_price;
+        });
+        setConvertedPrices(priceMap);
+      } else {
+        setConvertedPrices({});
+      }
     } catch (error) {
       console.error('Failed to fetch data:', error);
     } finally {
@@ -173,7 +188,7 @@ export default function TransactionsPage() {
                             {item.product_name}
                           </Link>
                           <p className="text-sm text-gray-600">
-                            Quantity: {item.quantity} × ${item.discounted_price}
+                            Quantity: {item.quantity} × {currencySymbol}{(convertedPrices[item.product_id] || item.discounted_price).toFixed(2)}
                           </p>
                         </div>
                       </div>
@@ -184,7 +199,7 @@ export default function TransactionsPage() {
                   <div className="border-t border-gray-200 pt-4 flex justify-between items-center">
                     <div>
                       <p className="text-sm text-gray-600">Total</p>
-                      <p className="text-xl font-bold text-gray-900">${transaction.total_price}</p>
+                      <p className="text-xl font-bold text-gray-900">{currencySymbol}{Object.keys(convertedPrices).length > 0 ? transaction.items.reduce((sum, item) => sum + (convertedPrices[item.product_id] || item.discounted_price) * item.quantity, 0).toFixed(2) : Number(transaction.total_price).toFixed(2)}</p>
                     </div>
                     <div>
                       {refund ? (

@@ -38,7 +38,7 @@ const ProductCard = ({ product, onWishlistChange }: ProductCardProps) => {
       const symbols: { [key: string]: string } = {
         'INR': '₹',
         'USD': '$',
-        'CAD': '$',
+        'CAD': 'C$',
         'EUR': '€',
         'GBP': '£',
       };

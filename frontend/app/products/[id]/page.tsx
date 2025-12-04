@@ -3,14 +3,16 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { ShoppingCart, Heart, Star, ExternalLink } from 'lucide-react';
-import { productAPI, reviewAPI, cartAPI, wishlistAPI } from '@/lib/api';
+import { productAPI, reviewAPI, cartAPI, wishlistAPI, currencyAPI } from '@/lib/api';
 import { Product, Review } from '@/types';
 import { useAuth } from '@/contexts/AuthContext';
+import { useCurrency } from '@/contexts/CurrencyContext';
 
 export default function ProductDetailPage() {
   const router = useRouter();
   const params = useParams();
   const { user } = useAuth();
+  const { currency, currencySymbol } = useCurrency();
   const productId = params.id as string;
 
   const [product, setProduct] = useState<Product | null>(null);
@@ -28,15 +30,27 @@ export default function ProductDetailPage() {
 
   useEffect(() => {
     fetchProductAndReviews();
-  }, [productId]);
+  }, [productId, currency]);
 
   const fetchProductAndReviews = async () => {
     setLoading(true);
     try {
-      const [productData, reviewsData] = await Promise.all([
-        productAPI.getById(productId),
-        reviewAPI.getReviews(productId),
-      ]);
+      let productData;
+      
+      // Fetch product with currency conversion if not INR
+      if (currency !== 'INR') {
+        const allProducts = await currencyAPI.getProductsInCurrency(currency);
+        productData = allProducts.find((p: Product) => p.product_id === productId);
+        if (!productData) {
+          // Fallback to regular API if not found
+          productData = await productAPI.getById(productId);
+        }
+      } else {
+        productData = await productAPI.getById(productId);
+      }
+      
+      const reviewsData = await reviewAPI.getReviews(productId);
+      
       setProduct(productData);
       setReviews(reviewsData);
     } catch (error) {
@@ -179,10 +193,10 @@ export default function ProductDetailPage() {
 
             {/* Price */}
             <div className="flex items-center gap-3 mb-6">
-              <span className="text-4xl font-bold text-gray-900">${product.discounted_price}</span>
+              <span className="text-4xl font-bold text-gray-900">{currencySymbol}{product.discounted_price}</span>
               {product.discount_percentage > 0 && (
                 <>
-                  <span className="text-xl text-gray-500 line-through">${product.actual_price}</span>
+                  <span className="text-xl text-gray-500 line-through">{currencySymbol}{product.actual_price}</span>
                   <span className="text-lg font-semibold text-green-600">
                     {product.discount_percentage}% off
                   </span>

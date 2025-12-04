@@ -5,31 +5,21 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { productAPI, currencyAPI } from '@/lib/api';
 import { Product } from '@/types';
 import ProductCard from '@/components/ProductCard';
+import { useCurrency } from '@/contexts/CurrencyContext';
 
 function ProductsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const searchQuery = searchParams.get('search');
+  const { currency, currencySymbol } = useCurrency();
 
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState(''); // Default to no sorting (natural order)
-  const [currency, setCurrency] = useState('INR'); // Default to INR (rupees)
-  const [currencySymbol, setCurrencySymbol] = useState('₹');
   
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 50;
-
-  useEffect(() => {
-    // Get currency from localStorage or default to INR
-    const savedCurrency = localStorage.getItem('currency');
-    if (savedCurrency) {
-      setCurrency(savedCurrency);
-      updateCurrencySymbol(savedCurrency);
-    }
-    // If no saved currency, keep default INR (already set in useState)
-  }, []);
 
   useEffect(() => {
     fetchProducts();
@@ -39,17 +29,6 @@ function ProductsContent() {
     // Reset to page 1 when filters change
     setCurrentPage(1);
   }, [searchQuery, sortBy, currency]);
-
-  const updateCurrencySymbol = (curr: string) => {
-    const symbols: { [key: string]: string } = {
-      'INR': '₹',
-      'USD': '$',
-      'CAD': '$',
-      'EUR': '€',
-      'GBP': '£',
-    };
-    setCurrencySymbol(symbols[curr] || curr);
-  };
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -112,12 +91,6 @@ function ProductsContent() {
     }
   };
 
-  const handleCurrencyChange = (newCurrency: string) => {
-    setCurrency(newCurrency);
-    localStorage.setItem('currency', newCurrency);
-    updateCurrencySymbol(newCurrency);
-  };
-
   const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSortBy(e.target.value);
   };
@@ -169,25 +142,6 @@ function ProductsContent() {
                   <option value="price_desc">Price: High to Low</option>
                   <option value="rating_desc">Top Rated</option>
                   <option value="discount_desc">Best Deals</option>
-                </select>
-              </div>
-
-              {/* Currency Selector */}
-              <div className="flex items-center gap-3">
-                <label htmlFor="currency" className="text-sm font-semibold text-gray-700 whitespace-nowrap">
-                  Currency
-                </label>
-                <select
-                  id="currency"
-                  value={currency}
-                  onChange={(e) => handleCurrencyChange(e.target.value)}
-                  className="px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-all bg-white"
-                >
-                  <option value="INR">₹ INR</option>
-                  <option value="USD">$ USD</option>
-                  <option value="CAD">$ CAD</option>
-                  <option value="EUR">€ EUR</option>
-                  <option value="GBP">£ GBP</option>
                 </select>
               </div>
             </div>

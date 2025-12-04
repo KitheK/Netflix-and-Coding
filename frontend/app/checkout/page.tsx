@@ -4,17 +4,20 @@ import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { CheckCircle } from 'lucide-react';
-import { transactionAPI } from '@/lib/api';
+import { transactionAPI, currencyAPI } from '@/lib/api';
 import { Transaction } from '@/types';
 import { useAuth } from '@/contexts/AuthContext';
+import { useCurrency } from '@/contexts/CurrencyContext';
 
 function CheckoutContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user } = useAuth();
+  const { currency, currencySymbol } = useCurrency();
   const transactionId = searchParams.get('transaction_id');
 
   const [transaction, setTransaction] = useState<Transaction | null>(null);
+  const [convertedPrices, setConvertedPrices] = useState<{ [key: string]: number }>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -27,7 +30,7 @@ function CheckoutContent() {
       return;
     }
     fetchTransaction();
-  }, [user, transactionId]);
+  }, [user, transactionId, currency]);
 
   const fetchTransaction = async () => {
     if (!transactionId) return;
@@ -35,6 +38,18 @@ function CheckoutContent() {
     try {
       const transactionData = await transactionAPI.getById(transactionId);
       setTransaction(transactionData);
+
+      // Fetch converted prices if currency is not INR
+      if (currency !== 'INR') {
+        const allProducts = await currencyAPI.getProductsInCurrency(currency);
+        const priceMap: { [key: string]: number } = {};
+        allProducts.forEach((product: any) => {
+          priceMap[product.product_id] = product.discounted_price;
+        });
+        setConvertedPrices(priceMap);
+      } else {
+        setConvertedPrices({});
+      }
     } catch (error) {
       console.error('Failed to fetch transaction:', error);
       alert('Failed to load transaction details');
@@ -141,9 +156,9 @@ function CheckoutContent() {
                     <p className="text-sm text-gray-600">Quantity: {item.quantity}</p>
                   </div>
                   <div className="text-right">
-                    <p className="font-medium">${item.discounted_price}</p>
+                    <p className="font-medium">{currencySymbol}{(convertedPrices[item.product_id] || item.discounted_price).toFixed(2)}</p>
                     <p className="text-sm text-gray-600">
-                      ${(Number(item.discounted_price) * item.quantity).toFixed(2)}
+                      {currencySymbol}{((convertedPrices[item.product_id] || Number(item.discounted_price)) * item.quantity).toFixed(2)}
                     </p>
                   </div>
                 </div>
@@ -155,7 +170,7 @@ function CheckoutContent() {
           <div className="border-t border-gray-200 mt-6 pt-4">
             <div className="flex justify-between text-xl font-bold">
               <span>Total:</span>
-              <span className="text-primary-600">${transaction.total_price}</span>
+              <span className="text-primary-600">{currencySymbol}{Object.keys(convertedPrices).length > 0 ? transaction.items.reduce((sum, item) => sum + (convertedPrices[item.product_id] || item.discounted_price) * item.quantity, 0).toFixed(2) : Number(transaction.total_price).toFixed(2)}</span>
             </div>
           </div>
         </div>

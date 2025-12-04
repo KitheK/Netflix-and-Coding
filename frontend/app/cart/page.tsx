@@ -3,17 +3,20 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Trash2, Plus, Minus } from 'lucide-react';
-import { cartAPI } from '@/lib/api';
-import { Cart, CartItem } from '@/types';
+import { cartAPI, currencyAPI } from '@/lib/api';
+import { Cart, CartItem, Product } from '@/types';
 import { useAuth } from '@/contexts/AuthContext';
+import { useCurrency } from '@/contexts/CurrencyContext';
 import Link from 'next/link';
 
 export default function CartPage() {
   const router = useRouter();
   const { user } = useAuth();
+  const { currency, currencySymbol } = useCurrency();
   const [cart, setCart] = useState<Cart | null>(null);
   const [loading, setLoading] = useState(true);
   const [checkingOut, setCheckingOut] = useState(false);
+  const [convertedPrices, setConvertedPrices] = useState<{ [key: string]: number }>({});
 
   useEffect(() => {
     if (!user) {
@@ -21,7 +24,7 @@ export default function CartPage() {
       return;
     }
     fetchCart();
-  }, [user]);
+  }, [user, currency]);
 
   const fetchCart = async () => {
     if (!user) return;
@@ -29,6 +32,21 @@ export default function CartPage() {
     try {
       const cartData = await cartAPI.getCart(user.user_id);
       setCart(cartData);
+      
+      // Fetch converted prices if currency is not INR
+      if (currency !== 'INR' && cartData.items.length > 0) {
+        const allProducts = await currencyAPI.getProductsInCurrency(currency);
+        const priceMap: { [key: string]: number } = {};
+        cartData.items.forEach((item: CartItem) => {
+          const converted = allProducts.find((p: Product) => p.product_id === item.product_id);
+          if (converted) {
+            priceMap[item.product_id] = converted.discounted_price;
+          }
+        });
+        setConvertedPrices(priceMap);
+      } else {
+        setConvertedPrices({});
+      }
     } catch (error) {
       console.error('Failed to fetch cart:', error);
     } finally {
@@ -63,6 +81,8 @@ export default function CartPage() {
     setCheckingOut(true);
     try {
       const response = await cartAPI.checkout(user.user_id);
+      // Dispatch cart update event to update navbar badge
+      window.dispatchEvent(new Event('cartUpdated'));
       router.push(`/checkout?transaction_id=${response.transaction.transaction_id}`);
     } catch (error: any) {
       console.error('Failed to checkout:', error);
@@ -136,7 +156,7 @@ export default function CartPage() {
                       {item.product_name}
                     </Link>
                     <p className="text-lg font-bold text-gray-900 mb-4">
-                      ${item.discounted_price}
+                      {currencySymbol}{convertedPrices[item.product_id] || item.discounted_price}
                     </p>
 
                     {/* Quantity Controls */}
@@ -170,7 +190,7 @@ export default function CartPage() {
                   {/* Item Total */}
                   <div className="text-right">
                     <p className="text-lg font-bold text-gray-900">
-                      ${(Number(item.discounted_price) * item.quantity).toFixed(2)}
+                      {currencySymbol}{((convertedPrices[item.product_id] || Number(item.discounted_price)) * item.quantity).toFixed(2)}
                     </p>
                   </div>
                 </div>
@@ -186,7 +206,7 @@ export default function CartPage() {
               <div className="space-y-2 mb-4">
                 <div className="flex justify-between text-gray-600">
                   <span>Items ({cart.items.reduce((sum, item) => sum + item.quantity, 0)}):</span>
-                  <span>${cart.total_price}</span>
+                  <span>{currencySymbol}{Object.keys(convertedPrices).length > 0 ? cart.items.reduce((sum, item) => sum + (convertedPrices[item.product_id] || item.discounted_price) * item.quantity, 0).toFixed(2) : cart.total_price}</span>
                 </div>
                 <div className="flex justify-between text-gray-600">
                   <span>Shipping:</span>
@@ -197,7 +217,7 @@ export default function CartPage() {
               <div className="border-t border-gray-200 pt-4 mb-6">
                 <div className="flex justify-between text-xl font-bold">
                   <span>Total:</span>
-                  <span className="text-primary-600">${cart.total_price}</span>
+                  <span className="text-primary-600">{currencySymbol}{Object.keys(convertedPrices).length > 0 ? cart.items.reduce((sum, item) => sum + (convertedPrices[item.product_id] || item.discounted_price) * item.quantity, 0).toFixed(2) : cart.total_price}</span>
                 </div>
               </div>
 

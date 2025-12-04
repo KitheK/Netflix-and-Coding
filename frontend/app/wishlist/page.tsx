@@ -4,13 +4,15 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Trash2, ShoppingCart } from 'lucide-react';
-import { wishlistAPI, cartAPI, productAPI } from '@/lib/api';
+import { wishlistAPI, cartAPI, productAPI, currencyAPI } from '@/lib/api';
 import { Product } from '@/types';
 import { useAuth } from '@/contexts/AuthContext';
+import { useCurrency } from '@/contexts/CurrencyContext';
 
 export default function WishlistPage() {
   const router = useRouter();
   const { user } = useAuth();
+  const { currency, currencySymbol } = useCurrency();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -20,19 +22,29 @@ export default function WishlistPage() {
       return;
     }
     fetchWishlist();
-  }, [user]);
+  }, [user, currency]);
 
   const fetchWishlist = async () => {
     if (!user) return;
     setLoading(true);
     try {
       const wishlistData = await wishlistAPI.getWishlist(user.user_id);
-      // Fetch full product details for each wishlist item
-      const productPromises = wishlistData.map((id: string) =>
-        productAPI.getById(id)
-      );
-      const productsData = await Promise.all(productPromises);
-      setProducts(productsData);
+      
+      // Fetch products with currency conversion if needed
+      if (currency !== 'INR') {
+        const allProducts = await currencyAPI.getProductsInCurrency(currency);
+        const productsData = wishlistData
+          .map((id: string) => allProducts.find((p: Product) => p.product_id === id))
+          .filter((p: Product | undefined) => p !== undefined);
+        setProducts(productsData);
+      } else {
+        // Fetch full product details for each wishlist item
+        const productPromises = wishlistData.map((id: string) =>
+          productAPI.getById(id)
+        );
+        const productsData = await Promise.all(productPromises);
+        setProducts(productsData);
+      }
     } catch (error) {
       console.error('Failed to fetch wishlist:', error);
     } finally {
@@ -123,7 +135,7 @@ export default function WishlistPage() {
                     {/* Price */}
                     <div className="flex items-center gap-2 mb-4">
                       <span className="text-xl font-bold text-gray-900">
-                        ${product.discounted_price}
+                        {currencySymbol}{product.discounted_price}
                       </span>
                       {product.discount_percentage > 0 && (
                         <span className="text-sm font-medium text-green-600">
