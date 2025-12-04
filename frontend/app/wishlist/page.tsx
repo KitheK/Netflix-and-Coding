@@ -7,10 +7,12 @@ import { Trash2, ShoppingCart } from 'lucide-react';
 import { wishlistAPI, cartAPI, productAPI } from '@/lib/api';
 import { Product } from '@/types';
 import { useAuth } from '@/contexts/AuthContext';
+import { useCurrency, formatPrice, convertPrice } from '@/contexts/CurrencyContext';
 
 export default function WishlistPage() {
   const router = useRouter();
   const { user } = useAuth();
+  const { currency, exchangeRate } = useCurrency();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -123,7 +125,12 @@ export default function WishlistPage() {
                     {/* Price */}
                     <div className="flex items-center gap-2 mb-4">
                       <span className="text-xl font-bold text-gray-900">
-                        ${product.discounted_price}
+                        {formatPrice(
+                          (product as any).currency && (product as any).currency === currency
+                            ? product.discounted_price
+                            : convertPrice(product.discounted_price, exchangeRate),
+                          currency
+                        )}
                       </span>
                       {product.discount_percentage > 0 && (
                         <span className="text-sm font-medium text-green-600">

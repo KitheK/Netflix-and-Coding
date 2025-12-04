@@ -7,11 +7,13 @@ import { CheckCircle } from 'lucide-react';
 import { transactionAPI } from '@/lib/api';
 import { Transaction } from '@/types';
 import { useAuth } from '@/contexts/AuthContext';
+import { useCurrency, formatPrice, convertPrice } from '@/contexts/CurrencyContext';
 
 function CheckoutContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user } = useAuth();
+  const { currency, exchangeRate } = useCurrency();
   const transactionId = searchParams.get('transaction_id');
 
   const [transaction, setTransaction] = useState<Transaction | null>(null);
@@ -141,9 +143,14 @@ function CheckoutContent() {
                     <p className="text-sm text-gray-600">Quantity: {item.quantity}</p>
                   </div>
                   <div className="text-right">
-                    <p className="font-medium">${item.discounted_price}</p>
+                    <p className="font-medium">
+                      {formatPrice(convertPrice(item.discounted_price, exchangeRate), currency)}
+                    </p>
                     <p className="text-sm text-gray-600">
-                      ${(Number(item.discounted_price) * item.quantity).toFixed(2)}
+                      {formatPrice(
+                        convertPrice(item.discounted_price, exchangeRate) * item.quantity,
+                        currency
+                      )}
                     </p>
                   </div>
                 </div>
@@ -155,7 +162,9 @@ function CheckoutContent() {
           <div className="border-t border-gray-200 mt-6 pt-4">
             <div className="flex justify-between text-xl font-bold">
               <span>Total:</span>
-              <span className="text-primary-600">${transaction.total_price}</span>
+              <span className="text-primary-600">
+                {formatPrice(convertPrice(transaction.total_price, exchangeRate), currency)}
+              </span>
             </div>
           </div>
         </div>

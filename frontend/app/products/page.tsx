@@ -5,31 +5,21 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { productAPI, currencyAPI } from '@/lib/api';
 import { Product } from '@/types';
 import ProductCard from '@/components/ProductCard';
+import { useCurrency } from '@/contexts/CurrencyContext';
 
 function ProductsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const searchQuery = searchParams.get('search');
+  const { currency, setCurrency } = useCurrency();
 
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState(''); // Default to no sorting (natural order)
-  const [currency, setCurrency] = useState('INR'); // Default to INR (rupees)
-  const [currencySymbol, setCurrencySymbol] = useState('₹');
   
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 50;
-
-  useEffect(() => {
-    // Get currency from localStorage or default to INR
-    const savedCurrency = localStorage.getItem('currency');
-    if (savedCurrency) {
-      setCurrency(savedCurrency);
-      updateCurrencySymbol(savedCurrency);
-    }
-    // If no saved currency, keep default INR (already set in useState)
-  }, []);
 
   useEffect(() => {
     fetchProducts();
@@ -39,17 +29,6 @@ function ProductsContent() {
     // Reset to page 1 when filters change
     setCurrentPage(1);
   }, [searchQuery, sortBy, currency]);
-
-  const updateCurrencySymbol = (curr: string) => {
-    const symbols: { [key: string]: string } = {
-      'INR': '₹',
-      'USD': '$',
-      'CAD': '$',
-      'EUR': '€',
-      'GBP': '£',
-    };
-    setCurrencySymbol(symbols[curr] || curr);
-  };
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -113,9 +92,7 @@ function ProductsContent() {
   };
 
   const handleCurrencyChange = (newCurrency: string) => {
-    setCurrency(newCurrency);
-    localStorage.setItem('currency', newCurrency);
-    updateCurrencySymbol(newCurrency);
+    setCurrency(newCurrency as 'INR' | 'USD' | 'CAD' | 'EUR' | 'GBP');
   };
 
   const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {

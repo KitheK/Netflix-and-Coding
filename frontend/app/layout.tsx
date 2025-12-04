@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { CurrencyProvider } from "@/contexts/CurrencyContext";
 import Navbar from "@/components/Navbar";
 
 export const metadata: Metadata = {
@@ -17,10 +18,12 @@ export default function RootLayout({
     <html lang="en">
       <body className="antialiased">
         <AuthProvider>
-          <Navbar />
-          <main className="min-h-screen">
-            {children}
-          </main>
+          <CurrencyProvider>
+            <Navbar />
+            <main className="min-h-screen">
+              {children}
+            </main>
+          </CurrencyProvider>
         </AuthProvider>
       </body>
     </html>

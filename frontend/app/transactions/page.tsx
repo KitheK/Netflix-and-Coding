@@ -6,10 +6,12 @@ import Link from 'next/link';
 import { transactionAPI, refundAPI } from '@/lib/api';
 import { Transaction, Refund } from '@/types';
 import { useAuth } from '@/contexts/AuthContext';
+import { useCurrency, formatPrice, convertPrice } from '@/contexts/CurrencyContext';
 
 export default function TransactionsPage() {
   const router = useRouter();
   const { user } = useAuth();
+  const { currency, exchangeRate } = useCurrency();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [refunds, setRefunds] = useState<Refund[]>([]);
   const [loading, setLoading] = useState(true);
@@ -173,7 +175,7 @@ export default function TransactionsPage() {
                             {item.product_name}
                           </Link>
                           <p className="text-sm text-gray-600">
-                            Quantity: {item.quantity} × ${item.discounted_price}
+                            Quantity: {item.quantity} × {formatPrice(convertPrice(item.discounted_price, exchangeRate), currency)}
                           </p>
                         </div>
                       </div>
@@ -184,7 +186,9 @@ export default function TransactionsPage() {
                   <div className="border-t border-gray-200 pt-4 flex justify-between items-center">
                     <div>
                       <p className="text-sm text-gray-600">Total</p>
-                      <p className="text-xl font-bold text-gray-900">${transaction.total_price}</p>
+                      <p className="text-xl font-bold text-gray-900">
+                        {formatPrice(convertPrice(transaction.total_price, exchangeRate), currency)}
+                      </p>
                     </div>
                     <div>
                       {refund ? (
@@ -233,7 +237,7 @@ export default function TransactionsPage() {
                     Order #{selectedTransaction.transaction_id}
                   </p>
                   <p className="text-lg font-bold text-gray-900 mb-4">
-                    Total: ${selectedTransaction.total_price}
+                    Total: {formatPrice(convertPrice(selectedTransaction.total_price, exchangeRate), currency)}
                   </p>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Reason for refund:

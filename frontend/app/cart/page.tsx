@@ -6,11 +6,13 @@ import { Trash2, Plus, Minus } from 'lucide-react';
 import { cartAPI } from '@/lib/api';
 import { Cart, CartItem } from '@/types';
 import { useAuth } from '@/contexts/AuthContext';
+import { useCurrency, formatPrice, convertPrice } from '@/contexts/CurrencyContext';
 import Link from 'next/link';
 
 export default function CartPage() {
   const router = useRouter();
   const { user } = useAuth();
+  const { currency, exchangeRate } = useCurrency();
   const [cart, setCart] = useState<Cart | null>(null);
   const [loading, setLoading] = useState(true);
   const [checkingOut, setCheckingOut] = useState(false);
@@ -136,7 +138,7 @@ export default function CartPage() {
                       {item.product_name}
                     </Link>
                     <p className="text-lg font-bold text-gray-900 mb-4">
-                      ${item.discounted_price}
+                      {formatPrice(convertPrice(item.discounted_price, exchangeRate), currency)}
                     </p>
 
                     {/* Quantity Controls */}
@@ -170,7 +172,10 @@ export default function CartPage() {
                   {/* Item Total */}
                   <div className="text-right">
                     <p className="text-lg font-bold text-gray-900">
-                      ${(Number(item.discounted_price) * item.quantity).toFixed(2)}
+                      {formatPrice(
+                        convertPrice(item.discounted_price, exchangeRate) * item.quantity,
+                        currency
+                      )}
                     </p>
                   </div>
                 </div>
@@ -186,7 +191,7 @@ export default function CartPage() {
               <div className="space-y-2 mb-4">
                 <div className="flex justify-between text-gray-600">
                   <span>Items ({cart.items.reduce((sum, item) => sum + item.quantity, 0)}):</span>
-                  <span>${cart.total_price}</span>
+                  <span>{formatPrice(convertPrice(cart.total_price, exchangeRate), currency)}</span>
                 </div>
                 <div className="flex justify-between text-gray-600">
                   <span>Shipping:</span>
@@ -197,7 +202,9 @@ export default function CartPage() {
               <div className="border-t border-gray-200 pt-4 mb-6">
                 <div className="flex justify-between text-xl font-bold">
                   <span>Total:</span>
-                  <span className="text-primary-600">${cart.total_price}</span>
+                  <span className="text-primary-600">
+                    {formatPrice(convertPrice(cart.total_price, exchangeRate), currency)}
+                  </span>
                 </div>
               </div>
 
