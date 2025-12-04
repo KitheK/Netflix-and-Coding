@@ -7,8 +7,20 @@ Fraser Muller
 Harrison Kayihura
 
     Installation Instructions: Step-by-step setup procedures for running the system using Docker:
-Since we are containerized, running the system using docker requires a few steps. Assuming you have Docker desktop. You must then run the following commands:
-ENTER COMMANDS HERE
+Since we are containerized, running the system using docker requires a few steps. Only assuming you have Docker desktop, here are some instructions to install the program, please make sure you are running commands in terminal and have the correct GitHub directory.
+Step 1, first clone and enter directory:
+git clone https://github.com/KitheK/Netflix-and-Coding.git
+cd Netflix-and-Coding
+
+Step 2, Checkout main branch (there by default):
+git checkout main
+
+Step 3, Build and Start Everything (first time), this will start up both the containerized front and backend:
+docker compose up --build https://github.com/KitheK/Netflix-and-Coding
+
+Step 4, Shutting down the program:
+docker compose down
+
 
     Dependencies: A complete list of required tools, libraries, and services (with version details):
 For a full list of requirements for the system, please see requirements.txt . We recommend running:
