@@ -168,6 +168,12 @@ export const reviewsAPI = {
       throw error;
     }
   },
+  getAll: async (token: string): Promise<(Review & { product_id: string })[]> => {
+    const response = await api.get('/reviews/admin/all', {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  },
   add: async (productId: string, userId: string, userName: string, reviewTitle: string, reviewContent: string) => {
     const response = await api.post(`/reviews/${productId}`, {
       user_id: userId,

@@ -105,18 +105,18 @@ export default function ProductCarousel({ products, title = 'Deals of the Day' }
                   </Link>
 
                   {/* Product Details */}
-                  <div className="w-full md:w-1/2 bg-white p-4 md:p-8 flex flex-col justify-center">
-                    <div className="mb-4">
-                      <span className="inline-block px-3 py-1 bg-red-100 text-red-700 text-sm font-semibold rounded-full">
+                  <div className="w-full md:w-1/2 bg-white p-4 md:p-8 flex flex-col justify-center overflow-hidden">
+                    <div className="mb-4 flex-shrink-0">
+                      <span className="inline-block px-3 py-1 bg-red-100 text-red-700 text-sm font-semibold rounded-full whitespace-nowrap">
                         {product.discount_percentage}% OFF
                       </span>
                     </div>
-                    <h3 className="text-xl md:text-3xl font-bold text-gray-900 mb-4 line-clamp-2">
+                    <h3 className="text-xl md:text-3xl font-bold text-gray-900 mb-4 break-words overflow-wrap-anywhere">
                       {product.product_name}
                     </h3>
-                    <div className="flex items-center mb-4">
-                      <div className="flex items-center bg-yellow-50 px-3 py-1.5 rounded-lg">
-                        <Star className="h-5 w-5 text-yellow-400 fill-yellow-400" />
+                    <div className="flex items-center mb-4 flex-shrink-0">
+                      <div className="flex items-center bg-yellow-50 px-3 py-1.5 rounded-lg whitespace-nowrap">
+                        <Star className="h-5 w-5 text-yellow-400 fill-yellow-400 flex-shrink-0" />
                         <span className="ml-2 text-sm font-medium text-gray-700">
                           {product.rating || 0}
                         </span>
@@ -125,29 +125,29 @@ export default function ProductCarousel({ products, title = 'Deals of the Day' }
                         </span>
                       </div>
                     </div>
-                    <div className="mb-6">
-                      <div className="flex items-baseline space-x-3 mb-2">
-                        <span className="text-2xl md:text-4xl font-bold text-gray-900">
+                    <div className="mb-6 flex-shrink-0">
+                      <div className="flex items-baseline flex-wrap gap-2 mb-2">
+                        <span className="text-2xl md:text-4xl font-bold text-gray-900 whitespace-nowrap">
                           {formatPrice(product.discounted_price || 0, symbol)}
                         </span>
                         {product.discount_percentage > 0 && (
-                          <span className="text-lg md:text-xl text-gray-500 line-through">
+                          <span className="text-lg md:text-xl text-gray-500 line-through whitespace-nowrap">
                             {formatPrice(product.actual_price || 0, symbol)}
                           </span>
                         )}
                       </div>
                       {product.discount_percentage > 0 && (
-                        <p className="text-sm text-green-600 font-medium">
+                        <p className="text-sm text-green-600 font-medium whitespace-nowrap">
                           You save {formatPrice((product.actual_price || 0) - (product.discounted_price || 0), symbol)}
                         </p>
                       )}
                     </div>
-                    <p className="text-gray-600 text-sm line-clamp-3 mb-6">
+                    <p className="text-gray-600 text-sm mb-6 line-clamp-3 break-words overflow-wrap-anywhere min-h-[3.75rem]">
                       {product.about_product}
                     </p>
                     <Link
                       href={`/products/${product.product_id}`}
-                      className="w-full bg-primary-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-primary-700 transition-colors shadow-md hover:shadow-lg text-center block"
+                      className="w-full bg-primary-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-primary-700 transition-colors shadow-md hover:shadow-lg text-center block flex-shrink-0"
                     >
                       View Details
                     </Link>

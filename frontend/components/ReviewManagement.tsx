@@ -26,23 +26,17 @@ export default function ReviewManagement({ token }: ReviewManagementProps) {
       const productsData = await productsAPI.getAll();
       setProducts(productsData);
 
-      // Fetch reviews for all products
-      const allReviews: Array<Review & { product_id: string; product_name: string }> = [];
+      // Fetch all reviews using admin endpoint
+      const allReviewsData = await reviewsAPI.getAll(token);
       
-      for (const product of productsData) {
-        try {
-          const productReviews = await reviewsAPI.getByProduct(product.product_id);
-          productReviews.forEach((review: Review) => {
-            allReviews.push({
-              ...review,
-              product_id: product.product_id,
-              product_name: product.product_name,
-            });
-          });
-        } catch (error) {
-          // Product has no reviews, skip
-        }
-      }
+      // Map product_id to product_name
+      const productMap = new Map(productsData.map(p => [p.product_id, p.product_name]));
+      
+      const allReviews: Array<Review & { product_id: string; product_name: string }> = 
+        allReviewsData.map((review: Review & { product_id: string }) => ({
+          ...review,
+          product_name: productMap.get(review.product_id) || 'Unknown Product',
+        }));
 
       setReviews(allReviews);
     } catch (error) {

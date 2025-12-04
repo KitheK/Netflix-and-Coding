@@ -8,14 +8,14 @@ import { useCurrency } from '@/contexts/CurrencyContext';
 import type { Product, Review } from '@/types';
 import Navbar from '@/components/Navbar';
 import Image from 'next/image';
-import { Star, ShoppingCart, Heart, Plus, Minus } from 'lucide-react';
+import { Star, ShoppingCart, Heart, Plus, Minus, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { formatPrice } from '@/lib/currency';
 
 export default function ProductDetailPage() {
   const params = useParams();
   const productId = params.id as string;
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const { currency, symbol } = useCurrency();
   const router = useRouter();
   const [product, setProduct] = useState<Product | null>(null);
@@ -117,6 +117,19 @@ export default function ProductDetailPage() {
       loadReviews();
     } catch (error: any) {
       alert(error.response?.data?.detail || 'Failed to submit review. Make sure you have purchased this product.');
+    }
+  };
+
+  const handleDeleteReview = async (reviewId: string) => {
+    if (!user || !isAdmin) return;
+    if (!confirm('Are you sure you want to delete this review?')) return;
+    
+    try {
+      await reviewsAPI.delete(productId, reviewId, user.user_token);
+      loadReviews(); // Reload reviews after deletion
+    } catch (error: any) {
+      alert('Failed to delete review');
+      console.error('Failed to delete review:', error);
     }
   };
 
@@ -292,11 +305,24 @@ export default function ProductDetailPage() {
             ) : (
               reviews.map((review) => (
                 <div key={review.review_id} className="border-b pb-4">
-                  <div className="flex items-center mb-2">
-                    <h4 className="font-semibold text-gray-900">{review.review_title}</h4>
-                    <span className="ml-2 text-sm text-gray-600">by {review.user_name}</span>
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1">
+                      <div className="flex items-center mb-2">
+                        <h4 className="font-semibold text-gray-900">{review.review_title}</h4>
+                        <span className="ml-2 text-sm text-gray-600">by {review.user_name}</span>
+                      </div>
+                      <p className="text-gray-700 whitespace-pre-wrap">{review.review_content}</p>
+                    </div>
+                    {isAdmin && user && (
+                      <button
+                        onClick={() => handleDeleteReview(review.review_id)}
+                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors flex-shrink-0"
+                        title="Delete review (Admin only)"
+                      >
+                        <Trash2 className="h-5 w-5" />
+                      </button>
+                    )}
                   </div>
-                  <p className="text-gray-700">{review.review_content}</p>
                 </div>
               ))
             )}

@@ -53,6 +53,23 @@ class ReviewService:
         # Convert dict data to Review objects
         return [Review(**review) for review in product_reviews]
     
+    def get_all_reviews(self) -> List[dict]:
+        """
+        Get all reviews across all products for admin moderation.
+        Returns a list of reviews with product_id included.
+        """
+        all_reviews = self.review_repository.get_all()
+        result = []
+        
+        # Flatten the structure: convert from {product_id: [reviews]} to [{product_id, ...review}]
+        for product_id, reviews in all_reviews.items():
+            for review in reviews:
+                review_with_product = review.copy()
+                review_with_product['product_id'] = product_id
+                result.append(review_with_product)
+        
+        return result
+    
     def add_review(self, product_id: str, review_req: AddReviewRequest) -> Review:
         """Add a review if the user has purchased the product"""
         

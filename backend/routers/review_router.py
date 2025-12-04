@@ -46,6 +46,20 @@ async def add_review_for_product(product_id: str, review_req: AddReviewRequest):
     return new_review
 
 
+# ADMIN ONLY: Get all reviews across all products for moderation
+@router.get("/admin/all", response_model=List[dict])
+async def admin_get_all_reviews(
+    current_user=Depends(admin_required_dep)
+):
+    """
+    Admin-only: Get all reviews across all products for moderation.
+    - Requires admin privileges (enforced by admin_required_dep)
+    - Returns list of reviews with product_id included
+    """
+    reviews = review_service.get_all_reviews()
+    return reviews
+
+
 # ADMIN ONLY: Delete a review by product_id and review_id
 @router.delete("/{product_id}/{review_id}")
 async def admin_delete_review(
