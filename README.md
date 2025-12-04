@@ -1,50 +1,148 @@
-Welcome to COSC310 Netflix & Coding Online Web Shopping Platform! We hope you find this system useful and efficient.
+# COSC310 Netflix & Coding Online Web Shopping Platform
 
-Team Members:
-Kithe Kisia
-Coran McColm 
-Fraser Muller
-Harrison Kayihura
+A containerized web shopping platform developed As the Main project for COSC 310
 
-    Installation Instructions: Step-by-step setup procedures for running the system using Docker:
-Since we are containerized, running the system using docker requires a few steps. Only assuming you have Docker desktop, here are some instructions to install the program, please make sure you are running commands in terminal and have the correct GitHub directory.
-Step 1, first clone and enter directory:
+## Team Members
+
+- Kithe Kisia
+- Coran McColm
+- Fraser Muller
+- Harrison Kayihura
+
+## Installation Instructions
+
+The system is fully containerized and requires Docker Desktop to run. Follow these steps to set up and run the application.
+
+### Prerequisites
+
+- Docker Desktop installed on your system
+- Git installed on your system
+- Terminal or command prompt access
+
+### Setup Steps
+
+**Step 1: Clone the Repository**
+
+```bash
 git clone https://github.com/KitheK/Netflix-and-Coding.git
 cd Netflix-and-Coding
+```
 
-Step 2, Checkout main branch (there by default):
+**Step 2: Checkout Main Branch**
+
+The main branch is checked out by default, but you can verify with:
+
+```bash
 git checkout main
+```
 
-Step 3, Build and Start Everything (first time), this will start up both the containerized front and backend:
-docker compose up --build https://github.com/KitheK/Netflix-and-Coding
+**Step 3: Build and Start the Application**
 
-Step 4, Shutting down the program:
+This command will build and start both the frontend and backend containers:
+
+```bash
+docker compose up --build
+```
+
+**Step 4: Stopping the Application**
+
+To shut down the system:
+
+```bash
 docker compose down
+```
 
+## Dependencies
 
-    Dependencies: A complete list of required tools, libraries, and services (with version details):
-For a full list of requirements for the system, please see requirements.txt . We recommend running:
-pip3 install -r "requirements.txt"
-upon loading into a virtual environment to ensure no conflicting packages and minimal running package load. Instructions for how to initialize a virtual environment depend on your operating system and are outside the scope of this handoff.
+A complete list of required packages and libraries is available in `requirements.txt`.
 
-        Maintenance Requirements: Details on ongoing maintenance, including:
+### Setting Up a Virtual Environment (Optional)
 
-    Account credentials (if applicable):
-Admin user login details:
-email:admin@example.com
-password:AdminPass1
-The user dashboard/account can be switched to using the login feature - once logged out, when you try to process an add to cart or add to feature process, you will be prompted to login.
-Example User login credentials:
-email:user@gmail.com
-password:User@123.com
+If you prefer to run the application outside of Docker, we recommend using a virtual environment to avoid package conflicts:
 
-    Database management procedures:
-In our systems configuration, all read and writes from or two any of our JSON files includle checks for duplicates and safety checks for removals. We recommend using the built in functions to create or remove any data entries from the database. However, if you wish to add entries manually, please follow the HashMap/Dict structure of the files. We have a key (either the product or user code depending) which relates to data entries 'under' the umbrella of what the key represents. This changed depending on case but is evident when reading the file with this given background knowledge.
+```bash
+pip3 install -r requirements.txt
+```
 
-    Configuration of external APIs or service:
-We have used two External APIs in the development.
+Note: Instructions for initializing a virtual environment vary by operating system and are outside the scope of this documentation.
 
-Base Currency Layer for currency conversion: "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/{base_currency_lower}.json"
-This layer is configured in the external files (ie external_service, external_router etc.). The way it works is first we call through this API to return the most recent exchange rate. Once this function has executed we then call a price conversion function using this previously obtained conversion rate to calculate local prices. We have shortened the available currencies to GBP CAD EUR USD, from the data native Rupees.
+## Account Credentials
 
-Image Scaper: Creates a mimick request to amazon, finding the necessary image from a provided product link from the database. From this image, the scaper obtains the URL landing image which is transfered back into the database to refresh the image. The scraper is configured in two parts: image_scraper_service to do the work and admin router.post where we require ADMIN permissions to request all photo refreshes. This is largely beneficial as amazon natively has an image expiry. Our approach navigates around this.
+### Administrator Account
+
+- **Email:** admin@example.com
+- **Password:** AdminPass1
+
+### Example User Account
+
+- **Email:** user@gmail.com
+- **Password:** User@123.com
+
+### Switching Accounts
+
+You can switch between user accounts using the login feature. When logged out, attempting to add items to your cart or favorites will prompt you to log in.
+
+## Maintenance Requirements
+
+### Database Management
+
+The system uses JSON files for data storage. All read and write operations include built-in duplicate checks and safety validations.
+
+#### Recommended Approach
+
+Use the built-in functions provided by the system to create or remove database entries.
+
+#### Manual Data Entry
+
+If you need to manually edit the JSON files, follow these guidelines:
+
+- The database uses a HashMap/Dictionary structure
+- Each file uses a key (either product code or user code) that maps to related data entries
+- The key serves as an umbrella for all associated data
+- Review the file structure carefully before making manual changes to understand the specific schema
+
+### External APIs and Services
+
+The system integrates two external APIs:
+
+#### 1. Currency Conversion API
+
+**Endpoint:** `https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/{base_currency_lower}.json`
+
+**Implementation:**
+- Configured in external service files (`external_service`, `external_router`)
+- Retrieves the most recent exchange rates
+- Converts prices from native Rupees to target currencies
+- Supported currencies: GBP, CAD, EUR, USD
+
+**Workflow:**
+1. API call retrieves current exchange rate
+2. Price conversion function applies the rate to calculate local prices
+
+#### 2. Image Scraper
+
+**Purpose:** Automatically refreshes product images to avoid Amazon's native image expiry.
+
+**Implementation:**
+- **Service Layer:** `image_scraper_service` handles the scraping logic
+- **API Endpoint:** `admin_router.post` (requires administrator permissions)
+
+**Functionality:**
+- Creates a mimicked request to Amazon using product links from the database
+- Extracts the URL of the landing page image
+- Updates the database with the new image URL
+- Requires admin permissions to request image refreshes for all products
+
+**Workflow:**
+1. Scraper retrieves product link from database
+2. Mimics request to Amazon product page
+3. Extracts current image URL
+4. Updates database with refreshed image link
+
+## Repository
+
+GitHub: [https://github.com/KitheK/Netflix-and-Coding](https://github.com/KitheK/Netflix-and-Coding)
+
+## Support
+
+For issues or questions, please refer to the repository's issue tracker or contact the development team.
