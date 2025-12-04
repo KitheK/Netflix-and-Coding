@@ -14,5 +14,13 @@
     "password_hash": "$2b$12$pNaCctPqFzTnbn4XbhqlyuF520KRlpIMQyhE5ZTaViiGDCzqVsHFW",
     "role": "customer",
     "user_token": "p26qpkNUF4NAq6TlVAmIf65bQuVP"
+  },
+  {
+    "user_id": "a9ad0b57-a1bc-4919-b724-d1a54505e439",
+    "name": "testubc",
+    "email": "kaksk@gmail.com",
+    "password_hash": "$2b$12$U/RCnvijhaHtapuhY4GaIuXy.eWyCtFGU.8.pnQl6QhGoP78c6DAK",
+    "role": "customer",
+    "user_token": "Cwb2TLiTujfZMAyhDUuo2teVnB02"
   }
 ]
