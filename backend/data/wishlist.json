@@ -1,4 +1,12 @@
 {
-  "user_id1": ["product1", "product2"],
-  "user_id2": ["product3"]
+  "user_id1": [
+    "product1",
+    "product2"
+  ],
+  "user_id2": [
+    "product3"
+  ],
+  "428391c9-ec68-4a25-9d66-0580cec3ce6a": [
+    "B08HDJ86NZ"
+  ]
 }
