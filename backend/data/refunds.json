@@ -43,5 +43,14 @@
     "status": "approved",
     "created_at": "2025-12-04T10:12:33.057054",
     "updated_at": "2025-12-04T10:12:45.085243"
+  },
+  {
+    "refund_id": "71f83598-299a-447f-849e-3b68bf9e8cd0",
+    "transaction_id": "c46e0b79-7826-456c-bdce-6dd3c6925455",
+    "user_id": "ae993132-12a6-40c6-a91a-3fe889d95edd",
+    "message": "doesnt work",
+    "status": "pending",
+    "created_at": "2025-12-04T20:46:11.739573",
+    "updated_at": null
   }
 ]

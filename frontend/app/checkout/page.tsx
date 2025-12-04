@@ -13,7 +13,7 @@ function CheckoutContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user } = useAuth();
-  const { currency, exchangeRate } = useCurrency();
+  const { currency, currencySymbol, exchangeRate } = useCurrency();
   const transactionId = searchParams.get('transaction_id');
 
   const [transaction, setTransaction] = useState<Transaction | null>(null);
@@ -144,7 +144,7 @@ function CheckoutContent() {
                   </div>
                   <div className="text-right">
                     <p className="font-medium">
-                      {formatPrice(convertPrice(item.discounted_price, exchangeRate), currency)}
+                      {formatPrice(convertPrice(item.discounted_price, exchangeRate), currencySymbol)}
                     </p>
                     <p className="text-sm text-gray-600">
                       {formatPrice(
@@ -163,7 +163,7 @@ function CheckoutContent() {
             <div className="flex justify-between text-xl font-bold">
               <span>Total:</span>
               <span className="text-primary-600">
-                {formatPrice(convertPrice(transaction.total_price, exchangeRate), currency)}
+                {formatPrice(convertPrice(transaction.total_price, exchangeRate), currencySymbol)}
               </span>
             </div>
           </div>

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { BarChart3, TrendingUp, Users, DollarSign, Package, AlertTriangle, ShoppingBag } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
-import { metricsAPI } from '@/lib/api';
+import { metricsAPI, currencyAPI } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCurrency, formatPrice, convertPrice } from '@/contexts/CurrencyContext';
 
@@ -103,11 +103,12 @@ const COLORS = [
 export default function AdminMetricsPage() {
   const router = useRouter();
   const { user, isAdmin, loading } = useAuth();
-  const { currency, exchangeRate } = useCurrency();
+  const { currency, currencySymbol, exchangeRate } = useCurrency();
   const [categoryMetrics, setCategoryMetrics] = useState<CategoryMetrics | null>(null);
   const [chartData, setChartData] = useState<ChartData | null>(null);
   const [anomalies, setAnomalies] = useState<Anomalies | null>(null);
   const [userMetrics, setUserMetrics] = useState<UserMetrics | null>(null);
+  const [convertedPrices, setConvertedPrices] = useState<{ [key: string]: number }>({});
   const [loadingData, setLoadingData] = useState(true);
 
   useEffect(() => {
@@ -121,7 +122,7 @@ export default function AdminMetricsPage() {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, isAdmin, loading]);
+  }, [user, isAdmin, loading, currency]);
 
   const fetchMetrics = async () => {
     setLoadingData(true);
@@ -216,7 +217,7 @@ export default function AdminMetricsPage() {
                   <DollarSign className="w-6 h-6 text-green-600" />
                 </div>
                 <span className="text-2xl font-bold text-gray-900">
-                  {formatPrice(convertPrice(categoryMetrics.summary.total_revenue, exchangeRate), currency)}
+                  {currencySymbol}{(categoryMetrics.summary.total_revenue * exchangeRate).toFixed(2)}
                 </span>
               </div>
               <h3 className="text-gray-600 font-medium">Total Revenue</h3>
@@ -295,8 +296,6 @@ export default function AdminMetricsPage() {
               <div className="space-y-3">
                 {chartData.category_distribution.map((category, index) => {
                   const maxRevenue = chartData.category_distribution[0]?.revenue || 1;
-                  const convertedRevenue = convertPrice(category.revenue, exchangeRate);
-                  const convertedMaxRevenue = convertPrice(maxRevenue, exchangeRate);
                   
                   return (
                     <div key={index} className="flex items-center gap-3">
@@ -306,7 +305,7 @@ export default function AdminMetricsPage() {
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-gray-900 truncate">{category.category}</p>
                         <p className="text-xs text-gray-500">
-                          {formatPrice(convertedRevenue, currency)} ({category.percentage.toFixed(1)}%)
+                          {formatPrice(convertPrice(category.revenue, exchangeRate), currencySymbol)} ({category.percentage.toFixed(1)}%)
                         </p>
                       </div>
                       <div className="flex-shrink-0">
@@ -418,7 +417,7 @@ export default function AdminMetricsPage() {
                         {category}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {formatPrice(convertPrice(data.total_revenue, exchangeRate), currency)}
+                        {currencySymbol}{(data.total_revenue * exchangeRate).toFixed(2)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {data.transaction_count}
@@ -562,13 +561,13 @@ export default function AdminMetricsPage() {
                   <div>
                     <p className="text-sm text-gray-600 mb-1">Average Spending per User</p>
                     <p className="text-2xl font-bold text-gray-900">
-                      {formatPrice(convertPrice(userMetrics.engagement.average_spending_per_user, exchangeRate), currency)}
+                      {formatPrice(convertPrice(userMetrics.engagement.average_spending_per_user, exchangeRate), currencySymbol)}
                     </p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-600 mb-1">Total User Spending</p>
-                    <p className="text-2xl font-bold text-primary-600">
-                      {formatPrice(convertPrice(userMetrics.engagement.total_spending, exchangeRate), currency)}
+                    <p className="text-2xl font-bold text-gray-900">
+                      {currencySymbol}{(userMetrics.engagement.total_spending * exchangeRate).toFixed(2)}
                     </p>
                   </div>
                 </div>
@@ -611,7 +610,7 @@ export default function AdminMetricsPage() {
                             {customer.user_email}
                           </td>
                           <td className="px-4 py-3 whitespace-nowrap text-sm font-semibold text-gray-900">
-                            {formatPrice(convertPrice(customer.total_spending, exchangeRate), currency)}
+                            {currencySymbol}{(customer.total_spending * exchangeRate).toFixed(2)}
                           </td>
                           <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
                             {customer.transaction_count}

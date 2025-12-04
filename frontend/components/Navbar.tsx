@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ShoppingCart, Heart, Search, User, LogOut } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useCurrency, getCurrencySymbol } from '@/contexts/CurrencyContext';
+import { useCurrency } from '@/contexts/CurrencyContext';
 import { cartAPI, wishlistAPI } from '@/lib/api';
 
 const Navbar = () => {

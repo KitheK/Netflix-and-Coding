@@ -11,7 +11,7 @@ import { useCurrency, formatPrice, convertPrice } from '@/contexts/CurrencyConte
 export default function TransactionsPage() {
   const router = useRouter();
   const { user } = useAuth();
-  const { currency, exchangeRate } = useCurrency();
+  const { currency, currencySymbol, exchangeRate } = useCurrency();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [refunds, setRefunds] = useState<Refund[]>([]);
   const [loading, setLoading] = useState(true);
@@ -175,7 +175,7 @@ export default function TransactionsPage() {
                             {item.product_name}
                           </Link>
                           <p className="text-sm text-gray-600">
-                            Quantity: {item.quantity} × {formatPrice(convertPrice(item.discounted_price, exchangeRate), currency)}
+                            Quantity: {item.quantity} × {formatPrice(convertPrice(item.discounted_price, exchangeRate), currencySymbol)}
                           </p>
                         </div>
                       </div>

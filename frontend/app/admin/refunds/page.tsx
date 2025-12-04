@@ -10,7 +10,7 @@ import { useCurrency, formatPrice, convertPrice } from '@/contexts/CurrencyConte
 export default function AdminRefundsPage() {
   const router = useRouter();
   const { user, isAdmin, loading } = useAuth();
-  const { currency, exchangeRate } = useCurrency();
+  const { currencySymbol, exchangeRate } = useCurrency();
   const [refunds, setRefunds] = useState<Refund[]>([]);
   const [transactions, setTransactions] = useState<{ [key: string]: Transaction }>({});
   const [loadingData, setLoadingData] = useState(true);
@@ -159,7 +159,7 @@ export default function AdminRefundsPage() {
                           <p className="text-sm font-medium text-gray-700">Transaction</p>
                           <p className="text-gray-900">#{transaction.transaction_id}</p>
                           <p className="text-sm text-gray-600">
-                            {formatPrice(convertPrice(transaction.total_price, exchangeRate), currency)}
+                            {formatPrice(convertPrice(transaction.total_price, exchangeRate), currencySymbol)}
                           </p>
                         </div>
                       </div>
@@ -191,7 +191,7 @@ export default function AdminRefundsPage() {
                             <div>
                               <p className="text-gray-900">{item.product_name}</p>
                               <p className="text-gray-600">
-                                Qty: {item.quantity} × {formatPrice(convertPrice(item.discounted_price, exchangeRate), currency)}
+                                Qty: {item.quantity} × {formatPrice(convertPrice(item.discounted_price, exchangeRate), currencySymbol)}
                               </p>
                             </div>
                           </div>

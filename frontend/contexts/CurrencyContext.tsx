@@ -3,98 +3,70 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { currencyAPI } from '@/lib/api';
 
-type Currency = 'INR' | 'USD' | 'CAD' | 'EUR' | 'GBP';
-
 interface CurrencyContextType {
-  currency: Currency;
-  exchangeRate: number | null;
-  setCurrency: (currency: Currency) => void;
-  isLoading: boolean;
+  currency: string;
+  currencySymbol: string;
+  exchangeRate: number;
+  setCurrency: (currency: string) => void;
 }
 
 const CurrencyContext = createContext<CurrencyContextType | undefined>(undefined);
 
-const CURRENCY_SYMBOLS: Record<Currency, string> = {
-  INR: '₹',
-  USD: '$',
-  CAD: '$',
-  EUR: '€',
-  GBP: '£',
-};
-
 export function CurrencyProvider({ children }: { children: ReactNode }) {
-  const [currency, setCurrencyState] = useState<Currency>('INR');
-  const [exchangeRate, setExchangeRate] = useState<number | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [currency, setCurrencyState] = useState('INR');
+  const [currencySymbol, setCurrencySymbol] = useState('₹');
+  const [exchangeRate, setExchangeRate] = useState(1);
 
-  // Load currency from localStorage on mount
   useEffect(() => {
-    const savedCurrency = localStorage.getItem('currency') as Currency;
-    if (savedCurrency && ['INR', 'USD', 'CAD', 'EUR', 'GBP'].includes(savedCurrency)) {
+    // Load saved currency from localStorage
+    const savedCurrency = localStorage.getItem('currency');
+    if (savedCurrency) {
       setCurrencyState(savedCurrency);
+      updateCurrencySymbol(savedCurrency);
+      fetchExchangeRate(savedCurrency);
     }
   }, []);
 
-  // Fetch exchange rate when currency changes (except for INR)
-  useEffect(() => {
-    const fetchExchangeRate = async () => {
-      if (currency === 'INR') {
-        setExchangeRate(1.0);
-        setIsLoading(false);
-        return;
-      }
+  const fetchExchangeRate = async (curr: string) => {
+    if (curr === 'INR') {
+      setExchangeRate(1);
+      return;
+    }
 
-      setIsLoading(true);
-      try {
-        // Fetch products in the selected currency to get the exchange rate
-        // The API returns products with exchange_rate field
-        const products = await currencyAPI.getProductsInCurrency(currency);
-        if (products && products.length > 0) {
-          // Use the exchange_rate from the first product if available
-          if ((products[0] as any).exchange_rate) {
-            setExchangeRate((products[0] as any).exchange_rate);
-          } else {
-            // Fallback: calculate from price ratio
-            // Get one product in base currency (INR) using regular product API
-            const { productAPI } = await import('@/lib/api');
-            const inrProducts = await productAPI.getAll();
-            if (inrProducts.length > 0 && products.length > 0) {
-              // Find matching product by ID
-              const matchingProduct = inrProducts.find(
-                (p: any) => p.product_id === (products[0] as any).product_id
-              );
-              if (matchingProduct) {
-                const rate = (products[0] as any).discounted_price / matchingProduct.discounted_price;
-                setExchangeRate(rate);
-              }
-            }
-          }
+    try {
+      const products = await currencyAPI.getProductsInCurrency(curr);
+      if (products && products.length > 0) {
+        const product = products[0] as any;
+        if (product.exchange_rate) {
+          setExchangeRate(product.exchange_rate);
         }
-      } catch (error) {
-        console.error('Failed to fetch exchange rate:', error);
-        setExchangeRate(null);
-      } finally {
-        setIsLoading(false);
       }
+    } catch (error) {
+      console.error('Failed to fetch exchange rate:', error);
+      setExchangeRate(1);
+    }
+  };
+
+  const updateCurrencySymbol = (curr: string) => {
+    const symbols: { [key: string]: string } = {
+      'INR': '₹',
+      'USD': '$',
+      'CAD': 'C$',
+      'EUR': '€',
+      'GBP': '£',
     };
+    setCurrencySymbol(symbols[curr] || curr);
+  };
 
-    fetchExchangeRate();
-  }, [currency]);
-
-  const setCurrency = (newCurrency: Currency) => {
+  const setCurrency = (newCurrency: string) => {
     setCurrencyState(newCurrency);
     localStorage.setItem('currency', newCurrency);
+    updateCurrencySymbol(newCurrency);
+    fetchExchangeRate(newCurrency);
   };
 
   return (
-    <CurrencyContext.Provider
-      value={{
-        currency,
-        exchangeRate,
-        setCurrency,
-        isLoading,
-      }}
-    >
+    <CurrencyContext.Provider value={{ currency, currencySymbol, exchangeRate, setCurrency }}>
       {children}
     </CurrencyContext.Provider>
   );
@@ -108,27 +80,13 @@ export function useCurrency() {
   return context;
 }
 
-// Utility function to get currency symbol
-export function getCurrencySymbol(currency: Currency): string {
-  return CURRENCY_SYMBOLS[currency] || currency;
+// Helper function to convert price from INR using exchange rate
+export function convertPrice(priceInINR: number, exchangeRate: number): number {
+  return priceInINR * exchangeRate;
 }
 
-// Utility function to convert price from INR to target currency
-export function convertPrice(priceInINR: number, exchangeRate: number | null): number {
-  if (!exchangeRate || exchangeRate === 1.0) {
-    return priceInINR;
-  }
-  return roundToTwoDecimals(priceInINR * exchangeRate);
-}
-
-// Utility function to format price with currency symbol
-export function formatPrice(price: number, currency: Currency): string {
-  const symbol = getCurrencySymbol(currency);
-  return `${symbol}${roundToTwoDecimals(price).toFixed(2)}`;
-}
-
-// Helper to round to 2 decimal places
-function roundToTwoDecimals(num: number): number {
-  return Math.round(num * 100) / 100;
+// Helper function to format price with currency symbol
+export function formatPrice(price: number, currencySymbol: string): string {
+  return `${currencySymbol}${price.toFixed(2)}`;
 }
 

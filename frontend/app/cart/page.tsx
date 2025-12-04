@@ -12,7 +12,7 @@ import Link from 'next/link';
 export default function CartPage() {
   const router = useRouter();
   const { user } = useAuth();
-  const { currency, exchangeRate } = useCurrency();
+  const { currency, currencySymbol, exchangeRate } = useCurrency();
   const [cart, setCart] = useState<Cart | null>(null);
   const [loading, setLoading] = useState(true);
   const [checkingOut, setCheckingOut] = useState(false);
@@ -54,6 +54,8 @@ export default function CartPage() {
     try {
       await cartAPI.removeFromCart(user.user_id, productId);
       fetchCart();
+      // Dispatch cart update event to update navbar badge
+      window.dispatchEvent(new Event('cartUpdated'));
     } catch (error) {
       console.error('Failed to remove item:', error);
       alert('Failed to remove item');
@@ -65,6 +67,10 @@ export default function CartPage() {
     setCheckingOut(true);
     try {
       const response = await cartAPI.checkout(user.user_id);
+      // Dispatch cart update event to update navbar badge
+      window.dispatchEvent(new Event('cartUpdated'));
+      // Give the navbar time to update before redirecting
+      await new Promise(resolve => setTimeout(resolve, 100));
       router.push(`/checkout?transaction_id=${response.transaction.transaction_id}`);
     } catch (error: any) {
       console.error('Failed to checkout:', error);
@@ -138,7 +144,7 @@ export default function CartPage() {
                       {item.product_name}
                     </Link>
                     <p className="text-lg font-bold text-gray-900 mb-4">
-                      {formatPrice(convertPrice(item.discounted_price, exchangeRate), currency)}
+                      {formatPrice(convertPrice(item.discounted_price, exchangeRate), currencySymbol)}
                     </p>
 
                     {/* Quantity Controls */}
@@ -191,7 +197,7 @@ export default function CartPage() {
               <div className="space-y-2 mb-4">
                 <div className="flex justify-between text-gray-600">
                   <span>Items ({cart.items.reduce((sum, item) => sum + item.quantity, 0)}):</span>
-                  <span>{formatPrice(convertPrice(cart.total_price, exchangeRate), currency)}</span>
+                  <span>{formatPrice(convertPrice(cart.total_price, exchangeRate), currencySymbol)}</span>
                 </div>
                 <div className="flex justify-between text-gray-600">
                   <span>Shipping:</span>
@@ -203,7 +209,7 @@ export default function CartPage() {
                 <div className="flex justify-between text-xl font-bold">
                   <span>Total:</span>
                   <span className="text-primary-600">
-                    {formatPrice(convertPrice(cart.total_price, exchangeRate), currency)}
+                    {formatPrice(convertPrice(cart.total_price, exchangeRate), currencySymbol)}
                   </span>
                 </div>
               </div>
