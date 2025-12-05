@@ -75,8 +75,8 @@ Note: Instructions for initializing a virtual environment vary by operating syst
 
 ### Example User Account
 
-- **Email:** user@gmail.com
-- **Password:** User@123.com
+- **Email:** testing@ubc.ca
+- **Password:** testingtesting1
 
 ### Switching Accounts
 
