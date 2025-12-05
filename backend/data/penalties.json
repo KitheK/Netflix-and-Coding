@@ -25,13 +25,48 @@
     "user_id": "79be980f-d83d-4c63-b3b6-77c13193e1a5",
     "reason": "this is a test\n",
     "timestamp": "2025-12-04T09:51:32.112239+00:00",
-    "status": "active"
+    "status": "resolved"
   },
   {
     "penalty_id": "fcc4f1f7-b804-47b7-aabd-df60422581e1",
     "user_id": "79be980f-d83d-4c63-b3b6-77c13193e1a5",
     "reason": "this will be resolved\n",
     "timestamp": "2025-12-04T09:51:39.294157+00:00",
+    "status": "resolved"
+  },
+  {
+    "penalty_id": "acea54ce-b852-4278-a61c-0c5ce22e1f4a",
+    "user_id": "79be980f-d83d-4c63-b3b6-77c13193e1a5",
+    "reason": "another one, bad",
+    "timestamp": "2025-12-04T21:36:26.127889+00:00",
+    "status": "active"
+  },
+  {
+    "penalty_id": "e540b446-4cc6-4fce-bb97-0391ad57a113",
+    "user_id": "0bffca91-1c49-47a5-87b7-b0248da35d16",
+    "reason": "youve been spamming orders",
+    "timestamp": "2025-12-04T23:16:53.220112+00:00",
+    "status": "active"
+  },
+  {
+    "penalty_id": "ad972921-23d0-4d17-918e-8d540c16a2aa",
+    "user_id": "a7977848-4f94-4cb5-beea-6aa0604d3dda",
+    "reason": "bad bad",
+    "timestamp": "2025-12-04T23:27:44.655761+00:00",
+    "status": "active"
+  },
+  {
+    "penalty_id": "ee63d5ff-75ab-4e8f-87a4-07b11e9f0c72",
+    "user_id": "a7977848-4f94-4cb5-beea-6aa0604d3dda",
+    "reason": "terrible",
+    "timestamp": "2025-12-04T23:27:53.185321+00:00",
+    "status": "resolved"
+  },
+  {
+    "penalty_id": "78900127-1853-499f-a3bb-33b92c2539aa",
+    "user_id": "a7977848-4f94-4cb5-beea-6aa0604d3dda",
+    "reason": "okay.",
+    "timestamp": "2025-12-04T23:27:59.267582+00:00",
     "status": "resolved"
   }
 ]

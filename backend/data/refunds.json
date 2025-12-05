@@ -52,5 +52,32 @@
     "status": "pending",
     "created_at": "2025-12-04T20:46:11.739573",
     "updated_at": null
+  },
+  {
+    "refund_id": "13a0b241-346a-4190-8afa-5e0c3b91b8a7",
+    "transaction_id": "0f782aad-2231-4e57-8e8a-372c549afa39",
+    "user_id": "79be980f-d83d-4c63-b3b6-77c13193e1a5",
+    "message": "too many remotes, not enough Tv's",
+    "status": "approved",
+    "created_at": "2025-12-04T21:33:17.094571",
+    "updated_at": "2025-12-04T21:34:32.033344"
+  },
+  {
+    "refund_id": "404885a2-860f-4205-82eb-a302f64e244d",
+    "transaction_id": "a0ed719b-2c7e-4b33-923f-34678914c794",
+    "user_id": "0bffca91-1c49-47a5-87b7-b0248da35d16",
+    "message": "I dont like these items, too expensive",
+    "status": "approved",
+    "created_at": "2025-12-04T23:10:46.971177",
+    "updated_at": "2025-12-04T23:11:51.938404"
+  },
+  {
+    "refund_id": "f6b3f3e4-f7f6-4aeb-b54c-055f5297d166",
+    "transaction_id": "57517be3-1662-4780-9e2f-bf6c22ceb909",
+    "user_id": "a7977848-4f94-4cb5-beea-6aa0604d3dda",
+    "message": "Not a fan of the charger",
+    "status": "approved",
+    "created_at": "2025-12-04T23:23:57.599942",
+    "updated_at": "2025-12-04T23:24:42.470210"
   }
 ]

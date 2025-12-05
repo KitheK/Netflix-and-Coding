@@ -319,6 +319,90 @@
       "timestamp": "2025-12-04T09:19:58.266513+00:00",
       "estimated_delivery": "2025-12-09",
       "status": "completed"
+    },
+    {
+      "transaction_id": "0f782aad-2231-4e57-8e8a-372c549afa39",
+      "user_id": "79be980f-d83d-4c63-b3b6-77c13193e1a5",
+      "customer_name": "Fraser Muller",
+      "customer_email": "frasermuller2005@gmail.com",
+      "items": [
+        {
+          "product_id": "B01N90RZ4M",
+          "product_name": "Tata Sky Universal Remote",
+          "img_link": "https://m.media-amazon.com/images/I/315GdnF+LcL._SY300_SX300_QL70_FMwebp_.jpg",
+          "product_link": "https://www.amazon.in/TATASKY-Universal-Remote/dp/B01N90RZ4M/ref=sr_1_60?qid=1672909126&s=electronics&sr=1-60",
+          "discounted_price": 230.0,
+          "quantity": 1
+        },
+        {
+          "product_id": "B07B275VN9",
+          "product_name": "Airtel DigitalTV DTH Television, Setup Box Remote Compatible for SD and HD Recording (Black)",
+          "img_link": "https://m.media-amazon.com/images/I/41v00lhhdbL._SY300_SX300_QL70_FMwebp_.jpg",
+          "product_link": "https://www.amazon.in/Airtel-Digital-Remote-Compatible-Recording/dp/B07B275VN9/ref=sr_1_66_mod_primary_new?qid=1672909126&s=electronics&sbo=RZvfv%2F%2FHxDF%2BO5021pAnSA%3D%3D&sr=1-66",
+          "discounted_price": 179.0,
+          "quantity": 1
+        },
+        {
+          "product_id": "B0BCZCQTJX",
+          "product_name": "Firestick Remote",
+          "img_link": "https://m.media-amazon.com/images/I/31BAOmjUAOL._SY300_SX300_QL70_FMwebp_.jpg",
+          "product_link": "https://www.amazon.in/Basesailor-2nd-generation-Firestick-Remote/dp/B0BCZCQTJX/ref=sr_1_88?qid=1672909128&s=electronics&sr=1-88",
+          "discounted_price": 1434.0,
+          "quantity": 1
+        }
+      ],
+      "total_price": 1843.0,
+      "timestamp": "2025-12-04T21:23:45.083282+00:00",
+      "estimated_delivery": "2025-12-09",
+      "status": "refunded"
+    },
+    {
+      "transaction_id": "5c1a24e9-ca40-4240-896f-90471d536858",
+      "user_id": "79be980f-d83d-4c63-b3b6-77c13193e1a5",
+      "customer_name": "Fraser Muller",
+      "customer_email": "frasermuller2005@gmail.com",
+      "items": [
+        {
+          "product_id": "B08B42LWKN",
+          "product_name": "OnePlus 80 cm (32 inches) Y Series HD Ready LED Smart Android TV 32Y1 (Black)",
+          "img_link": "https://m.media-amazon.com/images/I/41WE9ZGEC4L._SY300_SX300_QL70_FMwebp_.jpg",
+          "product_link": "https://www.amazon.in/OnePlus-inches-Ready-Android-32Y1/dp/B08B42LWKN/ref=sr_1_29?qid=1672909125&s=electronics&sr=1-29",
+          "discounted_price": 14999.0,
+          "quantity": 1
+        },
+        {
+          "product_id": "B09L8DSSFH",
+          "product_name": "7SEVEN® Compatible for Samsung Smart 4K Ultra HD TV Monitor Remote Control Replacement of Original Samsung TV Remote for LED OLED UHD QLED and Suitable for 6 7 8 Series Samsung TV with Hot Keys BN59-01259E",
+          "img_link": "https://m.media-amazon.com/images/I/21bnr4EWt0L._SY300_SX300_QL70_FMwebp_.jpg",
+          "product_link": "https://www.amazon.in/7SEVENTM-Compatible-Replacement-Original-BN59-01259E/dp/B09L8DSSFH/ref=sr_1_52?qid=1672909126&s=electronics&sr=1-52",
+          "discounted_price": 399.0,
+          "quantity": 1
+        }
+      ],
+      "total_price": 15398.0,
+      "timestamp": "2025-12-04T21:32:42.152434+00:00",
+      "estimated_delivery": "2025-12-09",
+      "status": "completed"
+    },
+    {
+      "transaction_id": "490fe43e-4332-41dc-a7da-6832463bb6ad",
+      "user_id": "79be980f-d83d-4c63-b3b6-77c13193e1a5",
+      "customer_name": "Fraser Muller",
+      "customer_email": "frasermuller2005@gmail.com",
+      "items": [
+        {
+          "product_id": "B08HDJ86NZ",
+          "product_name": "boAt Deuce USB 300 2 in 1 Type-C & Micro USB Stress Resistant, Tangle-Free, Sturdy Cable with 3A Fast Charging & 480mbps Data Transmission, 10000+ Bends Lifespan and Extended 1.5m Length(Martian Red)",
+          "img_link": "https://m.media-amazon.com/images/I/41V5FtEWPkL._SY300_SX300_QL70_FMwebp_.jpg",
+          "product_link": "https://www.amazon.in/Deuce-300-Resistant-Tangle-Free-Transmission/dp/B08HDJ86NZ/ref=sr_1_4?qid=1672909124&s=electronics&sr=1-4",
+          "discounted_price": 329.0,
+          "quantity": 1
+        }
+      ],
+      "total_price": 329.0,
+      "timestamp": "2025-12-04T21:37:44.248536+00:00",
+      "estimated_delivery": "2025-12-09",
+      "status": "completed"
     }
   ],
   "ae993132-12a6-40c6-a91a-3fe889d95edd": [
@@ -603,6 +687,74 @@
       "timestamp": "2025-12-04T09:43:00.145261+00:00",
       "estimated_delivery": "2025-12-09",
       "status": "completed"
+    }
+  ],
+  "0bffca91-1c49-47a5-87b7-b0248da35d16": [
+    {
+      "transaction_id": "a0ed719b-2c7e-4b33-923f-34678914c794",
+      "user_id": "0bffca91-1c49-47a5-87b7-b0248da35d16",
+      "customer_name": "new user",
+      "customer_email": "newuser@gmail.com",
+      "items": [
+        {
+          "product_id": "B098NS6PVG",
+          "product_name": "Ambrane Unbreakable 60W / 3A Fast Charging 1.5m Braided Type C Cable for Smartphones, Tablets, Laptops & other Type C devices, PD Technology, 480Mbps Data Sync, Quick Charge 3.0 (RCT15A, Black)",
+          "img_link": "https://m.media-amazon.com/images/I/41lJ8x1yeIL._SY300_SX300_QL70_FMwebp_.jpg",
+          "product_link": "https://www.amazon.in/Ambrane-Unbreakable-Charging-Braided-Cable/dp/B098NS6PVG/ref=sr_1_2?qid=1672909124&s=electronics&sr=1-2",
+          "discounted_price": 199.0,
+          "quantity": 1
+        },
+        {
+          "product_id": "B00MFPCY5C",
+          "product_name": "GIZGA essentials Universal Silicone Keyboard Protector Skin for 15.6-inches Laptop (5 x 6 x 3 inches)",
+          "img_link": "https://m.media-amazon.com/images/I/418Sf+2V1BL._SY300_SX300_QL70_FMwebp_.jpg",
+          "product_link": "https://www.amazon.in/Universal-Silicone-Keyboard-Protector-15-6-inch/dp/B00MFPCY5C/ref=sr_1_65?qid=1672902997&s=computers&sr=1-65",
+          "discounted_price": 39.0,
+          "quantity": 1
+        },
+        {
+          "product_id": "B008IFXQFU",
+          "product_name": "TP-Link USB WiFi Adapter for PC(TL-WN725N), N150 Wireless Network Adapter for Desktop - Nano Size WiFi Dongle Compatible with Windows 11/10/7/8/8.1/XP/ Mac OS 10.9-10.15 Linux Kernel 2.6.18-4.4.3",
+          "img_link": "https://m.media-amazon.com/images/I/31dDGr5uhaL._SY300_SX300_QL70_FMwebp_.jpg",
+          "product_link": "https://www.amazon.in/TP-Link-TL-WN725N-150Mbps-Wireless-Adapter/dp/B008IFXQFU/ref=sr_1_10?qid=1672909124&s=electronics&sr=1-10",
+          "discounted_price": 499.0,
+          "quantity": 1
+        }
+      ],
+      "total_price": 737.0,
+      "timestamp": "2025-12-04T23:09:54.824595+00:00",
+      "estimated_delivery": "2025-12-09",
+      "status": "refunded"
+    }
+  ],
+  "a7977848-4f94-4cb5-beea-6aa0604d3dda": [
+    {
+      "transaction_id": "57517be3-1662-4780-9e2f-bf6c22ceb909",
+      "user_id": "a7977848-4f94-4cb5-beea-6aa0604d3dda",
+      "customer_name": "newest user",
+      "customer_email": "newestuser@gmail.com",
+      "items": [
+        {
+          "product_id": "B098NS6PVG",
+          "product_name": "Ambrane Unbreakable 60W / 3A Fast Charging 1.5m Braided Type C Cable for Smartphones, Tablets, Laptops & other Type C devices, PD Technology, 480Mbps Data Sync, Quick Charge 3.0 (RCT15A, Black)",
+          "img_link": "https://m.media-amazon.com/images/I/41lJ8x1yeIL._SY300_SX300_QL70_FMwebp_.jpg",
+          "product_link": "https://www.amazon.in/Ambrane-Unbreakable-Charging-Braided-Cable/dp/B098NS6PVG/ref=sr_1_2?qid=1672909124&s=electronics&sr=1-2",
+          "discounted_price": 199.0,
+          "quantity": 1
+        },
+        {
+          "product_id": "B008IFXQFU",
+          "product_name": "TP-Link USB WiFi Adapter for PC(TL-WN725N), N150 Wireless Network Adapter for Desktop - Nano Size WiFi Dongle Compatible with Windows 11/10/7/8/8.1/XP/ Mac OS 10.9-10.15 Linux Kernel 2.6.18-4.4.3",
+          "img_link": "https://m.media-amazon.com/images/I/31dDGr5uhaL._SY300_SX300_QL70_FMwebp_.jpg",
+          "product_link": "https://www.amazon.in/TP-Link-TL-WN725N-150Mbps-Wireless-Adapter/dp/B008IFXQFU/ref=sr_1_10?qid=1672909124&s=electronics&sr=1-10",
+          "discounted_price": 499.0,
+          "quantity": 3
+        }
+      ],
+      "total_price": 1696.0,
+      "timestamp": "2025-12-04T23:22:50.898675+00:00",
+      "estimated_delivery": "2025-12-09",
+      "status": "refunded"
     }
   ]
 }
