@@ -70,7 +70,9 @@ async def get_available_exports(
     Admin-only: Get list of available files that can be exported.
     
     Returns:
-        List of filenames that can be downloaded
+        Dictionary with "available_files" key containing list of filenames that can be downloaded
     """
-    # Return list of actual filenames (e.g., users.json, products.json)
-    return [export_service.ALLOWED_FILES[key] for key in export_service.get_available_files()]
+    # Return dictionary with list of actual filenames (e.g., users.json, products.json)
+    return {
+        "available_files": [export_service.ALLOWED_FILES[key] for key in export_service.get_available_files()]
+    }
