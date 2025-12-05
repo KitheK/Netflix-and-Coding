@@ -80,7 +80,7 @@ Note: Instructions for initializing a virtual environment vary by operating syst
 
 ### Switching Accounts
 
-You can switch between user accounts using the login feature. When logged out, attempting to add items to your cart or favorites will prompt you to log in.
+You can switch between user accounts using the login/logout feature. When logged out, there is no option to add items to the cart.
 
 ## Maintenance Requirements
 
