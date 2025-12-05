@@ -1,5 +1,7 @@
 # API Documentation
 
+API documentation can also be at http://localhost:8000/docs#/ when running backend. This was generated documentation showing all 48 endpoints.
+
 Base URL: `http://localhost:8000`
 
 ## Authentication
