@@ -202,7 +202,7 @@ export const penaltyAPI = {
 
 // Admin - Export
 export const exportAPI = {
-  getAvailableFiles: async (): Promise<string[]> => {
+  getAvailableFiles: async (): Promise<{ available_files: string[] }> => {
     const response = await api.get('/export/available');
     return response.data;
   },

@@ -1,66 +1,10 @@
 [
   {
-    "user_id": "ae993132-12a6-40c6-a91a-3fe889d95edd",
+    "user_id": "a6da50a2-0e53-4776-b676-ef5e34f99963",
     "name": "Admin",
     "email": "admin@example.com",
-    "password_hash": "$2b$12$qqc7JMx01v45LICVN927q.VJplJyzmlZXZmQclZaag0uiuw2BxkeW",
-    "role": "admin",
-    "user_token": "lk6E4rp4RPu9MSq4wviWgEbbtgLK"
-  },
-  {
-    "user_id": "428391c9-ec68-4a25-9d66-0580cec3ce6a",
-    "name": "testing",
-    "email": "testing@ubc.ca",
-    "password_hash": "$2b$12$pNaCctPqFzTnbn4XbhqlyuF520KRlpIMQyhE5ZTaViiGDCzqVsHFW",
-    "role": "customer",
-    "user_token": "p26qpkNUF4NAq6TlVAmIf65bQuVP"
-  },
-  {
-    "user_id": "a9ad0b57-a1bc-4919-b724-d1a54505e439",
-    "name": "testubc",
-    "email": "kaksk@gmail.com",
-    "password_hash": "$2b$12$U/RCnvijhaHtapuhY4GaIuXy.eWyCtFGU.8.pnQl6QhGoP78c6DAK",
-    "role": "customer",
-    "user_token": "Cwb2TLiTujfZMAyhDUuo2teVnB02"
-  },
-  {
-    "user_id": "79be980f-d83d-4c63-b3b6-77c13193e1a5",
-    "name": "Fraser Muller",
-    "email": "frasermuller2005@gmail.com",
-    "password_hash": "$2b$12$0WBVrzELlsKw6Vez3bEViO1pdYXNeeNGzYHu0ZiR8oLKW/EEpdPT.",
-    "role": "admin",
-    "user_token": "7xf3lzPO8xV2D6UUfNquoWifPK1N"
-  },
-  {
-    "user_id": "1cb86309-e8b2-45e3-8da7-1c2f54c65ae5",
-    "name": "promote me",
-    "email": "promoteme@gmail.com",
-    "password_hash": "$2b$12$AeRCEl0GyH3aWZ0E8zDnZebtkk04jQIcr/hu/vqYp9E7IrGpYqlvO",
-    "role": "customer",
-    "user_token": "VoooH4Eb0DBF9BOJwQvfW2dM0heB"
-  },
-  {
-    "user_id": "ed4a708f-0291-4005-a2a6-96f15cfbfe5d",
-    "name": "test user",
-    "email": "testuser@gmail.com",
-    "password_hash": "$2b$12$.9814GuuEkLjCj/hDtEPSuQLKWhFX4MGHyxsb5vFcsotFmK0lsH3.",
-    "role": "customer",
-    "user_token": "mP922vmmReeJHxuq7GMtKhM0nxbO"
-  },
-  {
-    "user_id": "0bffca91-1c49-47a5-87b7-b0248da35d16",
-    "name": "new user",
-    "email": "newuser@gmail.com",
-    "password_hash": "$2b$12$FELV.wIPDPHWQnIVBXTTXu.Y531GcV9vB2Pt2wlH5x0TD0bF0sfo.",
-    "role": "customer",
-    "user_token": "EGe7sRYqgTcPxU8CdOYwh4ELp6TQ"
-  },
-  {
-    "user_id": "a7977848-4f94-4cb5-beea-6aa0604d3dda",
-    "name": "newest user",
-    "email": "newestuser@gmail.com",
-    "password_hash": "$2b$12$h.R6xGCUgUmSsffyyOlib.HfXZMWFMqFEecJyGfOxgrripDWHK5Xe",
-    "role": "customer",
-    "user_token": "XjTiuSrT8xayr1n3iZNTUvbBLIBr"
+    "password_hash": "$2b$12$VPd./kTWRwoRPUZv6UP/0.gsh/sEnoe9VkivoWUgVrAri0kfpHjKq",
+    "user_token": "wFOjQscQcXPiaDo0pwH7B2s6Nsj2",
+    "role": "admin"
   }
 ]

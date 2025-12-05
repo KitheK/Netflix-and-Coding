@@ -28,8 +28,9 @@ export default function AdminExportPage() {
   const fetchAvailableFiles = async () => {
     setLoadingData(true);
     try {
-      const files = await exportAPI.getAvailableFiles();
-      setAvailableFiles(files);
+      const response = await exportAPI.getAvailableFiles();
+      // Backend returns { available_files: [...] }
+      setAvailableFiles(response.available_files || response);
     } catch (error) {
       console.error('Failed to fetch available files:', error);
     } finally {
