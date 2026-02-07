@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:background="@android:color/white">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
+
+        <!-- Image at the top -->
+        <ImageView
+            android:id="@+id/imageViewTop"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:src="@drawable/app_logo"
+            android:contentDescription="App Logo" />
+
+        <!-- Username EditText with icon -->
+        <EditText
+            android:id="@+id/editTextName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Enter your name"
+            android:inputType="textPersonName"
+            android:drawableLeft="@drawable/ic_person"
+            android:drawablePadding="12dp"
+            android:layout_marginBottom="12dp"
+            android:padding="12dp" />
+
+        <!-- Email EditText with icon -->
+        <EditText
+            android:id="@+id/editTextEmail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Enter your email"
+            android:inputType="textEmailAddress"
+            android:drawableLeft="@drawable/ic_email"
+            android:drawablePadding="12dp"
+            android:layout_marginBottom="12dp"
+            android:padding="12dp" />
+
+        <!-- Gender Radio Buttons -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Select Gender:"
+            android:textSize="16sp"
+            android:layout_marginBottom="4dp" />
+
+        <RadioGroup
+            android:id="@+id/radioGroupGender"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="12dp">
+
+            <RadioButton
+                android:id="@+id/radioMale"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Male"
+                android:layout_marginEnd="16dp" />
+
+            <RadioButton
+                android:id="@+id/radioFemale"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Female"
+                android:layout_marginEnd="16dp" />
+
+            <RadioButton
+                android:id="@+id/radioOther"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Other" />
+
+        </RadioGroup>
+
+        <!-- Date of Birth EditText with icon -->
+        <EditText
+            android:id="@+id/editTextDOB"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Select date of birth"
+            android:focusable="false"
+            android:clickable="true"
+            android:drawableLeft="@drawable/ic_calendar"
+            android:drawablePadding="12dp"
+            android:layout_marginBottom="12dp"
+            android:padding="12dp" />
+
+        <!-- Password EditText with icon -->
+        <EditText
+            android:id="@+id/editTextPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Enter your password"
+            android:inputType="textPassword"
+            android:drawableLeft="@drawable/ic_lock"
+            android:drawablePadding="12dp"
+            android:layout_marginBottom="20dp"
+            android:padding="12dp" />
+
+        <!-- Register Now Button -->
+        <Button
+            android:id="@+id/buttonRegister"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Register Now"
+            android:textSize="18sp"
+            android:layout_marginBottom="24dp" />
+
+    </LinearLayout>
+
+</ScrollView>
