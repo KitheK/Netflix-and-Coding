@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "figureId": "ARCH_001",
+  "layout": "spine-lr",
+  "overview": {
+    "text": "Team demo: web client, API service, and persistence — typical course-project spine.",
+    "provenance": "inferred",
+    "source": "generated",
+    "evidence": "dogfood/team pack"
+  },
+  "nodes": [
+    {
+      "id": "web",
+      "label": "Web client",
+      "group": "client",
+      "path": "package.json",
+      "tone": "client",
+      "detail": {
+        "role": "Browser UI",
+        "evidence": "src/ or package.json scripts"
+      }
+    },
+    {
+      "id": "api",
+      "label": "API",
+      "group": "runtime",
+      "path": "package.json",
+      "tone": "service",
+      "detail": {
+        "role": "HTTP handlers",
+        "evidence": "package.json",
+        "ports": ["3000"]
+      }
+    },
+    {
+      "id": "db",
+      "label": "Database",
+      "group": "data",
+      "tone": "data",
+      "detail": {
+        "role": "Persistence",
+        "summary": "Inferred from project README or ORM config."
+      }
+    }
+  ],
+  "edges": [
+    { "from": "web", "to": "api", "label": "HTTP" },
+    { "from": "api", "to": "db", "label": "queries" }
+  ],
+  "groups": [
+    { "id": "client", "title": "Client", "tone": "client" },
+    { "id": "runtime", "title": "Runtime", "tone": "service" },
+    { "id": "data", "title": "Data", "tone": "data" }
+  ],
+  "mermaid": "flowchart LR\n  web[\"Web client\"] -->|HTTP| api[\"API\"]\n  api -->|queries| db[\"Database\"]"
+}

@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "packId": "editorial-plain",
+  "label": "Newsreader · Departure",
+  "license": "LICENSES/FONTS.txt",
+  "defaultFaceIds": {
+    "display": "newsreader",
+    "body": "newsreader",
+    "ui": "source-sans-3",
+    "mono": "departure"
+  },
+  "faces": {
+    "display": {
+      "family": "Newsreader",
+      "woff2": "/fonts/Newsreader-Variable.woff2",
+      "weight": "400 700",
+      "style": "normal"
+    },
+    "body": {
+      "family": "Newsreader",
+      "woff2": "/fonts/Newsreader-Variable.woff2",
+      "weight": "200 800",
+      "style": "normal"
+    },
+    "ui": {
+      "family": "Source Sans 3",
+      "woff2": "/fonts/SourceSans3-Variable.woff2",
+      "weight": "200 900",
+      "style": "normal"
+    },
+    "mono": {
+      "family": "Departure Mono",
+      "woff2": "/fonts/DepartureMono-Regular.woff2"
+    }
+  }
+}

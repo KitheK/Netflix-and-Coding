@@ -1,0 +1,8 @@
+Nouveau ornament motifs (Mucha Documents décoratifs plates 30, 33, 01, 46)
+are traced vector components from the Libretto ornaments package.
+
+Intended licence: permissive open source with attribution.
+Decide and record the final licence before first public release.
+
+README art (docs/assets/, logo.svg) is generated from the same traced motifs:
+plate 30 (logo and hero), plate 33 (page dividers), plate 46 (install-guide frames).

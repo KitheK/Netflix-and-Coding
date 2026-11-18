@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "steps": [
+    {
+      "title": "Install",
+      "command": "npm install",
+      "provenance": "draft",
+      "source": "generated"
+    },
+    {
+      "title": "Run the app",
+      "command": "npm run dev",
+      "provenance": "draft",
+      "source": "generated"
+    }
+  ],
+  "envNames": ["SESSION_SECRET"],
+  "demoScript": {
+    "text": "Log in with the seed user → show dashboard → open Scorecard requirements map for the marker.",
+    "provenance": "draft",
+    "source": "generated"
+  }
+}

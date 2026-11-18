@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "steps": [
+    {
+      "title": "Install",
+      "command": "pip install -e .",
+      "provenance": "draft",
+      "source": "generated"
+    },
+    {
+      "title": "Dry run on a folder",
+      "command": "photo-date --dry-run ~/Pictures/trip",
+      "provenance": "draft",
+      "source": "generated"
+    }
+  ],
+  "envNames": [],
+  "demoScript": {
+    "text": "Show before/after names on three folders; admit Windows path edge cases.",
+    "provenance": "draft",
+    "source": "generated"
+  }
+}

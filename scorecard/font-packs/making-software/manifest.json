@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "packId": "making-software",
+  "label": "Making Software · editorial",
+  "license": "LICENSES/FONTS.txt",
+  "defaultFaceIds": {
+    "display": "literata",
+    "body": "literata",
+    "ui": "source-sans-3",
+    "mono": "departure"
+  },
+  "substitutions": {
+    "display": {
+      "intended": "ABC Arizona Mix (Dinamo)",
+      "bundledFaceId": "literata",
+      "reason": "Arizona Mix is proprietary; Literata (OFL) matches the warm long-form serif used for chapter titles on makingsoftware.com."
+    },
+    "body": {
+      "intended": "ABC Arizona Mix (Dinamo)",
+      "bundledFaceId": "literata",
+      "reason": "Same editorial serif role as the live manual body copy."
+    },
+    "mono": {
+      "intended": "Departure Mono (Helena Zhang)",
+      "bundledFaceId": "departure",
+      "reason": "Same OFL face as makingsoftware.com navigation, labels, and figure captions."
+    }
+  },
+  "proprietarySlots": {
+    "display": {
+      "intended": "ABC Arizona Mix",
+      "dropPath": "font-packs/making-software/vendor/ArizonaMix-Regular.woff2",
+      "instructions": "If you licensed Arizona Mix from Dinamo, place the WOFF2 at dropPath, add a catalog entry or set theme.fontRoles.display to a custom traced pack, and update @font-face in a local override."
+    }
+  },
+  "faces": {
+    "display": {
+      "family": "Literata",
+      "woff2": "/fonts/catalog/literata.woff2",
+      "weight": "200 900"
+    },
+    "body": {
+      "family": "Literata",
+      "woff2": "/fonts/catalog/literata.woff2",
+      "weight": "200 900"
+    },
+    "ui": {
+      "family": "Source Sans 3",
+      "woff2": "/fonts/SourceSans3-Variable.woff2",
+      "weight": "200 900"
+    },
+    "mono": {
+      "family": "Departure Mono",
+      "woff2": "/fonts/DepartureMono-Regular.woff2"
+    }
+  }
+}

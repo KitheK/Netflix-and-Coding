@@ -1,0 +1,363 @@
+.architecture-plate {
+  overflow: visible;
+}
+
+.architecture-plate__frame-host {
+  width: 100%;
+  overflow: visible;
+}
+
+.architecture-plate__nouveau.nv-frame {
+  width: 100%;
+  display: block;
+  overflow: visible;
+  min-height: 11rem;
+}
+
+@media (max-width: 420px) {
+  .architecture-plate__nouveau.nv-frame {
+    min-height: 10.5rem;
+  }
+}
+
+.architecture-plate__nouveau .nv-frame__art,
+.architecture-plate__nouveau .nv-frame__art svg {
+  overflow: visible;
+  pointer-events: none;
+}
+
+.architecture-plate .nv-frame__body {
+  overflow-x: clip;
+  overflow-y: visible;
+  min-width: 0;
+  max-width: 100%;
+  min-height: 12rem;
+  box-sizing: border-box;
+}
+
+.arch-diagram-stack {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.arch-diagram-chrome {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.35rem 0.75rem;
+  min-height: 1.75rem;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0 0.1rem;
+}
+
+.arch-diagram-chrome__legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.85rem;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 11px;
+  letter-spacing: 0.03em;
+  color: var(--ink, #000);
+}
+
+.arch-diagram-chrome__legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.arch-diagram-chrome__swatch {
+  display: inline-block;
+  width: 0.85rem;
+  height: 0.85rem;
+  border: 1.5px solid;
+  flex-shrink: 0;
+}
+
+.arch-diagram-chrome__tag {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--action, #103dff);
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.arch-diagram-viewport {
+  width: 100%;
+}
+
+.arch-diagram-viewport--scroll {
+  overflow-x: auto;
+  overflow-y: visible;
+}
+
+.arch-diagram {
+  display: block;
+  width: 100%;
+  height: auto;
+  vertical-align: top;
+}
+
+.arch-diagram__edges {
+  pointer-events: none;
+}
+
+.arch-diagram__nodes {
+  pointer-events: auto;
+}
+
+.interactive-architecture {
+  width: 100%;
+}
+
+.interactive-plate {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(200px, 28%);
+  gap: 0.75rem 1.25rem;
+  align-items: start;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: clip;
+}
+
+.interactive-plate__canvas {
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: visible;
+}
+
+.interactive-architecture--compact .interactive-plate {
+  grid-template-columns: minmax(0, 1fr) minmax(188px, 32%);
+}
+
+.detail-rail {
+  border-top: none;
+  border-left: 1px dashed var(--rule, #d0d0d0);
+  padding: 0.35rem 0 0.5rem 1rem;
+  margin: 0;
+  max-width: 100%;
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
+  z-index: 1;
+}
+
+.detail-hint,
+.detail-kicker,
+.detail-label,
+.detail-ports {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+.detail-hint {
+  margin: 0;
+  color: var(--ink);
+  opacity: 0.72;
+}
+
+.detail-kicker {
+  margin: 0;
+  color: var(--action);
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.detail-swatch {
+  display: inline-block;
+  width: 0.85rem;
+  height: 0.85rem;
+  border: 1.5px solid;
+  flex-shrink: 0;
+}
+
+.detail-title {
+  margin: 0.35rem 0 0.25rem;
+  font-size: 1.1rem;
+}
+
+.detail-role {
+  margin: 0 0 0.5rem;
+}
+
+.detail-facts {
+  margin: 0.25rem 0 0.75rem;
+  padding-left: 1.25rem;
+}
+
+.diagram-hit {
+  transition: opacity 180ms ease;
+}
+
+.diagram-hit:hover > rect:last-of-type,
+.diagram-hit:hover > ellipse,
+.diagram-hit:focus-visible > rect:last-of-type {
+  filter: brightness(0.98);
+}
+
+.diagram-hit.is-selected {
+  transition: filter 220ms ease;
+}
+
+.diagram-hit.is-selected > rect,
+.diagram-hit.is-selected > ellipse,
+.diagram-hit.is-selected > path {
+  animation: arch-node-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes arch-node-pulse {
+  0%,
+  100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.06);
+  }
+}
+
+.diagram-hit:focus-visible {
+  outline: none;
+}
+
+.diagram-flow {
+  pointer-events: none;
+}
+
+.flow-track {
+  animation: flow-dash 1.35s linear infinite;
+}
+
+.flow-packet {
+  pointer-events: none;
+}
+
+@keyframes flow-dash {
+  to {
+    stroke-dashoffset: -32;
+  }
+}
+
+.detail-rail--active {
+  animation: rail-enter 280ms ease-out;
+}
+
+@keyframes rail-enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.topology-panel {
+  margin-top: 0.65rem;
+}
+
+.topology-panel summary {
+  cursor: pointer;
+  font-size: 11px;
+  color: var(--muted, #666);
+}
+
+.topology-mermaid {
+  font-size: 11px;
+  overflow-x: auto;
+  padding: 0.5rem;
+  border: 1px dashed var(--rule);
+  background: var(--canvas);
+}
+
+.architecture-plate__label {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--action);
+  margin: 0 0 0.35rem;
+}
+
+.architecture-plate__overview {
+  margin: 0 0 0.75rem;
+  max-width: 48rem;
+}
+
+@media (max-width: 820px) {
+  .interactive-plate {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-rail {
+    border-left: none;
+    border-top: 1px dashed var(--rule, #d0d0d0);
+    padding: 0.85rem 0.35rem 0.5rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .architecture-plate__frame-host,
+  .architecture-plate__nouveau.nv-frame {
+    min-width: min(100%, 260px);
+    width: 100%;
+  }
+
+  .architecture-plate__nouveau.nv-frame {
+    min-height: 11.5rem;
+  }
+
+  .architecture-plate .nv-frame__body {
+    min-height: 10.5rem;
+  }
+
+  .arch-diagram-chrome {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .arch-diagram-chrome__legend {
+    display: none;
+  }
+
+  .arch-diagram-chrome__tag {
+    margin-left: 0;
+    align-self: flex-start;
+  }
+
+  .home-hero .architecture-plate__nouveau .nv-frame__body {
+    padding-inline: 0.35rem;
+  }
+
+  .interactive-plate__canvas {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .detail-rail--active,
+  .flow-track,
+  .flow-packet,
+  .diagram-hit.is-selected > rect,
+  .diagram-hit.is-selected > ellipse,
+  .diagram-hit.is-selected > path {
+    animation: none !important;
+  }
+
+  .flow-packet {
+    display: none;
+  }
+}

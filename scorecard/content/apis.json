@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "routes": [
+    {
+      "id": "store-api",
+      "path": "/",
+      "methodHint": "GET",
+      "upstream": "FastAPI root",
+      "contract": "Welcome payload; see API.md for full router list",
+      "provenance": "inferred",
+      "source": "generated",
+      "evidence": "backend/main.py"
+    },
+    {
+      "id": "currency-cdn",
+      "path": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/{base}.json",
+      "methodHint": "GET",
+      "upstream": "jsDelivr currency API",
+      "contract": "Exchange rates for INR base prices",
+      "provenance": "inferred",
+      "source": "generated",
+      "evidence": "README.md, backend/services/external_service.py"
+    },
+    {
+      "id": "amazon-pages",
+      "path": "(product links in backend/data)",
+      "methodHint": "GET",
+      "upstream": "Amazon product HTML",
+      "contract": "Scraped for refreshed image URLs — admin only",
+      "provenance": "inferred",
+      "source": "generated",
+      "evidence": "backend/services/img_scraper_service.py"
+    }
+  ]
+}

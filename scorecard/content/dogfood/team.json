@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "people": [
+    {
+      "name": "A",
+      "role": "frontend",
+      "areas": ["UI", "Write mode"],
+      "provenance": "draft",
+      "source": "generated"
+    },
+    {
+      "name": "B",
+      "role": "backend",
+      "areas": ["CLI", "generators"],
+      "provenance": "draft",
+      "source": "generated"
+    }
+  ]
+}

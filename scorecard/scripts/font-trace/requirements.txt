@@ -1,0 +1,7 @@
+numpy>=1.26
+opencv-python-headless>=4.8
+Pillow>=10.0
+potracer>=0.0.4
+fonttools>=4.47
+brotli>=1.1
+skia-pathops>=0.0.1

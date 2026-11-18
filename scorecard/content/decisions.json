@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "decisions": [
+    {
+      "id": "json-persistence",
+      "decision": "Persist all domain state as JSON files instead of a database",
+      "alternatives": "SQLite, Postgres, ORM migrations",
+      "reason": "Course timeline and simplicity; matches HashMap assignment patterns",
+      "outcome": "Fast local setup but no transactions and manual schema discipline",
+      "provenance": "inferred",
+      "source": "generated",
+      "evidence": "backend/repositories/base_repository.py, README.md"
+    },
+    {
+      "id": "docker-first",
+      "decision": "Docker Compose as the primary install path",
+      "alternatives": "Document-only pip/npm setup",
+      "reason": "Single command for markers and teammates",
+      "outcome": "README centers compose; venv install is optional footnote",
+      "provenance": "inferred",
+      "source": "generated",
+      "evidence": "docker-compose.yml, README.md"
+    },
+    {
+      "id": "token-auth",
+      "decision": "Opaque user_token Bearer auth instead of JWT sessions",
+      "alternatives": "JWT with expiry, cookie sessions",
+      "reason": "Straightforward demo auth for coursework",
+      "deadEnd": false,
+      "provenance": "inferred",
+      "source": "generated",
+      "evidence": "backend/services/auth_service.py"
+    }
+  ]
+}

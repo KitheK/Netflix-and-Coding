@@ -1,0 +1,30 @@
+[
+  {
+    "type": "live",
+    "mode": "screenshot",
+    "src": "/media/demo-dashboard.png",
+    "poster": "/media/demo-dashboard.png",
+    "chrome": { "routeLabel": "app/dashboard", "tabs": ["A", "B"] },
+    "linkOut": "https://deploy.example.com",
+    "caption": "Screenshot of the real UI; not live in page.",
+    "provenance": "inferred",
+    "source": "generated",
+    "evidence": "capture/run"
+  },
+  {
+    "type": "motion",
+    "webm": "/media/demo.webm",
+    "gif": "/media/demo.gif",
+    "poster": "/media/demo-poster.png",
+    "caption": "Recording with reduced-motion fallback.",
+    "provenance": "draft",
+    "source": "generated"
+  },
+  {
+    "type": "desk",
+    "kind": "nouveau",
+    "title": "Try ornament tokens",
+    "provenance": "draft",
+    "source": "authored"
+  }
+]

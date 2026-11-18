@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "items": [
+    {
+      "id": "R1",
+      "text": "Containerized full-stack shopping platform (course main project)",
+      "where": "README.md",
+      "provenance": "inferred",
+      "source": "generated",
+      "evidence": "README.md COSC 310"
+    },
+    {
+      "id": "R2",
+      "text": "Customer flows: browse, cart, checkout, account history",
+      "where": "API.md — products, cart, transactions",
+      "provenance": "inferred",
+      "source": "generated",
+      "evidence": "API.md"
+    },
+    {
+      "id": "R3",
+      "text": "Admin capabilities: catalog, refunds, penalties, metrics, export",
+      "where": "frontend/app/admin/",
+      "provenance": "inferred",
+      "source": "generated",
+      "evidence": "frontend/app/admin/"
+    },
+    {
+      "id": "R4",
+      "text": "Automated backend tests",
+      "where": "backend/tests/, pytest.ini",
+      "provenance": "inferred",
+      "source": "generated",
+      "evidence": ".github/workflows/ci.yml"
+    },
+    {
+      "id": "R5",
+      "text": "External integration (currency conversion)",
+      "where": "backend/services/external_service.py",
+      "provenance": "inferred",
+      "source": "generated",
+      "evidence": "README.md"
+    }
+  ]
+}

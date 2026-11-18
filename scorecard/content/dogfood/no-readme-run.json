@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "steps": [
+    {
+      "title": "Inspect entrypoints",
+      "command": "node -p \"require('./package.json').bin\"",
+      "provenance": "draft",
+      "source": "generated"
+    }
+  ],
+  "envNames": [],
+  "demoScript": {
+    "text": "Show the empty README case: Scorecard stays draft-heavy until the author types the job line.",
+    "provenance": "draft",
+    "source": "generated"
+  }
+}

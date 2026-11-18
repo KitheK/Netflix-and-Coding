@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "people": [
+    {
+      "name": "Kithe Kisia",
+      "role": "team",
+      "areas": ["repo", "docs"],
+      "provenance": "inferred",
+      "source": "generated",
+      "evidence": "README.md"
+    },
+    {
+      "name": "Coran McColm",
+      "role": "team",
+      "areas": ["backend/features"],
+      "provenance": "inferred",
+      "source": "generated",
+      "evidence": "README.md"
+    },
+    {
+      "name": "Fraser Muller",
+      "role": "team",
+      "areas": ["backend/features"],
+      "provenance": "inferred",
+      "source": "generated",
+      "evidence": "README.md"
+    },
+    {
+      "name": "Harrison Kayihura",
+      "role": "team",
+      "areas": ["backend/features"],
+      "provenance": "inferred",
+      "source": "generated",
+      "evidence": "README.md"
+    }
+  ]
+}

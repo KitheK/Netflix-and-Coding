@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "parts": [
+    {
+      "id": "frontend",
+      "title": "Next.js storefront",
+      "role": "Customer and admin UI",
+      "path": "frontend/package.json",
+      "provenance": "inferred",
+      "source": "generated",
+      "evidence": "frontend/"
+    },
+    {
+      "id": "backend",
+      "title": "FastAPI API",
+      "role": "REST surface and business logic",
+      "path": "backend/main.py",
+      "provenance": "inferred",
+      "source": "generated",
+      "evidence": "backend/"
+    },
+    {
+      "id": "data",
+      "title": "JSON data layer",
+      "role": "File-backed persistence",
+      "path": "backend/data/products.json",
+      "provenance": "inferred",
+      "source": "generated",
+      "evidence": "backend/data/"
+    },
+    {
+      "id": "ops",
+      "title": "Docker / CI",
+      "role": "Compose packaging and pytest workflow",
+      "path": "docker-compose.yml",
+      "provenance": "inferred",
+      "source": "generated",
+      "evidence": ".github/workflows/ci.yml"
+    }
+  ]
+}
