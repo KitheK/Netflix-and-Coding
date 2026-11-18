@@ -3,3 +3,4 @@ dist
 EXPORT-README-SNIPPET.md
 .DS_Store
 __pycache__/
+test-results/
