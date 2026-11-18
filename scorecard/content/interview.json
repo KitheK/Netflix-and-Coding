@@ -1,0 +1,140 @@
+{
+  "schemaVersion": 1,
+  "depth": "deep",
+  "profile": {
+    "kind": "coursework",
+    "builders": "small team",
+    "purpose": "submission",
+    "readerGoal": "run",
+    "scale": "weeks",
+    "projectName": "Netflix and Coding"
+  },
+  "answers": {
+    "projectName": {
+      "value": "Netflix and Coding",
+      "provenance": "inferred",
+      "evidence": "README.md title and backend/main.py FastAPI title"
+    },
+    "A1": {
+      "value": "coursework",
+      "provenance": "inferred",
+      "evidence": "README.md — COSC 310 main project"
+    },
+    "A2": {
+      "value": "small team",
+      "provenance": "inferred",
+      "evidence": "README.md team list (4 members)"
+    },
+    "A3": {
+      "value": "submission",
+      "provenance": "inferred",
+      "evidence": "README.md and scrum-documents/"
+    },
+    "A4": {
+      "value": "run",
+      "provenance": "inferred",
+      "evidence": "README.md emphasizes docker compose setup"
+    },
+    "A5": {
+      "value": "weeks",
+      "provenance": "inferred",
+      "evidence": "Multi-feature backend routers and admin surface"
+    },
+    "A6": {
+      "value": "deep",
+      "provenance": "inferred",
+      "evidence": "Agent infer-first path for Full guide"
+    },
+    "B1": {
+      "value": "A containerized Amazon-style web store where customers browse products, manage a cart and wishlist, checkout, and request refunds — with admins managing catalog, penalties, metrics, and exports.",
+      "provenance": "inferred",
+      "evidence": "README.md, API.md, backend/main.py"
+    },
+    "B2": {
+      "value": "Course deliverable: FastAPI + Next.js stack running via Docker Compose, broad API coverage with pytest in CI, and demo accounts documented in README.",
+      "provenance": "inferred",
+      "evidence": ".github/workflows/ci.yml, API.md"
+    },
+    "B3": {
+      "value": "Happy-path shopping, auth, cart, checkout, reviews, refunds, and admin flows work against JSON data. Currency conversion calls a live external API. CI unit/integration jobs use continue-on-error. No frontend test suite. Some auth tests mutate users.json on disk.",
+      "provenance": "inferred",
+      "evidence": "backend/tests/, .github/workflows/ci.yml, frontend/package.json"
+    },
+    "B4": {
+      "value": "Built: FastAPI routers/services/repositories, Next.js UI, JSON persistence, image scraper, admin metrics. Borrowed: FastAPI, Next.js, Tailwind, axios, bcrypt, pandas, BeautifulSoup, Amazon-derived product CSV, jsDelivr currency API.",
+      "provenance": "inferred",
+      "evidence": "requirements.txt, frontend/package.json, backend/data/amazon.csv"
+    },
+    "B5": {
+      "value": "Keeping JSON files consistent across parallel features (cart, wishlist, transactions) without a real database, and coordinating a large router surface for a team codebase.",
+      "provenance": "inferred",
+      "evidence": "backend/repositories/, API.md endpoint count"
+    },
+    "B6": {
+      "value": "Would defend Docker Compose as the single setup path. Would reconsider token-in-header auth without JWT expiry for a production deployment.",
+      "provenance": "inferred",
+      "evidence": "docker-compose.yml, backend/services/auth_service.py"
+    },
+    "B7": {
+      "value": "Harden CI (fail on test errors), add frontend smoke tests, replace file-based auth test side effects, and document environment variables formally.",
+      "provenance": "inferred",
+      "evidence": ".github/workflows/ci.yml continue-on-error"
+    },
+    "B8": {
+      "value": "Run docker compose up --build; open localhost:3000; pytest -m unit in backend/tests; Swagger at :8000/docs.",
+      "provenance": "inferred",
+      "evidence": "README.md, API.md"
+    },
+    "B9": {
+      "value": "Redact demo passwords from public guide; env names only (CORS_ORIGIN, NEXT_PUBLIC_API_URL, PRODUCTS_FILE, USERS_FILE).",
+      "provenance": "inferred",
+      "evidence": "README.md credentials section"
+    },
+    "C_story": {
+      "value": "COSC 310 team capstone mimicking e-commerce flows with real-enough admin tooling and external integrations.",
+      "provenance": "inferred",
+      "evidence": "README.md"
+    },
+    "C_audience": {
+      "value": "Course markers and teammates who need to run the stack and understand what is implemented vs stubbed.",
+      "provenance": "inferred",
+      "evidence": "profile A3/A4"
+    },
+    "D_entrypoints": {
+      "value": "Backend: backend/main.py (uvicorn). Frontend: frontend/app/layout.tsx → pages under app/. Data: backend/data/*.json.",
+      "provenance": "inferred",
+      "evidence": "docker-compose.yml, backend/main.py"
+    },
+    "D_flow": {
+      "value": "Browser → Next.js pages → axios (NEXT_PUBLIC_API_URL) → FastAPI router → service → repository → JSON file.",
+      "provenance": "inferred",
+      "evidence": "frontend/lib/api.ts, backend/repositories/base_repository.py"
+    },
+    "D_deps": {
+      "value": "Python: FastAPI, pytest, httpx, bcrypt, pandas, beautifulsoup4. Node: next, react, tailwind, axios, recharts.",
+      "provenance": "inferred",
+      "evidence": "requirements.txt, frontend/package.json"
+    },
+    "D_failures": {
+      "value": "External currency API outages break converted prices; scraper depends on Amazon HTML shape; parallel writes to JSON risk corruption without DB transactions.",
+      "provenance": "inferred",
+      "evidence": "backend/services/external_service.py, img_scraper_service.py"
+    },
+    "E_scheme": {
+      "value": "libretto",
+      "provenance": "inferred",
+      "evidence": "Full Libretto-style home per task brief"
+    },
+    "E_tone": {
+      "value": "manual",
+      "provenance": "inferred",
+      "evidence": "Course submission guide tone"
+    }
+  },
+  "narrative": {
+    "hook": "A semester-long storefront exercise that ships as two containers and a folder of JSON databases.",
+    "proudMoment": "Broad admin surface — refunds, penalties, metrics, export — on top of file-backed persistence."
+  },
+  "agentNotes": "Interview completed via infer-first path; author unavailable. All answers remain inferred until Write → Review.",
+  "submittedAt": "2026-11-18T00:15:00.000Z"
+}

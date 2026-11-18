@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "packId": "libretto-default",
+  "label": "Paléologue · Departure",
+  "license": "LICENSES/FONTS.txt",
+  "defaultFaceIds": {
+    "display": "paleologue-poster",
+    "body": "newsreader",
+    "ui": "source-sans-3",
+    "mono": "departure"
+  },
+  "faces": {
+    "display": {
+      "family": "Libretto Paléologue Poster",
+      "woff2": "/fonts/LibrettoPaleologuePoster-Regular.woff2"
+    },
+    "body": {
+      "family": "Newsreader",
+      "woff2": "/fonts/Newsreader-Variable.woff2",
+      "weight": "200 800",
+      "style": "normal"
+    },
+    "ui": {
+      "family": "Source Sans 3",
+      "woff2": "/fonts/SourceSans3-Variable.woff2",
+      "weight": "200 900",
+      "style": "normal"
+    },
+    "mono": {
+      "family": "Departure Mono",
+      "woff2": "/fonts/DepartureMono-Regular.woff2"
+    }
+  }
+}

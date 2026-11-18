@@ -1,0 +1,98 @@
+/* Libretto · Nouveau ornaments — vector components drawn from Mucha plates 30, 33, 01, 46.
+   Colour comes from CSS custom properties: palette="plate" leaves the traced plate
+   colours as fallbacks; palette="libretto" maps every role onto ink / blue / vermilion. */
+
+.nv { position: relative; --nv-ease: cubic-bezier(.5, .05, .25, 1); }
+.nv-svg { display: block; overflow: visible; pointer-events: none; }
+
+/* ---------- palettes ---------- */
+.nv[data-palette="libretto"] {
+  --lb-ink: #12141c; --lb-blue: #103DFF; --lb-verm: #E8641B; --lb-paper: #F3EBDD;
+  --nv-ink: var(--lb-ink);
+  --nv-paper: #FFFCF5; --nv-ground: #ECE2D0; --nv-band: var(--lb-blue);
+  --nv-leaf: var(--lb-blue); --nv-sage: #B4C0FF; --nv-taupe: #F1B48E; --nv-violet: var(--lb-verm);
+  --nv-rose: #F7C9A8; --nv-cream: #FBF6EC; --nv-shade: #E6D9C3; --nv-terracotta: var(--lb-verm);
+  --nv-gold: var(--lb-verm); --nv-olive: var(--lb-blue); --nv-yolk: var(--lb-verm); --nv-wash: #DCE3FF;
+  --nv-green: var(--lb-blue); --nv-yellow: var(--lb-paper); --nv-red: var(--lb-verm);
+  --nv-rule: var(--lb-ink); --nv-ring: var(--lb-ink); --nv-accent: var(--lb-verm); --nv-backing: transparent;
+}
+.nv[data-palette="plate"] { --nv-rule: #1d1d16; --nv-ring: #141410; --nv-accent: #2a7a66; --nv-backing: transparent; }
+
+/* dark: explicit [data-theme=dark] / .dark on an ancestor, or the OS setting unless the page forces light */
+:where([data-theme="dark"], .dark) .nv[data-palette="libretto"] {
+  --nv-ink: var(--lb-paper); --nv-paper: #1A1C26; --nv-ground: #171922; --nv-band: #3557FF;
+  --nv-leaf: #6F88FF; --nv-sage: #2B3B8C; --nv-taupe: #7A3C1C; --nv-rose: #6E3B22; --nv-cream: #313752; --nv-shade: #42496B;
+  --nv-wash: #1E2650; --nv-olive: #6F88FF; --nv-green: #3557FF; --nv-yellow: #1C1E29; --nv-rule: var(--lb-paper); --nv-ring: var(--lb-paper);
+}
+:where([data-theme="dark"], .dark) .nv[data-palette="plate"] { --nv-backing: #F1EBDA; --nv-rule: #E9E1CC; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]):not(.light) .nv[data-palette="libretto"] {
+    --nv-ink: var(--lb-paper); --nv-paper: #1A1C26; --nv-ground: #171922; --nv-band: #3557FF;
+    --nv-leaf: #6F88FF; --nv-sage: #2B3B8C; --nv-taupe: #7A3C1C; --nv-rose: #6E3B22; --nv-cream: #313752; --nv-shade: #42496B;
+    --nv-wash: #1E2650; --nv-olive: #6F88FF; --nv-green: #3557FF; --nv-yellow: #1C1E29; --nv-rule: var(--lb-paper); --nv-ring: var(--lb-paper);
+  }
+  :root:not([data-theme="light"]):not(.light) .nv[data-palette="plate"] { --nv-backing: #F1EBDA; --nv-rule: #E9E1CC; }
+}
+/* hide the painted plate ground (ground="none") */
+.nv[data-ground="none"] .nv-r-ground { display: none; }
+
+/* ---------- movement ---------- */
+.nv-pen { stroke-dasharray: 1 1; animation: nv-draw var(--t, 1s) var(--nv-ease) var(--d, 0s) backwards; }
+@keyframes nv-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+
+.nv-fade { animation: nv-fade var(--t, .6s) ease-out var(--d, 0s) backwards; }
+@keyframes nv-fade { from { opacity: 0; } }
+
+/* petals / pods unfurl from their base */
+.nv-unfurl { animation: nv-unfurl 1.25s cubic-bezier(.2, .75, .25, 1.12) var(--d, 0s) backwards; }
+@keyframes nv-unfurl {
+  0% { transform: scale(var(--nv-sx0, .08), var(--nv-sy0, .12)) rotate(var(--nv-rot, -24deg)); opacity: 0; }
+  35% { opacity: 1; }
+  100% { transform: none; }
+}
+/* gentle loop around the base; starts and ends at rest so there is no jump */
+.nv-sway { animation: nv-sway var(--t, 5s) ease-in-out var(--d, 0s) infinite; }
+@keyframes nv-sway {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(var(--a, 2deg)); }
+  75% { transform: rotate(calc(var(--a, 2deg) * -1)); }
+}
+/* wipe downward (rail caps, band) */
+.nv-wipe { animation: nv-wipe var(--t, 1s) var(--nv-ease) var(--d, 0s) backwards; }
+@keyframes nv-wipe { from { clip-path: inset(0 0 100% 0); } to { clip-path: inset(0 0 0 0); } }
+/* grow from a point (rings, stars, tiles) */
+.nv-pop { transform-box: fill-box; transform-origin: center; animation: nv-pop .7s cubic-bezier(.2, .8, .3, 1.25) var(--d, 0s) backwards; }
+@keyframes nv-pop { from { transform: scale(0); opacity: 0; } }
+/* stroke draw for procedural lines (pathLength=1) */
+.nv-line { stroke-dasharray: 1 1; animation: nv-draw var(--t, 1.2s) var(--nv-ease) var(--d, 0s) backwards; }
+/* sheen travelling down the woodcut band */
+.nv-sheen { animation: nv-sheen var(--t, 9s) linear var(--d, 0s) infinite; }
+@keyframes nv-sheen { from { transform: translateY(var(--from, -200px)); } to { transform: translateY(var(--to, 2000px)); } }
+/* ring glint orbit */
+.nv-orbit { animation: nv-orbit var(--t, 14s) linear var(--d, 0s) infinite; }
+@keyframes nv-orbit { to { transform: rotate(360deg); } }
+/* stars twinkle */
+.nv-twinkle { transform-box: fill-box; transform-origin: center; animation: nv-twinkle var(--t, 3.2s) ease-in-out var(--d, 0s) infinite; }
+@keyframes nv-twinkle { 0%, 100% { transform: scale(1) rotate(0); } 50% { transform: scale(.72) rotate(30deg); } }
+
+/* off-screen → paused; static / reduced motion → final frame */
+/* (scoped to the ornament SVG so content inside a frame keeps its own animations) */
+.nv[data-nv-inview="false"] .nv-svg * { animation-play-state: paused !important; }
+.nv[data-nv-static] .nv-svg * { animation: none !important; }
+@media (prefers-reduced-motion: reduce) { .nv .nv-svg * { animation: none !important; } }
+
+/* optional scroll-linked growth (rails with scroll) */
+@supports (animation-timeline: view()) {
+  .nv-scroll .nv-grow { animation: nv-wipe linear both; animation-timeline: view(); animation-range: entry 0% cover 35%; }
+}
+
+/* ---------- layout ---------- */
+.nv-frieze { width: 100%; }
+.nv-frieze > .nv-svg { width: 100%; height: auto; }
+.nv-rail { height: 100%; display: flex; }
+.nv-rail[data-side="right"] { justify-content: flex-end; }
+.nv-frame { position: relative; }
+.nv-frame > .nv-frame__art { position: absolute; inset: 0; pointer-events: none; }
+.nv-frame > .nv-frame__body { position: relative; }
+.nv-medallion { display: inline-block; position: relative; }
+.nv-medallion > .nv-medallion__body { position: absolute; overflow: hidden; border-radius: 50%; display: grid; place-items: center; }

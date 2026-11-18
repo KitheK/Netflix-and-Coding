@@ -1,0 +1,223 @@
+.interview-shell {
+  max-width: 42rem;
+}
+
+.interview-hero {
+  margin-bottom: 2rem;
+}
+
+.interview-kicker {
+  color: var(--muted);
+  margin: 0 0 0.5rem;
+}
+
+.interview-title {
+  font-size: clamp(2rem, 6vw, 3.25rem);
+  margin: 0 0 0.75rem;
+}
+
+.interview-subtitle {
+  margin: 1rem 0 0;
+  color: var(--muted);
+}
+
+.interview-project {
+  color: var(--action);
+}
+
+.interview-progress {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  color: var(--muted);
+}
+
+.interview-save {
+  color: var(--ink);
+}
+
+.interview-banner {
+  background: color-mix(in srgb, var(--action) 6%, var(--canvas));
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--rule);
+  margin-bottom: 1.5rem;
+}
+
+.interview-stage-title {
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  text-transform: uppercase;
+  margin: 0 0 0.5rem;
+  line-height: 1.1;
+}
+
+.interview-standfirst {
+  font-size: 1.05rem;
+  margin: 0 0 1.5rem;
+  max-width: var(--measure);
+}
+
+.interview-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+.interview-field-label {
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  display: block;
+  margin-bottom: 0.35rem;
+}
+
+.interview-optional {
+  text-transform: lowercase;
+  letter-spacing: 0;
+}
+
+.interview-field-prompt {
+  margin: 0 0 0.5rem;
+  font-size: 1.1rem;
+}
+
+.interview-field-example {
+  margin: 0 0 0.65rem;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.interview-inferred {
+  margin: 0 0 0.5rem;
+  font-size: 0.85rem;
+  color: var(--action);
+  font-family: var(--font-ui);
+}
+
+.interview-input {
+  width: 100%;
+  font: inherit;
+  font-family: var(--font-body);
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--rule);
+  background: #fff;
+  line-height: 1.5;
+  border-radius: 0.4rem;
+}
+
+.interview-textarea {
+  resize: vertical;
+  min-height: 6rem;
+}
+
+.interview-choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.interview-choice {
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+  padding: 0.45rem 0.7rem;
+  border: 1px solid var(--rule);
+  background: var(--canvas);
+  cursor: pointer;
+  text-align: left;
+  border-radius: 0.4rem;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.interview-choice[aria-checked="true"] {
+  border-color: var(--action);
+  color: var(--action);
+  box-shadow: inset 0 0 0 1px var(--action);
+}
+
+.interview-choice:hover {
+  border-color: color-mix(in srgb, var(--action) 50%, var(--rule));
+}
+
+.interview-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin: 2rem 0 1rem;
+  padding-top: 1.5rem;
+  border-top: 1px dashed var(--rule);
+}
+
+.interview-btn {
+  font-family: var(--font-ui);
+  padding: 0.55rem 1rem;
+  border: 1px solid var(--rule);
+  background: var(--canvas);
+  cursor: pointer;
+  border-radius: 0.45rem;
+}
+
+.interview-slider {
+  padding: 0.75rem 0.25rem 0.5rem;
+  border: 1px solid var(--rule);
+  border-radius: 0.4rem;
+  background: #fff;
+}
+
+.interview-slider-readout {
+  margin: 0 0 0.75rem;
+  color: var(--action);
+  font-size: 0.9rem;
+}
+
+.interview-range {
+  width: 100%;
+  accent-color: var(--action);
+  cursor: pointer;
+}
+
+.interview-slider-ticks {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+  font-size: 0.65rem;
+  color: var(--muted);
+}
+
+.interview-slider-ticks .is-active {
+  color: var(--action);
+}
+
+.interview-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.interview-btn-primary {
+  border-color: var(--action);
+  background: var(--action);
+  color: #fff;
+}
+
+.interview-btn-primary:hover:not(:disabled) {
+  filter: brightness(1.05);
+}
+
+.interview-btn-ghost {
+  border-style: dashed;
+  color: var(--muted);
+}
+
+.interview-footer-note {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-top: 2rem;
+}
+
+.interview-error {
+  color: #a11;
+  font-family: var(--font-ui);
+}

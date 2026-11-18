@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "scheme": "libretto",
+  "tone": "manual",
+  "fontPackId": "libretto-default",
+  "tokens": {
+    "canvas": "#fbfbfb",
+    "ink": "#000000",
+    "action": "#103dff",
+    "rule": "#d0d0d0",
+    "muted": "#666666"
+  },
+  "fonts": {
+    "display": "paleologue-poster",
+    "body": "newsreader",
+    "ui": "source-sans",
+    "mono": "departure"
+  },
+  "ornaments": {
+    "plateFrame": "coins46",
+    "demoFrame": "pavot30",
+    "footFrieze": "lys33",
+    "footCrop": "full",
+    "footAnimate": true,
+    "rail": "none",
+    "ornamentPalette": "theme"
+  }
+}

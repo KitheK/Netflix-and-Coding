@@ -1,0 +1,145 @@
+{
+  "schemaVersion": 1,
+  "size": "full",
+  "projectName": "Netflix and Coding",
+  "job": {
+    "text": "A containerized Amazon-style web store for COSC 310 where customers browse, cart, checkout, and review products, and admins manage catalog, refunds, penalties, and metrics.",
+    "provenance": "inferred",
+    "source": "generated",
+    "evidence": "README.md, API.md"
+  },
+  "brief": {
+    "text": "Deliver a full-stack shopping platform as the course main project with Docker, documented APIs, and team-scoped features.",
+    "provenance": "inferred",
+    "source": "generated",
+    "evidence": "README.md"
+  },
+  "outcome": {
+    "text": "FastAPI JSON-file backend with a dozen routers, Next.js 16 storefront, Docker Compose on ports 8000/3000, pytest CI, and external currency plus admin image scraping.",
+    "provenance": "inferred",
+    "source": "generated",
+    "evidence": "backend/main.py, docker-compose.yml, .github/workflows/ci.yml"
+  },
+  "features": [
+    {
+      "name": "Product catalog & search",
+      "status": "works",
+      "note": "List, detail, admin CRUD",
+      "provenance": "inferred",
+      "source": "generated",
+      "evidence": "backend/routers/product_router.py, frontend/app/products/"
+    },
+    {
+      "name": "Auth (register/login/roles)",
+      "status": "works",
+      "note": "Bearer user_token, customer vs admin",
+      "provenance": "inferred",
+      "source": "generated",
+      "evidence": "backend/services/auth_service.py"
+    },
+    {
+      "name": "Cart & checkout",
+      "status": "works",
+      "provenance": "inferred",
+      "source": "generated",
+      "evidence": "backend/routers/cart_router.py, backend/tests/test_cart.py"
+    },
+    {
+      "name": "Wishlist",
+      "status": "works",
+      "provenance": "inferred",
+      "source": "generated",
+      "evidence": "backend/routers/wishlist_router.py"
+    },
+    {
+      "name": "Reviews",
+      "status": "works",
+      "provenance": "inferred",
+      "source": "generated",
+      "evidence": "backend/routers/review_router.py"
+    },
+    {
+      "name": "Refunds workflow",
+      "status": "works",
+      "provenance": "inferred",
+      "source": "generated",
+      "evidence": "backend/routers/refund_router.py, frontend/app/admin/refunds/"
+    },
+    {
+      "name": "Penalties",
+      "status": "works",
+      "provenance": "inferred",
+      "source": "generated",
+      "evidence": "backend/routers/penalty_router.py"
+    },
+    {
+      "name": "Admin metrics",
+      "status": "works",
+      "note": "Recharts dashboards",
+      "provenance": "inferred",
+      "source": "generated",
+      "evidence": "frontend/app/admin/metrics/"
+    },
+    {
+      "name": "Currency conversion",
+      "status": "partial",
+      "note": "Depends on jsDelivr live API",
+      "provenance": "inferred",
+      "source": "generated",
+      "evidence": "backend/services/external_service.py"
+    },
+    {
+      "name": "Amazon image scraper",
+      "status": "partial",
+      "note": "Admin-only; HTML fragility",
+      "provenance": "inferred",
+      "source": "generated",
+      "evidence": "backend/services/img_scraper_service.py"
+    },
+    {
+      "name": "Frontend automated tests",
+      "status": "cut",
+      "provenance": "inferred",
+      "source": "generated",
+      "evidence": "frontend/package.json — no test script"
+    },
+    {
+      "name": "CI gate on test failures",
+      "status": "partial",
+      "note": "continue-on-error: true on pytest jobs",
+      "provenance": "inferred",
+      "source": "generated",
+      "evidence": ".github/workflows/ci.yml"
+    }
+  ],
+  "knownGap": {
+    "text": "JSON files are the database — no migrations, no concurrent write safety, and CI does not fail when tests fail.",
+    "provenance": "inferred",
+    "source": "generated",
+    "evidence": "backend/repositories/base_repository.py, .github/workflows/ci.yml"
+  },
+  "built": {
+    "text": "Routers, services, repositories, Next.js pages, Docker setup, pytest suites, admin tooling, scraper, currency integration.",
+    "provenance": "inferred",
+    "source": "generated",
+    "evidence": "backend/, frontend/"
+  },
+  "borrowed": {
+    "text": "FastAPI, Next.js, React, Tailwind, axios, bcrypt, pandas, BeautifulSoup, recharts, Amazon product dataset, public currency API.",
+    "provenance": "inferred",
+    "source": "generated",
+    "evidence": "requirements.txt, frontend/package.json"
+  },
+  "proof": {
+    "text": "docker compose up --build; demo accounts in README (passwords redacted in this guide); pytest -m unit under backend/tests.",
+    "provenance": "inferred",
+    "source": "generated",
+    "evidence": "README.md"
+  },
+  "next": {
+    "text": "Fail CI on test errors, add frontend smoke tests, document env vars, and consider SQLite or Postgres if the project continues past the course.",
+    "provenance": "inferred",
+    "source": "generated",
+    "evidence": "interview B7"
+  }
+}

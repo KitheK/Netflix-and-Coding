@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "submittedAt": "2026-11-17T12:00:00.000Z",
+  "depth": "standard",
+  "profile": {
+    "kind": "team",
+    "builders": "small team",
+    "purpose": "handoff",
+    "readerGoal": "run",
+    "scale": "weeks",
+    "projectName": "Conductor"
+  },
+  "answers": {
+    "A1": { "value": "team", "provenance": "confirmed" },
+    "B1": { "value": "One sentence job.", "provenance": "confirmed" },
+    "E_scheme": { "value": "libretto", "provenance": "confirmed" }
+  },
+  "narrative": {
+    "hook": "optional free text",
+    "proudMoment": "optional"
+  },
+  "agentNotes": "Displayed only in handoff export"
+}

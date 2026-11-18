@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "steps": [
+    {
+      "title": "Install kit",
+      "command": "npm install",
+      "provenance": "draft",
+      "source": "generated"
+    },
+    {
+      "title": "Open Write mode",
+      "command": "npx scorecard-kit dev",
+      "provenance": "draft",
+      "source": "generated"
+    }
+  ],
+  "envNames": [],
+  "demoScript": {
+    "text": "Show Summary → team areas → hand keyboard to the other owner for Write → Review.",
+    "provenance": "draft",
+    "source": "generated"
+  }
+}

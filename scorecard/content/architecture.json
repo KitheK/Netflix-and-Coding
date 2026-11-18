@@ -1,0 +1,153 @@
+{
+  "schemaVersion": 1,
+  "figureId": "ARCH_001",
+  "layout": "spine-lr",
+  "overview": {
+    "text": "FastAPI backend with JSON-file persistence, Next.js storefront, Docker Compose packaging for COSC 310.",
+    "provenance": "inferred",
+    "source": "generated",
+    "evidence": "repo-scan"
+  },
+  "nodes": [
+    {
+      "id": "frontend",
+      "label": "Next.js UI",
+      "path": "frontend/app/layout.tsx",
+      "group": "client",
+      "tone": "client",
+      "detail": {
+        "role": "App Router pages, auth/currency context, axios API client",
+        "evidence": "frontend/app/, frontend/lib/api.ts",
+        "ports": [
+          "3000"
+        ]
+      },
+      "layoutW": 120,
+      "x": 54,
+      "y": 58
+    },
+    {
+      "id": "api",
+      "label": "FastAPI API",
+      "path": "backend/main.py",
+      "group": "server",
+      "tone": "service",
+      "detail": {
+        "role": "REST routers for catalog, cart, auth, admin",
+        "evidence": "backend/main.py, backend/routers/",
+        "ports": [
+          "8000"
+        ]
+      },
+      "layoutW": 158,
+      "x": 222,
+      "y": 24
+    },
+    {
+      "id": "services",
+      "label": "Domain services",
+      "path": "backend/services/cart_service.py",
+      "group": "server",
+      "tone": "service",
+      "detail": {
+        "role": "Business rules between routers and repositories",
+        "evidence": "backend/services/"
+      },
+      "layoutW": 158,
+      "x": 222,
+      "y": 92
+    },
+    {
+      "id": "repos",
+      "label": "JSON repositories",
+      "path": "backend/repositories/base_repository.py",
+      "group": "data",
+      "tone": "data",
+      "detail": {
+        "role": "Load/save HashMap JSON under backend/data/",
+        "evidence": "backend/repositories/, backend/data/"
+      },
+      "layoutW": 175,
+      "x": 428,
+      "y": 55
+    },
+    {
+      "id": "external",
+      "label": "Currency API",
+      "path": "backend/services/external_service.py",
+      "group": "integration",
+      "tone": "edge",
+      "detail": {
+        "role": "Fetches jsDelivr currency rates; converts INR list prices",
+        "evidence": "backend/services/external_service.py"
+      },
+      "layoutW": 141,
+      "x": 651,
+      "y": 24
+    },
+    {
+      "id": "scraper",
+      "label": "Image scraper",
+      "path": "backend/services/img_scraper_service.py",
+      "group": "integration",
+      "tone": "edge",
+      "detail": {
+        "role": "Admin-triggered Amazon image refresh via BeautifulSoup",
+        "evidence": "backend/services/img_scraper_service.py"
+      },
+      "layoutW": 141,
+      "x": 651,
+      "y": 92
+    }
+  ],
+  "edges": [
+    {
+      "from": "frontend",
+      "to": "api",
+      "label": "HTTP + Bearer token"
+    },
+    {
+      "from": "api",
+      "to": "services",
+      "label": "calls"
+    },
+    {
+      "from": "services",
+      "to": "repos",
+      "label": "persist"
+    },
+    {
+      "from": "services",
+      "to": "external",
+      "label": "rates"
+    },
+    {
+      "from": "api",
+      "to": "scraper",
+      "label": "admin"
+    }
+  ],
+  "groups": [
+    {
+      "id": "client",
+      "title": "Client",
+      "tone": "client"
+    },
+    {
+      "id": "server",
+      "title": "Server",
+      "tone": "service"
+    },
+    {
+      "id": "data",
+      "title": "Data",
+      "tone": "data"
+    },
+    {
+      "id": "integration",
+      "title": "Integration",
+      "tone": "edge"
+    }
+  ],
+  "mermaid": "flowchart LR\n  frontend[\"Next.js UI\"]\n  api[\"FastAPI API\"]\n  services[\"Domain services\"]\n  repos[\"JSON repositories\"]\n  external[\"Currency API\"]\n  scraper[\"Image scraper\"]\n  frontend -->|HTTP + Bearer token| api\n  api -->|calls| services\n  services -->|persist| repos\n  services -->|rates| external\n  api -->|admin| scraper"
+}

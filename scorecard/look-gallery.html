@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Scorecard Look gallery</title>
+    <style>
+      body { font-family: Georgia, serif; margin: 2rem; background: #fbfbfb; color: #111; }
+      h1 { font-size: 1.5rem; }
+      .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; }
+      .card { border: 1px solid #ddd; padding: 0.75rem; background: #fff; }
+      .card img { width: 100%; height: auto; display: block; }
+      code { font-size: 0.85rem; }
+      .swatch { height: 48px; display: flex; }
+      .swatch span { flex: 1; }
+    </style>
+  </head>
+  <body>
+    <h1>Scorecard Look gallery</h1>
+    <p>Reply in chat with card IDs, e.g. <code>poster + coins46 + lys33</code></p>
+    <h2>Schemes</h2>
+    <div class="grid">
+      <div class="card" id="libretto"><strong>libretto</strong><div class="swatch"><span style="background:#fbfbfb"></span><span style="background:#000"></span><span style="background:#103dff"></span></div></div>
+      <div class="card" id="plate"><strong>plate</strong><div class="swatch"><span style="background:#f3ebdd"></span><span style="background:#12141c"></span><span style="background:#2a7a66"></span></div></div>
+      <div class="card" id="poster"><strong>poster</strong><div class="swatch"><span style="background:#fbf7f2"></span><span style="background:#1a120c"></span><span style="background:#e87a3a"></span></div></div>
+      <div class="card" id="plain"><strong>plain</strong><div class="swatch"><span style="background:#fff"></span><span style="background:#111"></span><span style="background:#222"></span></div></div>
+    </div>
+    <h2>Font packs</h2>
+    <p>Pick a pack in Write → Look, or set <code>theme.json</code> → <code>fontPackId</code>.</p>
+    <div class="grid">
+      <div class="card" id="pack-libretto-default">
+        <strong>libretto-default</strong>
+        <span>Paléologue · Departure</span>
+        <img src="public/previews/fonts/specimen-AZ.png" alt="Paléologue A–Z specimen" />
+      </div>
+      <div class="card" id="pack-editorial-plain">
+        <strong>editorial-plain</strong>
+        <span>Newsreader · Departure</span>
+        <img src="public/previews/fonts/pack-editorial-plain.png" alt="Newsreader editorial specimen" />
+      </div>
+      <div class="card" id="pack-making-software">
+        <strong>making-software</strong>
+        <span>Literata · Departure (Arizona substitute)</span>
+        <img src="public/previews/fonts/pack-making-software.png" alt="Making Software editorial specimen" />
+      </div>
+    </div>
+    <p>Write → Look also exposes <strong>per-role</strong> picks (display, body, UI, mono) with live preview — see <code>theme.fontRoles</code>.</p>
+    <h2>Ornaments</h2>
+    <div class="grid">
+      <div class="card" id="coins46"><code>coins46</code><img src="public/previews/nouveau/frame-coins46.png" alt="coins46" /></div>
+      <div class="card" id="pavot30"><code>pavot30</code><img src="public/previews/nouveau/frame-pavot30.png" alt="pavot30" /></div>
+      <div class="card" id="lys33"><code>lys33</code><img src="public/previews/nouveau/frieze-lys33.png" alt="lys33" /></div>
+      <div class="card" id="halo01"><code>halo01</code><img src="public/previews/nouveau/frame-halo01.png" alt="halo01" /></div>
+    </div>
+  </body>
+</html>

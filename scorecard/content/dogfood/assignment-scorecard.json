@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "size": "standard",
+  "job": {
+    "text": "Course assignment: a small auth + persist app that maps to the rubric.",
+    "provenance": "draft",
+    "source": "generated"
+  },
+  "brief": {
+    "text": "Satisfy login and persistence requirements with evidence paths for the marker.",
+    "provenance": "draft",
+    "source": "generated"
+  },
+  "outcome": {
+    "text": "Login works; persistence is still in-memory — marked partial on the rubric map.",
+    "provenance": "draft",
+    "source": "generated"
+  },
+  "features": [
+    {
+      "name": "Login",
+      "status": "works",
+      "note": "src/auth.ts",
+      "provenance": "inferred",
+      "source": "generated",
+      "evidence": "src/auth.ts"
+    },
+    {
+      "name": "Persist data",
+      "status": "partial",
+      "note": "in-memory only",
+      "provenance": "draft",
+      "source": "generated"
+    }
+  ],
+  "knownGap": {
+    "text": "No durable store yet — rubric item r2 stays partial.",
+    "provenance": "draft",
+    "source": "generated"
+  },
+  "built": {
+    "text": "Auth flow and UI shell.",
+    "provenance": "draft",
+    "source": "generated"
+  },
+  "borrowed": {
+    "text": "Course starter template.",
+    "provenance": "draft",
+    "source": "generated"
+  },
+  "proof": {
+    "text": "Requirements map links each rubric line to a path or honest gap.",
+    "provenance": "draft",
+    "source": "generated"
+  },
+  "next": {
+    "text": "Swap in-memory store for SQLite before final submit.",
+    "provenance": "draft",
+    "source": "generated"
+  }
+}

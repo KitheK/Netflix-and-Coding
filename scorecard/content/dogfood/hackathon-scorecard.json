@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "size": "lite",
+  "job": {
+    "text": "Weekend demo that turns receipts into a shared expense list.",
+    "provenance": "draft",
+    "source": "generated"
+  },
+  "brief": {
+    "text": "Hackathon theme: money tools. Success = live demo in 90 seconds.",
+    "provenance": "draft",
+    "source": "generated"
+  },
+  "outcome": {
+    "text": "UI works; bank sync is mocked.",
+    "provenance": "draft",
+    "source": "generated"
+  },
+  "features": [
+    { "name": "Receipt upload", "status": "works", "provenance": "draft", "source": "generated" },
+    { "name": "Bank sync", "status": "stubbed", "provenance": "draft", "source": "generated" }
+  ],
+  "knownGap": {
+    "text": "No real bank API.",
+    "provenance": "draft",
+    "source": "generated"
+  },
+  "built": {
+    "text": "React UI and parsing.",
+    "provenance": "draft",
+    "source": "generated"
+  },
+  "borrowed": {
+    "text": "Vite template, mock JSON.",
+    "provenance": "draft",
+    "source": "generated"
+  },
+  "proof": {
+    "text": "Demo script on the Run panel.",
+    "provenance": "draft",
+    "source": "generated"
+  },
+  "next": {
+    "text": "Wire a sandbox bank API.",
+    "provenance": "draft",
+    "source": "generated"
+  }
+}

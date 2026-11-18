@@ -1,0 +1,10 @@
+Scorecard ships the following typefaces. Confirm final public licences before release.
+
+- Libretto Paléologue / Poster — author open-source pack (intended SIL OFL or equivalent)
+- Newsreader — SIL Open Font License
+- Source Sans 3 — SIL Open Font License
+- Departure Mono — SIL OFL (bundled)
+- Catalog (public/fonts/catalog/): Literata, Fraunces, Source Serif 4, Lora, Inter, JetBrains Mono, IBM Plex Sans, IBM Plex Mono — SIL OFL via Google Fonts
+- Making Software pack: ABC Arizona Mix and Apple New York are **not** bundled; see font-packs/making-software/README.md
+
+Attribution appears in the site footer.

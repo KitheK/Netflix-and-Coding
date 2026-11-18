@@ -1,0 +1,36 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/KitheK/scorecard/docs/contracts/json-schema/font-pack.schema.json",
+  "title": "FontPackManifest",
+  "type": "object",
+  "required": ["schemaVersion", "packId", "label", "license", "faces"],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "packId": { "type": "string", "minLength": 1 },
+    "label": { "type": "string" },
+    "license": { "type": "string" },
+    "faces": {
+      "type": "object",
+      "required": ["display", "body", "ui", "mono"],
+      "properties": {
+        "display": { "$ref": "#/definitions/face" },
+        "body": { "$ref": "#/definitions/face" },
+        "ui": { "$ref": "#/definitions/face" },
+        "mono": { "$ref": "#/definitions/face" }
+      }
+    }
+  },
+  "definitions": {
+    "face": {
+      "type": "object",
+      "required": ["family", "woff2"],
+      "properties": {
+        "family": { "type": "string" },
+        "woff2": { "type": "string" },
+        "weight": {},
+        "style": { "enum": ["normal", "italic"] }
+      }
+    }
+  }
+}

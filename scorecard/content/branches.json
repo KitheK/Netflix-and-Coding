@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "form": "build-log",
+  "events": [
+    {
+      "id": "e1",
+      "label": "Core API & data",
+      "t": 0,
+      "blurb": "FastAPI routers, JSON repositories, product dataset",
+      "provenance": "inferred",
+      "source": "generated",
+      "evidence": "backend/"
+    },
+    {
+      "id": "e2",
+      "label": "Frontend storefront",
+      "t": 1,
+      "blurb": "Next.js App Router pages and auth context",
+      "provenance": "inferred",
+      "source": "generated",
+      "evidence": "frontend/"
+    },
+    {
+      "id": "e3",
+      "label": "API documentation",
+      "t": 2,
+      "blurb": "API.md and Swagger alignment",
+      "provenance": "inferred",
+      "source": "generated",
+      "evidence": "API.md commit 3430f85"
+    },
+    {
+      "id": "e4",
+      "label": "Global currency",
+      "t": 3,
+      "blurb": "CurrencyContext and external rates",
+      "provenance": "inferred",
+      "source": "generated",
+      "evidence": "git log a4a0304"
+    },
+    {
+      "id": "e5",
+      "label": "Admin polish",
+      "t": 4,
+      "blurb": "Export page fix, scraper restoration, scrum docs",
+      "provenance": "inferred",
+      "source": "generated",
+      "evidence": "git log 7115d07"
+    }
+  ]
+}

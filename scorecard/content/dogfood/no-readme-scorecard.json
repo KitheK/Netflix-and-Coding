@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "size": "lite",
+  "job": {
+    "text": "Untagged personal script repo with no README — purpose inferred from package entrypoints.",
+    "provenance": "draft",
+    "source": "generated"
+  },
+  "brief": {
+    "text": "Agent must not invent a confident product story; ask B1 and keep draft tags.",
+    "provenance": "draft",
+    "source": "generated"
+  },
+  "outcome": {
+    "text": "Lite Scorecard scaffolded from package.json name/bin only; author still confirms the job line.",
+    "provenance": "draft",
+    "source": "generated"
+  },
+  "features": [
+    {
+      "name": "CLI entry",
+      "status": "partial",
+      "note": "Inferred from package.bin",
+      "provenance": "inferred",
+      "source": "generated",
+      "evidence": "package.json"
+    },
+    {
+      "name": "Documented intent",
+      "status": "stubbed",
+      "note": "No README yet",
+      "provenance": "draft",
+      "source": "generated"
+    }
+  ],
+  "knownGap": {
+    "text": "No authored description until Write → Review.",
+    "provenance": "draft",
+    "source": "generated"
+  },
+  "built": {
+    "text": "Unknown until author confirms — do not invent.",
+    "provenance": "draft",
+    "source": "generated"
+  },
+  "borrowed": {
+    "text": "Unknown — left draft.",
+    "provenance": "draft",
+    "source": "generated"
+  },
+  "proof": {
+    "text": "Open this demo to see honest draft tags before author voice exists.",
+    "provenance": "draft",
+    "source": "generated"
+  }
+}

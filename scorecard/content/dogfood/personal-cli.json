@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "size": "lite",
+  "job": {
+    "text": "A personal CLI that renames photo folders by date.",
+    "provenance": "draft",
+    "source": "generated"
+  },
+  "brief": {
+    "text": "Scratch an itch after a trip; success is one command that does the right thing.",
+    "provenance": "draft",
+    "source": "generated"
+  },
+  "outcome": {
+    "text": "Works on my machine; Windows paths still brittle.",
+    "provenance": "draft",
+    "source": "generated"
+  },
+  "features": [
+    { "name": "Rename by EXIF date", "status": "works", "provenance": "draft", "source": "generated" },
+    { "name": "Dry-run mode", "status": "partial", "provenance": "draft", "source": "generated" }
+  ],
+  "built": {
+    "text": "Python script and tests.",
+    "provenance": "draft",
+    "source": "generated"
+  },
+  "borrowed": {
+    "text": "Pillow, click.",
+    "provenance": "draft",
+    "source": "generated"
+  }
+}

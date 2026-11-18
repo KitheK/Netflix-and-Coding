@@ -1,0 +1,16 @@
+{
+  "name": "kithek",
+  "owner": {
+    "name": "Kithe"
+  },
+  "metadata": {
+    "description": "Kithe's agent plugins. Scorecard turns any repo into a descriptive project manual with Write mode, and never grades."
+  },
+  "plugins": [
+    {
+      "name": "scorecard",
+      "source": "./",
+      "description": "Turn any repo into a descriptive project manual with Write mode. Never grades."
+    }
+  ]
+}

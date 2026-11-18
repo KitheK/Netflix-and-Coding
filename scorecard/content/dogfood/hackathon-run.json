@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "steps": [
+    {
+      "title": "Clone the weekend repo",
+      "body": "Judges only have two minutes.",
+      "provenance": "draft",
+      "source": "generated"
+    },
+    {
+      "title": "Start the mock demo",
+      "command": "npm run demo",
+      "provenance": "draft",
+      "source": "generated"
+    }
+  ],
+  "envNames": [],
+  "demoScript": {
+    "text": "Upload one receipt → shared list updates → say bank sync is mocked when asked.",
+    "provenance": "draft",
+    "source": "generated"
+  }
+}

@@ -1,0 +1,179 @@
+{
+  "schemaVersion": 1,
+  "projectName": "Netflix and Coding",
+  "title": "Netflix and Coding Guide",
+  "parts": [
+    {
+      "id": "I",
+      "title": "Orientation",
+      "blurb": "What the platform is and how the containers talk."
+    },
+    {
+      "id": "II",
+      "title": "Shape of the system",
+      "blurb": "Backend layers, frontend routes, and integrations."
+    },
+    {
+      "id": "III",
+      "title": "Evidence",
+      "blurb": "Run steps, requirements map, and decisions."
+    }
+  ],
+  "chapters": [
+    {
+      "slug": "01-platform",
+      "number": "01",
+      "part": "I",
+      "title": "Platform overview",
+      "standfirst": "COSC 310 capstone: a Netflix-themed coding pun on a real e-commerce surface.",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "Netflix and Coding is a **two-container** stack: a FastAPI API on port 8000 and a Next.js storefront on port 3000, wired together with `docker-compose.yml`. Persistence is a set of JSON dictionaries under `backend/data/`, not a SQL database.",
+          "provenance": "inferred",
+          "source": "generated",
+          "evidence": "docker-compose.yml, backend/repositories/base_repository.py"
+        },
+        {
+          "type": "p",
+          "text": "Customers get catalog browsing, cart, checkout, transactions, wishlist, and reviews. Admins get product CRUD, refunds, penalties, metrics charts, bulk export, role promotion, and an image refresh scraper. API contracts are summarized in `API.md` with interactive Swagger at `/docs`.",
+          "provenance": "inferred",
+          "source": "generated",
+          "evidence": "API.md, backend/main.py"
+        },
+        { "type": "status", "provenance": "inferred", "source": "generated" }
+      ]
+    },
+    {
+      "slug": "02-architecture",
+      "number": "02",
+      "part": "II",
+      "title": "Architecture plate",
+      "standfirst": "Click nodes for paths; edges show the main request and data flows.",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "The browser talks to Next.js App Router pages (`frontend/app/`). Pages call the API through `frontend/lib/api.ts`, sending the user's `user_token` as a Bearer header. FastAPI routers delegate to services, which read and write JSON via repositories.",
+          "provenance": "inferred",
+          "source": "generated",
+          "evidence": "frontend/lib/api.ts, backend/routers/"
+        },
+        {
+          "type": "figure",
+          "id": "ARCH_001",
+          "caption": "System components grounded in repo paths",
+          "provenance": "inferred",
+          "source": "generated"
+        },
+        { "type": "architecture", "provenance": "inferred", "source": "generated" }
+      ],
+      "sources": ["content/architecture.json"]
+    },
+    {
+      "slug": "03-backend",
+      "number": "03",
+      "part": "II",
+      "title": "Backend domains",
+      "standfirst": "One router file per feature area; services hold business rules.",
+      "blocks": [
+        {
+          "type": "h2",
+          "text": "Router map",
+          "provenance": "inferred",
+          "source": "generated"
+        },
+        {
+          "type": "p",
+          "text": "Routers live in `backend/routers/`: auth, products, cart, wishlist, transactions, reviews, refunds, penalties, metrics, export, and external currency. They are mounted from `backend/main.py`. Auth uses bcrypt-hashed passwords and opaque `user_token` strings rather than JWTs.",
+          "provenance": "inferred",
+          "source": "generated",
+          "evidence": "backend/main.py, backend/services/auth_service.py"
+        },
+        {
+          "type": "h2",
+          "text": "Data on disk",
+          "provenance": "inferred",
+          "source": "generated"
+        },
+        {
+          "type": "p",
+          "text": "Each domain maps to a JSON file in `backend/data/` (products, users, cart, transactions, wishlist, reviews, refunds, penalties). Tests can redirect filenames with `PRODUCTS_FILE` / `USERS_FILE` via `backend/tests/conftest.py`.",
+          "provenance": "inferred",
+          "source": "generated",
+          "evidence": "backend/data/, backend/tests/conftest.py"
+        },
+        { "type": "run", "provenance": "inferred", "source": "generated" }
+      ]
+    },
+    {
+      "slug": "04-frontend",
+      "number": "04",
+      "part": "II",
+      "title": "Frontend routes",
+      "standfirst": "Next.js 16 App Router with shared Auth and Currency providers.",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "The root page redirects to `/products`. Authenticated flows include cart, checkout, transactions, and wishlist. Admin hub pages live under `frontend/app/admin/` (products, refunds, penalties, metrics, export, promote). Global currency display uses `CurrencyContext` fed by `/external/currency`.",
+          "provenance": "inferred",
+          "source": "generated",
+          "evidence": "frontend/app/page.tsx, frontend/contexts/CurrencyContext.tsx"
+        },
+        {
+          "type": "p",
+          "text": "Styling is Tailwind 4. Charts on the metrics dashboard use Recharts. There is no frontend test script in `package.json` — verification is manual or via the API pytest suite.",
+          "provenance": "inferred",
+          "source": "generated",
+          "evidence": "frontend/package.json"
+        }
+      ]
+    },
+    {
+      "slug": "05-team",
+      "number": "05",
+      "part": "III",
+      "title": "Team & coursework",
+      "standfirst": "Four named contributors; requirements mapped without grades.",
+      "blocks": [
+        { "type": "contribution", "provenance": "inferred", "source": "generated" },
+        { "type": "requirement", "provenance": "inferred", "source": "generated" },
+        {
+          "type": "decision",
+          "id": "json-persistence",
+          "provenance": "inferred",
+          "source": "generated"
+        },
+        {
+          "type": "decision",
+          "id": "docker-first",
+          "provenance": "inferred",
+          "source": "generated"
+        },
+        { "type": "timeline", "provenance": "inferred", "source": "generated" }
+      ]
+    }
+  ],
+  "faqs": [
+    {
+      "question": "How do I run the store?",
+      "answer": "From the repo root: docker compose up --build. Frontend at http://localhost:3000, API at http://localhost:8000. See the Run plate in chapter 03.",
+      "provenance": "inferred",
+      "source": "generated",
+      "evidence": "README.md"
+    },
+    {
+      "question": "Where are demo logins documented?",
+      "answer": "README lists admin and test customer emails. This guide redacts passwords — use the README in your private checkout.",
+      "provenance": "inferred",
+      "source": "generated",
+      "evidence": "README.md"
+    },
+    {
+      "question": "Does CI block broken tests?",
+      "answer": "Not today — both pytest jobs in .github/workflows/ci.yml set continue-on-error: true.",
+      "provenance": "inferred",
+      "source": "generated",
+      "evidence": ".github/workflows/ci.yml"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "figureId": "ARCH_001",
+  "layout": "spine-lr",
+  "nodes": [
+    {
+      "id": "api",
+      "label": "API",
+      "group": "runtime",
+      "path": "package.json",
+      "tone": "service",
+      "detail": {
+        "role": "HTTP entry",
+        "evidence": "package.json scripts",
+        "ports": ["3000"]
+      }
+    },
+    {
+      "id": "db",
+      "label": "Database",
+      "group": "runtime",
+      "tone": "data",
+      "detail": { "role": "Persistence" }
+    },
+    {
+      "id": "ui",
+      "label": "UI",
+      "group": "client",
+      "tone": "client",
+      "detail": { "role": "Browser app" }
+    }
+  ],
+  "edges": [
+    { "from": "api", "to": "db", "label": "queries" },
+    { "from": "ui", "to": "api", "label": "calls" }
+  ],
+  "groups": [
+    { "id": "runtime", "title": "Runtime", "tone": "service" },
+    { "id": "client", "title": "Client", "tone": "client" }
+  ],
+  "mermaid": "flowchart LR\n  api --> db\n  ui --> api"
+}

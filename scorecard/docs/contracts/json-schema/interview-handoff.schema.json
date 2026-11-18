@@ -1,0 +1,44 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/KitheK/scorecard/docs/contracts/json-schema/interview-handoff.schema.json",
+  "title": "InterviewHandoffFile",
+  "type": "object",
+  "required": ["schemaVersion", "depth", "profile", "answers"],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "exportedAt": { "type": "string", "format": "date-time" },
+    "depth": { "enum": ["quick", "standard", "deep"] },
+    "profile": {
+      "type": "object",
+      "properties": {
+        "kind": { "type": "string" },
+        "builders": { "type": "string" },
+        "purpose": { "type": "string" },
+        "readerGoal": { "type": "string" },
+        "scale": { "type": "string" },
+        "projectName": { "type": "string", "minLength": 1 }
+      }
+    },
+    "answers": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["value", "provenance"],
+        "properties": {
+          "value": {},
+          "provenance": { "enum": ["confirmed", "inferred", "draft"] },
+          "evidence": { "type": "string" }
+        }
+      }
+    },
+    "narrative": {
+      "type": "object",
+      "properties": {
+        "hook": { "type": "string" },
+        "proudMoment": { "type": "string" }
+      }
+    },
+    "agentNotes": { "type": "string" }
+  }
+}

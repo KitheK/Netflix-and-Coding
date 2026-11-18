@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "packId": "libretto-default",
+  "label": "Paléologue · Departure",
+  "license": "LICENSES/FONTS.txt",
+  "faces": {
+    "display": {
+      "family": "Libretto Paléologue Poster",
+      "woff2": "/fonts/LibrettoPaleologue-Regular.woff2"
+    },
+    "body": { "family": "Newsreader", "woff2": "/fonts/Newsreader.woff2" },
+    "ui": { "family": "Source Sans 3", "woff2": "/fonts/SourceSans3.woff2" },
+    "mono": { "family": "Departure Mono", "woff2": "/fonts/DepartureMono-Regular.woff2" }
+  }
+}

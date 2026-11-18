@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "size": "full",
+  "job": {
+    "text": "Multi-person product: a shared Scorecard kit with UI and CLI owners.",
+    "provenance": "draft",
+    "source": "generated"
+  },
+  "brief": {
+    "text": "Ship a descriptive manual product as a team without inventing individual glory.",
+    "provenance": "draft",
+    "source": "generated"
+  },
+  "outcome": {
+    "text": "Frontend owns Write mode; backend owns CLI and generators — both listed with areas.",
+    "provenance": "draft",
+    "source": "generated"
+  },
+  "features": [
+    {
+      "name": "Write mode UI",
+      "status": "works",
+      "note": "Owner: A",
+      "provenance": "draft",
+      "source": "generated"
+    },
+    {
+      "name": "CLI + generators",
+      "status": "works",
+      "note": "Owner: B",
+      "provenance": "draft",
+      "source": "generated"
+    },
+    {
+      "name": "Hosted Write",
+      "status": "cut",
+      "provenance": "draft",
+      "source": "generated"
+    }
+  ],
+  "built": {
+    "text": "Kit UI, skill workflow, provenance model.",
+    "provenance": "draft",
+    "source": "generated"
+  },
+  "borrowed": {
+    "text": "React, Vite, TipTap.",
+    "provenance": "draft",
+    "source": "generated"
+  },
+  "proof": {
+    "text": "Team panel names people and areas; no invented commits.",
+    "provenance": "draft",
+    "source": "generated"
+  },
+  "next": {
+    "text": "Add contribution evidence from git with author confirmation.",
+    "provenance": "draft",
+    "source": "generated"
+  }
+}

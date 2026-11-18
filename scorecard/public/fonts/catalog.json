@@ -1,0 +1,15 @@
+{
+  "paleologue-poster": "/fonts/LibrettoPaleologuePoster-Regular.woff2",
+  "paleologue": "/fonts/LibrettoPaleologue-Regular.woff2",
+  "newsreader": "/fonts/Newsreader-Variable.woff2",
+  "literata": "/fonts/catalog/literata.woff2",
+  "fraunces": "/fonts/catalog/fraunces.woff2",
+  "source-serif-4": "/fonts/catalog/source-serif-4.woff2",
+  "lora": "/fonts/catalog/lora.woff2",
+  "source-sans-3": "/fonts/SourceSans3-Variable.woff2",
+  "inter": "/fonts/catalog/inter.woff2",
+  "ibm-plex-sans": "/fonts/catalog/ibm-plex-sans.woff2",
+  "departure": "/fonts/DepartureMono-Regular.woff2",
+  "jetbrains-mono": "/fonts/catalog/jetbrains-mono.woff2",
+  "ibm-plex-mono": "/fonts/catalog/ibm-plex-mono.woff2"
+}

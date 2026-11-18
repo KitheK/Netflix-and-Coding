@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "steps": [
+    {
+      "title": "Prerequisites",
+      "body": "Docker Desktop and Git.",
+      "provenance": "inferred",
+      "source": "generated",
+      "evidence": "README.md"
+    },
+    {
+      "title": "Build and start",
+      "command": "docker compose up --build",
+      "provenance": "inferred",
+      "source": "generated",
+      "evidence": "docker-compose.yml"
+    },
+    {
+      "title": "Open the storefront",
+      "body": "http://localhost:3000 — home redirects to /products.",
+      "provenance": "inferred",
+      "source": "generated",
+      "evidence": "frontend/app/page.tsx"
+    },
+    {
+      "title": "API docs",
+      "body": "http://localhost:8000/docs (Swagger UI).",
+      "provenance": "inferred",
+      "source": "generated",
+      "evidence": "API.md"
+    },
+    {
+      "title": "Backend tests (optional)",
+      "command": "pip install -r requirements.txt && pytest -m unit backend/tests",
+      "provenance": "inferred",
+      "source": "generated",
+      "evidence": "pytest.ini, backend/tests/"
+    },
+    {
+      "title": "Stop",
+      "command": "docker compose down",
+      "provenance": "inferred",
+      "source": "generated",
+      "evidence": "README.md"
+    }
+  ],
+  "envNames": ["CORS_ORIGIN", "NEXT_PUBLIC_API_URL", "PRODUCTS_FILE", "USERS_FILE"],
+  "demoScript": {
+    "text": "60s: compose up → open /products → log in with README demo user → add item to cart → checkout → open /transactions. If admin credentials available, open /admin/metrics and mention currency toggle on navbar.",
+    "provenance": "inferred",
+    "source": "generated",
+    "evidence": "README.md, frontend/app/"
+  }
+}
